@@ -269,7 +269,7 @@ body.role-viewer .owner-only{ display:none!important; }
 .h-row{ display:grid; gap:6px; align-items:center; grid-template-columns:minmax(0,1fr) 100px 62px 62px 34px; }
 .h-row-head{ display:none; }
 @media(min-width:641px){ .h-row-head{ display:grid; grid-template-columns:minmax(0,1fr) 100px 62px 62px 34px; gap:6px; font-family:'JetBrains Mono',monospace; font-size:9px; text-transform:uppercase; letter-spacing:.08em; color:var(--faint); padding:0 2px; } }
-@media(max-width:640px){ .h-row{ grid-template-columns:84px 48px 48px 30px; } .hr-title{ grid-column:1/-1; } }
+@media(max-width:640px){ .h-row{ grid-template-columns:104px 44px 44px 30px; } .hr-title{ grid-column:1/-1; } }
 .hr-del{ justify-content:center; padding:.5rem 0; }
 .ladder-t{ cursor:pointer; transition:.2s; opacity:.75; filter:saturate(.4); }
 .ladder-t:hover{ opacity:1; filter:none; transform:translateY(-2px); }
@@ -296,7 +296,7 @@ body.role-viewer .owner-only{ display:none!important; }
 header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
 @media(max-width:640px){ .modal{ padding:.75rem; } }
 
-/* ============ ТЕЛЕФОН: 3D отключаем, карточка = страница ============ */
+/* ============ ТЕЛЕФОН: отключаем 3D (ломает тач-скролл) ============ */
 @media(hover:none) and (pointer:coarse){
   [data-tilt]{ transform:none!important; transform-style:flat!important; }
   .pop,.card-body{ transform:none!important; }
@@ -307,6 +307,10 @@ header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
   .card:active{ transform:scale(.98)!important; }
 }
 @keyframes vfade{ from{ opacity:0; } }
+
+/* ============ ТЕЛЕФОН: модалка = обычная часть страницы ============
+   Карточка лежит в общем потоке документа (position:relative),
+   листается родным скроллом браузера — свайп работает всегда. */
 @media(max-width:900px){
   #app{ animation:none!important; }
   body.locked,html.locked{ overflow:visible!important; }
@@ -314,8 +318,7 @@ header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
   body.modal-page #app,body.modal-page #scroll-top{ display:none!important; }
   .modal{ touch-action:pan-y!important; -webkit-overflow-scrolling:touch; }
   .modal.open{
-    display:block!important; position:absolute!important;
-    top:0!important; left:0!important; right:0!important; bottom:auto!important;
+    display:block!important; position:relative!important; inset:auto!important;
     min-height:100vh; min-height:100svh;
     padding:.75rem calc(.75rem + env(safe-area-inset-right)) calc(.75rem + env(safe-area-inset-bottom)) calc(.75rem + env(safe-area-inset-left));
     padding-top:calc(.75rem + env(safe-area-inset-top));
@@ -360,7 +363,7 @@ header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
         <div class="w-11 h-11 rounded-2xl flex items-center justify-center font-disp font-black text-lg text-white shadow-lg" style="background:linear-gradient(135deg,var(--pink),var(--purple))">ア</div>
         <div class="min-w-0">
           <h1 class="font-disp text-[13px] tracking-wide" style="color:var(--text)">アニメ アРХИВ</h1>
-          <p class="text-[10px] font-mono" style="color:var(--faint)">sakura edition · v1.8</p>
+          <p class="text-[10px] font-mono" style="color:var(--faint)">sakura edition · v1.9</p>
         </div>
         <button onclick="toggleSidebar(false)" class="ml-auto lg:hidden text-lg" style="color:var(--faint)">✕</button>
       </div>
@@ -479,7 +482,7 @@ header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
 
       <footer class="text-center text-[10px] font-mono py-4 space-y-1" style="color:var(--faint)">
         <div id="sync-line">☁️ подключение к серверу…</div>
-        <div>アニメ アーカイブ · v1.8 · сделано с ❤️ и 🌸</div>
+        <div>アニメ アーカイブ · v1.9 · сделано с ❤️ и 🌸</div>
       </footer>
     </main>
   </div>
@@ -523,7 +526,7 @@ header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
       </div>
       <div><label class="block font-mono font-bold mb-1.5 text-[10px] uppercase tracking-wider" style="color:var(--faint)">Жанры (через запятую)</label><input type="text" id="form-genres" placeholder="Драма, Романтика, Фэнтези" class="input font-mono !text-[11px]"></div>
       <div class="space-y-2">
-        <label class="block font-mono font-bold text-[10px] uppercase tracking-wider" style="color:var(--faint)">История сезонов и просмотров <span class="normal-case">(дата: ДД.ММ.ГГГГ или ГГГГ-ММ-ДД)</span></label>
+        <label class="block font-mono font-bold text-[10px] uppercase tracking-wider" style="color:var(--faint)">История сезонов и просмотров <span class="normal-case">(дата: ДД.ММ.ГГГГ / ММ.ГГГГ / ГГГГ)</span></label>
         <div class="h-row-head"><span>Запись / сезон</span><span>Дата</span><span>Серий</span><span>Фильмов</span><span></span></div>
         <div id="form-history-container" class="space-y-2"></div>
         <button type="button" onclick="addHistoryRow()" class="btn w-full justify-center !py-2.5 border-dashed">+ Добавить запись / сезон</button>
@@ -588,6 +591,7 @@ header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
           <div id="preview-history-list" class="ptl"></div>
         </div>
         <button onclick="editFromPreview()" class="btn w-full justify-center !py-2.5 owner-only">✏️ Редактировать этот тайтл</button>
+        <button onclick="closePreviewModal()" class="btn w-full justify-center !py-2.5">✕ Закрыть</button>
       </div>
     </div>
   </div>
@@ -701,12 +705,7 @@ let charts={radar:null,yearly:null,tier:null,format:null};
 let wind=0, windTarget=0, petalColor='255,158,196';
 let revealed=false, firstPull=true, pageSavedY=-1;
 
-// ===== СОСТОЯНИЕ СИНХРОНИЗАЦИЯ (v1.8 — правки переживают перезагрузку) =====
-// localHash — отпечаток текущих локальных данных
-// pubHash  — отпечаток последней УСПЕШНО опубликованной версии (хранится в браузере)
-// pubV     — номер версии последней публикации (пишется в data_v.json на сервере)
-// Откат невозможен: серверная копия старее pubV игнорируется, несинхронные правки
-// не затираются никогда и автоматически досылаются после перезагрузки.
+// ===== СОСТОЯНИЕ СИНХРОНИЗАЦИИ (правки переживают перезагрузку) =====
 const R={ token:'', repo:'', sha:null, shaV:null, published:null, dirty:false, flying:false, timer:null,
           lastPull:0, lastSync:0, pending:null, pendingV:0, booted:false,
           localHash:null, pubHash:null, pubV:null, lastRemoteStr:null };
@@ -723,22 +722,27 @@ const pad=n=>String(n).padStart(2,'0');
 const isMobile=()=>matchMedia('(max-width:900px)').matches;
 function strHash(s){ let h=2166136261; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
 const hasUnsynced=()=>R.pubHash!==null&&R.localHash!==null&&R.localHash!==R.pubHash;
+// дата → timestamp; понимает полные, месячные и годовые даты
 function dateTs(s){
   if(!s) return 0; s=String(s).trim(); let m;
   if(m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/)) return +new Date(+m[1],+m[2]-1,+m[3]);
   if(m=s.match(/^(\d{4})-(\d{1,2})$/)) return +new Date(+m[1],+m[2]-1,1);
   if(m=s.match(/^(\d{4})$/)) return +new Date(+m[1],0,1);
   if(m=s.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/)) return +new Date(+m[3],+m[2]-1,+m[1]);
+  if(m=s.match(/^(\d{1,2})\.(\d{4})$/)) return +new Date(+m[2],+m[1]-1,1);
   const t=Date.parse(s); return Number.isFinite(t)?t:0;
 }
+// пользовательский ввод → хранимый формат (ДД.ММ.ГГГГ / ММ.ГГГГ / ГГГГ / ISO)
 function normDate(s){
   s=(s||'').trim(); if(!s) return ''; let m;
   if(m=s.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/)) return `${m[3]}-${pad(m[2])}-${pad(m[1])}`;
+  if(m=s.match(/^(\d{1,2})\.(\d{4})$/)) return `${m[2]}-${pad(m[1])}`;
   if(m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/)) return `${m[1]}-${pad(m[2])}-${pad(m[3])}`;
   if(m=s.match(/^(\d{4})-(\d{1,2})$/)) return `${m[1]}-${pad(m[2])}`;
   if(m=s.match(/^(\d{4})$/)) return m[1];
   return s;
 }
+// хранимый формат → человекочитаемо
 function fmtRuDate(s){
   if(!s) return '—'; s=String(s).trim(); let m;
   if(m=s.match(/^(\d{4})-(\d{2})-(\d{2})$/)) return `${m[3]}.${m[2]}.${m[1]}`;
@@ -834,7 +838,6 @@ function markDirty(){
   clearTimeout(R.timer);
   R.timer=setTimeout(()=>commitNow(false),1100);
 }
-// PUT файла на GitHub с автоповтором при конфликте версий
 async function putFile(path,sha,str,msg){
   const mk=s=>{ const b={message:msg,content:b64e(str)}; if(s) b.sha=s; return JSON.stringify(b); };
   let p=await fetch(`${GH_API}/repos/${R.repo}/contents/${path}`,{method:'PUT',headers:ownerHeaders(),body:mk(sha)});
@@ -865,11 +868,9 @@ async function commitNow(force){
     const stamp=new Date().toLocaleString('ru-RU');
     if(R.sha===null) R.sha=await getFileSha('data.json');
     if(R.shaV===null) R.shaV=await getFileSha('data_v.json');
-    // 1) сами данные
     const r1=await putFile('data.json',R.sha,itemsStr,`🌐 архив · ${stamp}`);
     R.sha=r1.sha;
     if(!r1.ok) throw {code:r1.status};
-    // 2) маркер версии (для отсечения устаревших копий CDN)
     const r2=await putFile('data_v.json',R.shaV,JSON.stringify({v:newV}),`🔖 версия архива · ${stamp}`);
     R.shaV=r2.sha;
     if(!r2.ok) throw {code:r2.status};
@@ -891,7 +892,6 @@ async function commitNow(force){
   updateOmStatus();
   if(R.dirty){ clearTimeout(R.timer); R.timer=setTimeout(()=>commitNow(false),8000); }
 }
-// безопасное чтение файла с сервера
 async function fetchText(path){
   try{
     const r=await fetch(path+'?nc='+Date.now(),{cache:'no-store'});
@@ -907,7 +907,6 @@ function applyData(arr,silent){
   render();
   if(!silent) toast('Архив обновлён 🌸');
 }
-// принять серверную версию как «нашу» точку отсчёта
 function adoptRemote(arr,rv){
   R.pubHash=strHash(JSON.stringify(arr));
   if(rv>0&&rv>(R.pubV||0)) R.pubV=rv;
@@ -915,7 +914,6 @@ function adoptRemote(arr,rv){
 }
 async function pull(manual){
   if(R.flying) return;
-  // есть неотправленные правки → отправляем их, а не читаем сервер
   if(isOwner()&&hasUnsynced()){
     if(manual) toast('Ваши правки ещё не опубликованы — отправляю…');
     commitNow(true);
@@ -927,7 +925,6 @@ async function pull(manual){
   if(res.status!==200||!res.text){ if(manual)toast('Сервер недоступен, попробуйте позже'); reveal(); updateSyncLine(); return; }
   R.published=true; R.booted=true;
   const remoteStr=res.text;
-  // версия на сервере
   let rv=0;
   if(isOwner()){
     const vr=await fetchText('data_v.json');
@@ -1284,7 +1281,7 @@ function renderDashboard(){
 }
 
 // ============================================================
-// ХРОНОЛОГИЯ
+// ХРОНОЛОГИЯ (группировка учитывает неполные даты)
 // ============================================================
 function renderTimeline(){
   const list=getFiltered(); const entries=[];
@@ -1292,8 +1289,12 @@ function renderTimeline(){
   entries.sort((x,y)=>dateTs(y.h.date)-dateTs(x.h.date));
   let html='', lastYM='';
   entries.forEach(({h,a})=>{
+    const ds=String(h.date||'').trim();
     const ts=dateTs(h.date);
-    const ym=ts?new Date(ts).toLocaleDateString('ru-RU',{month:'long',year:'numeric'}):'Без даты';
+    let ym;
+    if(/^\d{4}$/.test(ds)) ym=ds; // только год
+    else if(ts) ym=new Date(ts).toLocaleDateString('ru-RU',{month:'long',year:'numeric'});
+    else ym='Без даты';
     if(ym!==lastYM){ lastYM=ym; html+=`<div class="tl-month">${ym}</div>`; }
     html+=`<div class="tl-row" data-idx="${a._i}">
       <div class="hist-icon">${historyIcon(h)}</div>
@@ -1306,7 +1307,7 @@ function renderTimeline(){
 }
 
 // ============================================================
-// МОДАЛКИ (+ мобильный режим «карточка = страница»)
+// МОДАЛКИ (телефон: карточка = обычная часть страницы)
 // ============================================================
 function wakeScroll(){
   try{
@@ -1373,7 +1374,7 @@ function addHistoryRow(h={}){
   const row=document.createElement('div'); row.className='h-row';
   row.innerHTML=`
     <input class="input hr-title !text-[11.5px]" placeholder="1 сезон / OVA / Фильм…" value="${esc(h.title||'')}">
-    <input class="input hr-date font-mono !text-[10.5px]" placeholder="дд.мм.гггг" inputmode="numeric" value="${h.date?esc(fmtRuDate(h.date)):''}">
+    <input class="input hr-date font-mono !text-[10.5px]" placeholder="дд.мм.гггг / мм.гггг / гггг" inputmode="numeric" value="${h.date?esc(fmtRuDate(h.date)):''}">
     <input class="input hr-eps font-mono !text-[10.5px]" type="number" min="0" inputmode="numeric" placeholder="эп" value="${(h.episodes||0)>0?h.episodes:''}">
     <input class="input hr-mov font-mono !text-[10.5px]" type="number" min="0" inputmode="numeric" placeholder="ф" value="${(h.movies||0)>0?h.movies:''}">
     <button type="button" class="btn hr-del" title="Удалить запись">✕</button>`;
@@ -1462,8 +1463,9 @@ function openPreview(i){
   el('preview-last').textContent=fmtRuDate(lastDate(a));
   el('preview-ladder').innerHTML=TIER_ORDER.map(t=>`<button class="tb tb-sm tb-${t} ladder-t${t===a.tier?' on':''}" data-t="${t}" title="${TIERS.find(x=>x.key===t).title}">${t}</button>`).join('');
   renderPreviewHistory();
-  if(!wasOpen) showModal('preview-modal'); // без прыжка к началу при смене тира
+  if(!wasOpen) showModal('preview-modal');
 }
+// полный таймлайн истории — без внутренней прокрутки, группировка по годам
 function renderPreviewHistory(){
   if(previewIndex<0) return;
   const a=animeData[previewIndex];
@@ -1770,12 +1772,10 @@ addEventListener('scroll',()=>{
   }catch(e){}
   loadData();
   R.localHash=strHash(JSON.stringify(animeData));
-  // первый запуск v1.8 у владельца: принимаем текущее за базу
   if(R.pubHash===null&&isOwner()){ R.pubHash=R.localHash; persistPub(); }
   applyRole();
   render();
   initPetals(); initParallax(); initTilt(); setupUpload(); setupDelegations();
-  // правки, не успевшие уйти до перезагрузки — досылаем автоматически
   if(isOwner()&&hasUnsynced()){
     toast('⏳ Есть неотправленные правки — публикую…');
     R.dirty=true;
