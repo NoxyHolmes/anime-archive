@@ -285,19 +285,25 @@ body.role-viewer .owner-only{ display:none!important; }
 #scroll-top{ bottom:calc(1.25rem + env(safe-area-inset-bottom)); left:calc(1.25rem + env(safe-area-inset-left)); }
 header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
 @media(max-width:640px){ .modal{ padding:.75rem; } }
-/* ============ v1.3 ТЕЛЕФОН: КАРТОЧКА ЛИСТАЕТСЯ КАК ОБЫЧНАЯ СТРАНИЦА ============ */
-html.locked{ overflow:hidden; overscroll-behavior:none; }
-@media(max-width:900px){
+/* ============ v1.4 ТЕЛЕФОН: ЧИНЮ СЕНСОРНЫЙ СКРОЛЛ ============ */
+/* 3D-слои (perspective/preserve-3d) внутри прокручиваемого окна ломают
+   тач-скролл на телефонах: ползунок работает, палец — нет. Отключаем 3D. */
+@media (hover:none) and (pointer:coarse), (max-width:900px){
+  [data-tilt]{ transform:none!important; transform-style:flat!important; }
+  .pop,.card-body{ transform:none!important; }
+  .mbox{ animation:none!important; }
+  .card{ animation:vfade .4s ease backwards!important; }
+  .view-section.active{ animation:vfade .35s ease!important; }
+  .toast{ animation:none!important; }
+  .card:active{ transform:scale(.98)!important; }
   .modal.open{ display:block!important; }
-  .modal{ padding:.75rem; }
+  .modal{ -webkit-overflow-scrolling:touch; touch-action:pan-y!important; }
   .modal .mbox{ margin:.5rem auto!important; margin-bottom:calc(.75rem + env(safe-area-inset-bottom))!important; }
-  .scrollbox{ max-height:none!important; }
-  #preview-history-list{ max-height:none!important; }
-  #genre-list{ max-height:none!important; }
-  #top-genres-list{ max-height:none!important; }
+  .scrollbox,#preview-history-list,#genre-list,#top-genres-list{ max-height:none!important; }
   .modal{ backdrop-filter:none!important; -webkit-backdrop-filter:none!important;
           background:color-mix(in srgb,var(--bg) 96%,transparent)!important; }
 }
+@keyframes vfade{ from{ opacity:0; } }
 @media (prefers-reduced-motion: reduce){ *{ animation-duration:.01ms!important; transition-duration:.01ms!important; } }
 </style>
 </head>
