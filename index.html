@@ -246,7 +246,7 @@ body.role-viewer .owner-only{ display:none!important; }
 .tg-bar{ height:5px; border-radius:99px; background:color-mix(in srgb,var(--text) 8%,transparent); overflow:hidden; }
 .tg-bar>div{ height:100%; border-radius:inherit; transition:width .6s cubic-bezier(.16,1,.3,1); }
 
-/* ================= ИСТОРИЯ ПРОСМОТРОВ: ПОЛНЫЙ ТАЙМЛАЙН (без прокрутки) ================= */
+/* ================= ИСТОРИЯ ПРОСМОТРОВ: ПОЛНЫЙ ТАЙМЛАЙН ================= */
 .ptl-year{ font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--faint); margin:16px 2px 8px; display:flex; align-items:center; gap:10px; }
 .ptl-year::after{ content:''; flex:1; height:1px; background:var(--border); }
 .ptl-year:first-child{ margin-top:2px; }
@@ -296,9 +296,8 @@ body.role-viewer .owner-only{ display:none!important; }
 header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
 @media(max-width:640px){ .modal{ padding:.75rem; } }
 
-/* ============ v1.7 ТЕЛЕФОН: КАРТОЧКА = ОТДЕЛЬНАЯ СТРАНИЦА, ОДИН СКРОЛЛ ============ */
+/* ============ ТЕЛЕФОН: 3D отключаем, карточка = страница ============ */
 @media(hover:none) and (pointer:coarse){
-  /* 3D-слои внутри прокручиваемого окна ломают тач-скролл — отключаем */
   [data-tilt]{ transform:none!important; transform-style:flat!important; }
   .pop,.card-body{ transform:none!important; }
   .mbox{ animation:none!important; }
@@ -336,7 +335,6 @@ header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
 <!-- ПРЕЛОАДЕР -->
 <div id="boot"><div class="b-glyph">ア</div><div class="spin"></div><p class="text-[10px] font-mono" style="color:var(--faint)">загрузка архива…</p></div>
 <noscript><p style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:2rem">Для работы архива включите JavaScript.</p></noscript>
-<!-- страховка: спрятать загрузчик, даже если основной скрипт не запустился -->
 <script>setTimeout(function(){var b=document.getElementById('boot');if(b){b.style.opacity=0;b.style.pointerEvents='none';}},6000);</script>
 
 <!-- ====== ФОН ====== -->
@@ -361,8 +359,8 @@ header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
       <div class="flex items-center gap-3">
         <div class="w-11 h-11 rounded-2xl flex items-center justify-center font-disp font-black text-lg text-white shadow-lg" style="background:linear-gradient(135deg,var(--pink),var(--purple))">ア</div>
         <div class="min-w-0">
-          <h1 class="font-disp text-[13px] tracking-wide" style="color:var(--text)">アニメ АРХИВ</h1>
-          <p class="text-[10px] font-mono" style="color:var(--faint)">sakura edition · v1.7</p>
+          <h1 class="font-disp text-[13px] tracking-wide" style="color:var(--text)">アニメ アРХИВ</h1>
+          <p class="text-[10px] font-mono" style="color:var(--faint)">sakura edition · v1.8</p>
         </div>
         <button onclick="toggleSidebar(false)" class="ml-auto lg:hidden text-lg" style="color:var(--faint)">✕</button>
       </div>
@@ -481,7 +479,7 @@ header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
 
       <footer class="text-center text-[10px] font-mono py-4 space-y-1" style="color:var(--faint)">
         <div id="sync-line">☁️ подключение к серверу…</div>
-        <div>アニメ アーカイブ · v1.7 · сделано с ❤️ и 🌸</div>
+        <div>アニメ アーカイブ · v1.8 · сделано с ❤️ и 🌸</div>
       </footer>
     </main>
   </div>
@@ -703,12 +701,15 @@ let charts={radar:null,yearly:null,tier:null,format:null};
 let wind=0, windTarget=0, petalColor='255,158,196';
 let revealed=false, firstPull=true, pageSavedY=-1;
 
-// ===== СОСТОЯНИЕ СИНХРОНИЗАЦИИ =====
-// localPublished — последняя успешно отправленная НАМИ версия (строка JSON)
-// lastRemote    — последняя увиденная версия сервера (строка JSON)
-// Сервер НИКОГДА не затирает локальные несинхронизированные правки владельца.
-const R={ token:'', repo:'', sha:null, published:null, dirty:false, flying:false, timer:null,
-          lastPull:0, lastSync:0, pending:null, booted:false, localPublished:null, lastRemote:null };
+// ===== СОСТОЯНИЕ СИНХРОНИЗАЦИЯ (v1.8 — правки переживают перезагрузку) =====
+// localHash — отпечаток текущих локальных данных
+// pubHash  — отпечаток последней УСПЕШНО опубликованной версии (хранится в браузере)
+// pubV     — номер версии последней публикации (пишется в data_v.json на сервере)
+// Откат невозможен: серверная копия старее pubV игнорируется, несинхронные правки
+// не затираются никогда и автоматически досылаются после перезагрузки.
+const R={ token:'', repo:'', sha:null, shaV:null, published:null, dirty:false, flying:false, timer:null,
+          lastPull:0, lastSync:0, pending:null, pendingV:0, booted:false,
+          localHash:null, pubHash:null, pubV:null, lastRemoteStr:null };
 
 addEventListener('unhandledrejection',function(e){ e.preventDefault(); });
 
@@ -720,6 +721,8 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 function cssVar(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
 const pad=n=>String(n).padStart(2,'0');
 const isMobile=()=>matchMedia('(max-width:900px)').matches;
+function strHash(s){ let h=2166136261; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
+const hasUnsynced=()=>R.pubHash!==null&&R.localHash!==null&&R.localHash!==R.pubHash;
 function dateTs(s){
   if(!s) return 0; s=String(s).trim(); let m;
   if(m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/)) return +new Date(+m[1],+m[2]-1,+m[3]);
@@ -790,12 +793,13 @@ function matchesTypes(a){
 }
 
 // ============================================================
-// ХРАНИЛИЩЕ + СИНХРОНИЗАЦИЯ С GITHUB (v1.7 — без откатов правок)
+// ХРАНИЛИЩЕ + СИНХРОНИЗАЦИЯ С GITHUB
 // ============================================================
 function saveLocal(){ try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(animeData)); }catch(e){} }
 function save(){
   try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(animeData)); }
   catch(e){ toast('Локальное хранилище переполнено — постеры слишком тяжёлые','err'); }
+  R.localHash=strHash(JSON.stringify(animeData));
   markDirty();
 }
 function loadData(){
@@ -818,115 +822,150 @@ function detectRepo(){
 }
 function ownerHeaders(){ const h={Accept:'application/vnd.github+json'}; if(R.token) h.Authorization='Bearer '+R.token; return h; }
 function b64e(str){ const u=new TextEncoder().encode(str); let s=''; u.forEach(b=>s+=String.fromCharCode(b)); return btoa(s); }
+function persistPub(){
+  try{
+    if(R.pubHash!==null) localStorage.setItem('oa_pub_hash',String(R.pubHash));
+    if(R.pubV!==null) localStorage.setItem('oa_pub_v',String(R.pubV));
+  }catch(e){}
+}
 function markDirty(){
   if(!isOwner()) return;
   R.dirty=true; updateOmStatus();
   clearTimeout(R.timer);
-  R.timer=setTimeout(()=>commitNow(false),1500);
+  R.timer=setTimeout(()=>commitNow(false),1100);
+}
+// PUT файла на GitHub с автоповтором при конфликте версий
+async function putFile(path,sha,str,msg){
+  const mk=s=>{ const b={message:msg,content:b64e(str)}; if(s) b.sha=s; return JSON.stringify(b); };
+  let p=await fetch(`${GH_API}/repos/${R.repo}/contents/${path}`,{method:'PUT',headers:ownerHeaders(),body:mk(sha)});
+  if(p.status===409||(sha&&(p.status===404||p.status===422))){
+    const g=await fetch(`${GH_API}/repos/${R.repo}/contents/${path}`,{headers:ownerHeaders()});
+    sha=g.ok?(await g.json()).sha:'';
+    p=await fetch(`${GH_API}/repos/${R.repo}/contents/${path}`,{method:'PUT',headers:ownerHeaders(),body:mk(sha)});
+  }
+  if(p.status===401) return {ok:false,status:401,sha};
+  if(!p.ok) return {ok:false,status:p.status,sha};
+  try{ const j=await p.json(); return {ok:true,status:200,sha:(j.content&&j.content.sha)?j.content.sha:j.sha}; }
+  catch(e){ return {ok:true,status:200,sha}; }
+}
+async function getFileSha(path){
+  const g=await fetch(`${GH_API}/repos/${R.repo}/contents/${path}`,{headers:ownerHeaders()});
+  if(g.status===401) throw {code:401};
+  return g.ok?(await g.json()).sha:'';
 }
 async function commitNow(force){
   if(!isOwner()){ toast('Сначала войдите как владелец (кнопка 🔒)','err'); return; }
   if(R.flying) return;
-  if(!R.dirty&&!force) return;
+  if(!R.dirty&&!force&&!hasUnsynced()) return;
   R.flying=true; R.dirty=false;
   toast('☁️ Отправляю на GitHub…');
   try{
-    if(R.sha===null){
-      const g=await fetch(`${GH_API}/repos/${R.repo}/contents/data.json`,{headers:ownerHeaders()});
-      if(g.status===401) throw {code:401};
-      R.sha=g.ok?(await g.json()).sha:(g.status===404?'':'');
-    }
-    const payload=JSON.stringify(animeData);
-    const mkBody=()=>{ const b={message:`🌐 обновление архива · ${new Date().toLocaleString('ru-RU')}`,content:b64e(payload)}; if(R.sha) b.sha=R.sha; return JSON.stringify(b); };
-    let p=await fetch(`${GH_API}/repos/${R.repo}/contents/data.json`,{method:'PUT',headers:ownerHeaders(),body:mkBody()});
-    if(p.status===409){ // файл изменили извне — перечитываем sha и повторяем
-      const g=await fetch(`${GH_API}/repos/${R.repo}/contents/data.json`,{headers:ownerHeaders()});
-      R.sha=g.ok?(await g.json()).sha:'';
-      p=await fetch(`${GH_API}/repos/${R.repo}/contents/data.json`,{method:'PUT',headers:ownerHeaders(),body:mkBody()});
-    }
-    if(p.ok){
-      const j=await p.json();
-      R.sha=(j.content&&j.content.sha)?j.content.sha:j.sha;
-      R.localPublished=payload;   // считаем эту версию «нашей опубликованной»
-      R.published=true; R.booted=true; R.lastSync=Date.now(); R.lastPull=Date.now();
-      toast('☁️ Опубликовано! Зрители увидят обновление через ~1 мин');
-      updateOmStatus(); updateSyncLine();
-    }else if(p.status===401) throw {code:401};
-    else if(p.status===403){ toast('Нет прав на запись: у токена нет разрешения Contents → Read and write','err'); R.dirty=true; }
-    else{ toast('GitHub отклонил сохранение ('+p.status+')','err'); R.dirty=true; }
+    const itemsStr=JSON.stringify(animeData);
+    const newV=Math.max(Date.now(),(R.pubV||0)+1);
+    const stamp=new Date().toLocaleString('ru-RU');
+    if(R.sha===null) R.sha=await getFileSha('data.json');
+    if(R.shaV===null) R.shaV=await getFileSha('data_v.json');
+    // 1) сами данные
+    const r1=await putFile('data.json',R.sha,itemsStr,`🌐 архив · ${stamp}`);
+    R.sha=r1.sha;
+    if(!r1.ok) throw {code:r1.status};
+    // 2) маркер версии (для отсечения устаревших копий CDN)
+    const r2=await putFile('data_v.json',R.shaV,JSON.stringify({v:newV}),`🔖 версия архива · ${stamp}`);
+    R.shaV=r2.sha;
+    if(!r2.ok) throw {code:r2.status};
+    R.pubV=newV;
+    R.pubHash=strHash(itemsStr);
+    R.localHash=R.pubHash;
+    R.lastRemoteStr=null;
+    persistPub();
+    R.published=true; R.booted=true; R.lastSync=Date.now(); R.lastPull=Date.now();
+    toast('☁️ Опубликовано! Зрители увидят изменения через ~1 мин');
+    updateOmStatus(); updateSyncLine();
   }catch(err){
     if(err&&err.code===401) toast('Токен истёк или неверен — войдите заново через кнопку 🔒','err');
-    else toast('Нет связи с GitHub','err');
+    else if(err&&err.code===403) toast('Нет прав на запись: у токена нет разрешения Contents → Read and write','err');
+    else toast('Не удалось отправить — повторю автоматически','err');
     R.dirty=true;
   }
   R.flying=false;
   updateOmStatus();
   if(R.dirty){ clearTimeout(R.timer); R.timer=setTimeout(()=>commitNow(false),8000); }
 }
-// безопасный запрос: HTML никогда не парсится, ошибки сети гасятся
-async function fetchRemoteRaw(){
+// безопасное чтение файла с сервера
+async function fetchText(path){
   try{
-    const r=await fetch('data.json?nc='+Date.now(),{cache:'no-store'});
+    const r=await fetch(path+'?nc='+Date.now(),{cache:'no-store'});
     if(r.status===404) return {status:404,text:null};
     if(!r.ok) return {status:r.status,text:null};
     return {status:200,text:await r.text()};
   }catch(e){ return {status:0,text:null}; }
 }
-// применить серверную версию (с защитой локальных правок)
-function applyRemote(remoteStr,silent){
-  let arr; try{ arr=JSON.parse(remoteStr); }catch(e){ return; }
+function applyData(arr,silent){
   if(!Array.isArray(arr)) return;
-  const localStr=JSON.stringify(animeData);
-  if(isOwner()&&R.localPublished!==null&&localStr!==R.localPublished) return; // есть несинхронные правки — не трогаем
-  if(remoteStr===localStr) return;
-  animeData=arr; saveLocal(); render();
+  animeData=arr; saveLocal();
+  R.localHash=strHash(JSON.stringify(animeData));
+  render();
   if(!silent) toast('Архив обновлён 🌸');
+}
+// принять серверную версию как «нашу» точку отсчёта
+function adoptRemote(arr,rv){
+  R.pubHash=strHash(JSON.stringify(arr));
+  if(rv>0&&rv>(R.pubV||0)) R.pubV=rv;
+  persistPub();
 }
 async function pull(manual){
   if(R.flying) return;
-  if(R.dirty&&isOwner()){ if(manual) toast('Ваши правки ещё отправляются — секунду…'); return; }
-  const res=await fetchRemoteRaw();
+  // есть неотправленные правки → отправляем их, а не читаем сервер
+  if(isOwner()&&hasUnsynced()){
+    if(manual) toast('Ваши правки ещё не опубликованы — отправляю…');
+    commitNow(true);
+    return;
+  }
+  const res=await fetchText('data.json');
   R.lastPull=Date.now();
-  if(res.status===404){
-    R.published=false; R.booted=true;
-    if(manual) toast('Архив ещё не опубликован владельцем');
-    reveal(); updateSyncLine(); updateOmStatus();
-    return;
-  }
-  if(res.status!==200||!res.text){
-    if(manual) toast('Сервер недоступен, попробуйте позже');
-    reveal(); updateSyncLine();
-    return;
-  }
+  if(res.status===404){ R.published=false; R.booted=true; if(manual)toast('Архив ещё не опубликован владельцем'); reveal(); updateSyncLine(); updateOmStatus(); return; }
+  if(res.status!==200||!res.text){ if(manual)toast('Сервер недоступен, попробуйте позже'); reveal(); updateSyncLine(); return; }
   R.published=true; R.booted=true;
   const remoteStr=res.text;
-  if(remoteStr===R.lastRemote){ // сервер не менялся
-    if(manual) toast('Данные актуальны ✓');
-    reveal(); updateSyncLine(); updateOmStatus();
-    return;
+  // версия на сервере
+  let rv=0;
+  if(isOwner()){
+    const vr=await fetchText('data_v.json');
+    if(vr.status===200&&vr.text){ try{ rv=(JSON.parse(vr.text)||{}).v||0; }catch(e){} }
+    // CDN раздаёт копию не новее нашей публикации → пропускаем (защита от отката)
+    if(R.pubV!==null&&rv<=R.pubV){
+      R.lastRemoteStr=remoteStr;
+      if(manual) toast('Сервер догоняет — локальные данные актуальны ✓');
+      reveal(); updateSyncLine(); updateOmStatus();
+      return;
+    }
   }
-  R.lastRemote=remoteStr;
-  if(remoteStr===R.localPublished){ // наша же публикация добралась до CDN
+  if(remoteStr===R.lastRemoteStr){ if(manual)toast('Данные актуальны ✓'); reveal(); updateSyncLine(); updateOmStatus(); return; }
+  let arr=null; try{ arr=JSON.parse(remoteStr); }catch(e){}
+  if(!Array.isArray(arr)){ reveal(); return; }
+  if(JSON.stringify(arr)===JSON.stringify(animeData)){
+    R.lastRemoteStr=remoteStr;
+    if(isOwner()) adoptRemote(arr,rv);
     if(manual) toast('Данные актуальны ✓');
-    reveal(); updateSyncLine(); updateOmStatus();
-    return;
+    reveal(); updateSyncLine(); updateOmStatus(); return;
   }
-  // сервер реально изменился (с другого устройства владельца)
   if(document.querySelector('.modal.open')){
-    // окно открыто: применяем только после закрытия, чтобы не ломать редактирование
-    R.pending=remoteStr; updateSyncLine();
+    R.pending=remoteStr; R.pendingV=rv;
+    updateSyncLine(); updateOmStatus();
     if(manual) toast('Обновление применится после закрытия окна');
     reveal(); return;
   }
   const silent=firstPull; firstPull=false;
-  applyRemote(remoteStr,silent);
+  applyData(arr,silent);
+  if(isOwner()) adoptRemote(arr,rv);
+  R.lastRemoteStr=remoteStr;
   reveal(); updateSyncLine(); updateOmStatus();
 }
 function startPolling(){
   setInterval(()=>{
     if(document.visibilityState!=='visible'||R.flying) return;
     if(R.dirty&&isOwner()) return;
-    const gap=(R.published===false)?90000:8000; // опубликовано → живой опрос ~8 сек
+    const gap=(R.published===false)?90000:8000;
     if(Date.now()-R.lastPull<gap) return;
     pull(false);
   },3000);
@@ -971,7 +1010,8 @@ function updateOmStatus(){
     ['Публикация',R.published===null?'проверяется…':(R.published?'✓ data.json на сервере':'пока нет данных на сервере')],
     ['Обновлено',R.lastPull?fmtTime(R.lastPull):'—']
   ];
-  if(R.dirty) rows.push(['⚡ Не отправлено','правки ждут отправки']);
+  if(R.pubV) rows.push(['Версия данных',new Date(R.pubV).toLocaleString('ru-RU')]);
+  if(R.dirty) rows.push(['⚡ Не отправлено','правки ждут отправки / досылаются']);
   if(R.flying) rows.push(['☁️ Статус','идёт отправка на GitHub…']);
   if(R.pending) rows.push(['⏳ Скачано','применится после закрытия окна']);
   s.innerHTML=rows.map(([k,v])=>`<div class="flex justify-between gap-3"><span style="color:var(--faint)">${k}</span><span class="text-right" style="color:var(--text)">${esc(v)}</span></div>`).join('');
@@ -979,7 +1019,11 @@ function updateOmStatus(){
 function updateSyncLine(){
   const n=el('sync-line'); if(!n) return;
   let line;
-  if(isOwner()) line=`✍️ режим владельца${R.lastSync?` · опубликовано ${fmtTime(R.lastSync)}`:''}`;
+  if(isOwner()){
+    line='✍️ режим владельца';
+    if(R.dirty) line+=' · ⚡ отправляю правки';
+    else if(R.lastSync) line+=` · опубликовано ${fmtTime(R.lastSync)} · зрителям ~1 мин`;
+  }
   else line=(R.published===false?'👁 архив ещё не опубликован владельцем':`👁 только просмотр · обновлено ${R.lastPull?fmtTime(R.lastPull):'—'}`);
   if(R.pending) line+=' · ⏳ обновление после закрытия окна';
   n.textContent=line;
@@ -998,18 +1042,17 @@ async function ownerLogin(){
     if(!r.ok){ toast('GitHub ответил ошибкой '+r.status,'err'); return; }
     const j=await r.json();
     if(j.permissions&&!j.permissions.push){ toast('У токена нет прав на запись в этот репозиторий','err'); return; }
-    R.token=tok; R.repo=repo; R.sha=null; R.dirty=false;
-    R.localPublished=null; R.lastRemote=null; R.pending=null;
+    R.token=tok; R.repo=repo; R.sha=null; R.shaV=null; R.lastRemoteStr=null; R.pending=null;
     try{ localStorage.setItem('oa_token',tok); localStorage.setItem('oa_repo',repo); }catch(e){}
     el('om-token').value='';
     applyRole(); renderOwnerModal();
     toast('Режим владельца активирован ✍️');
-    await pull(false); // сразу подхватываем серверную версию архива
+    await pull(false);
   }catch(e){ toast('Нет связи с GitHub','err'); }
   finally{ btn.textContent='✍️ Войти как владелец'; btn.disabled=false; }
 }
 function ownerLogout(){
-  R.token=''; R.repo=''; R.sha=null; R.dirty=false; clearTimeout(R.timer);
+  R.token=''; R.repo=''; R.sha=null; R.shaV=null; R.dirty=false; clearTimeout(R.timer);
   try{ localStorage.removeItem('oa_token'); localStorage.removeItem('oa_repo'); }catch(e){}
   applyRole(); renderOwnerModal();
   toast('Вышли из режима владельца');
@@ -1265,8 +1308,6 @@ function renderTimeline(){
 // ============================================================
 // МОДАЛКИ (+ мобильный режим «карточка = страница»)
 // ============================================================
-// Chrome на телефоне не сразу пересчитывает высоту страницы после
-// разворачивания карточки — принудительно будим прокрутку.
 function wakeScroll(){
   try{
     const de=document.documentElement;
@@ -1313,8 +1354,13 @@ function hideModal(id){
     m.classList.remove('open','closing');
     syncLock();
     if(R.pending&&!document.querySelector('.modal.open')){
-      const s=R.pending; R.pending=null;
-      applyRemote(s,false);
+      const s=R.pending, pv=R.pendingV||0; R.pending=null; R.pendingV=0;
+      let arr=null; try{ arr=JSON.parse(s); }catch(e){}
+      if(Array.isArray(arr)){
+        applyData(arr,false);
+        if(isOwner()) adoptRemote(arr,pv);
+        R.lastRemoteStr=s;
+      }
       updateSyncLine();
     }
   },180);
@@ -1394,6 +1440,7 @@ function confirmDeleteTitle(){
 // ============================================================
 function openPreview(i){
   if(i<0||i>=animeData.length) return;
+  const wasOpen=el('preview-modal').classList.contains('open');
   previewIndex=i;
   const a=animeData[i];
   const im=el('preview-img'); im.src=a.img||FALLBACK_IMG;
@@ -1415,9 +1462,8 @@ function openPreview(i){
   el('preview-last').textContent=fmtRuDate(lastDate(a));
   el('preview-ladder').innerHTML=TIER_ORDER.map(t=>`<button class="tb tb-sm tb-${t} ladder-t${t===a.tier?' on':''}" data-t="${t}" title="${TIERS.find(x=>x.key===t).title}">${t}</button>`).join('');
   renderPreviewHistory();
-  showModal('preview-modal');
+  if(!wasOpen) showModal('preview-modal'); // без прыжка к началу при смене тира
 }
-// полный таймлайн истории — без внутренней прокрутки, с группировкой по годам
 function renderPreviewHistory(){
   if(previewIndex<0) return;
   const a=animeData[previewIndex];
@@ -1718,16 +1764,24 @@ addEventListener('scroll',()=>{
   try{
     R.token=localStorage.getItem('oa_token')||'';
     R.repo=localStorage.getItem('oa_repo')||'';
+    const ph=localStorage.getItem('oa_pub_hash'); R.pubHash=ph===null?null:+ph;
+    const pv=localStorage.getItem('oa_pub_v'); R.pubV=pv===null?null:+pv;
     if(!R.repo){ const d=detectRepo(); if(d) R.repo=`${d.owner}/${d.repo}`; }
   }catch(e){}
   loadData();
+  R.localHash=strHash(JSON.stringify(animeData));
+  // первый запуск v1.8 у владельца: принимаем текущее за базу
+  if(R.pubHash===null&&isOwner()){ R.pubHash=R.localHash; persistPub(); }
   applyRole();
   render();
-  initPetals();
-  initParallax();
-  initTilt();
-  setupUpload();
-  setupDelegations();
+  initPetals(); initParallax(); initTilt(); setupUpload(); setupDelegations();
+  // правки, не успевшие уйти до перезагрузки — досылаем автоматически
+  if(isOwner()&&hasUnsynced()){
+    toast('⏳ Есть неотправленные правки — публикую…');
+    R.dirty=true;
+    clearTimeout(R.timer);
+    R.timer=setTimeout(()=>commitNow(false),600);
+  }
   bootRemote();
   setTimeout(reveal,2500);
 })();
