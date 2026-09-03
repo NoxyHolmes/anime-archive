@@ -285,6 +285,21 @@ body.role-viewer .owner-only{ display:none!important; }
 #scroll-top{ bottom:calc(1.25rem + env(safe-area-inset-bottom)); left:calc(1.25rem + env(safe-area-inset-left)); }
 header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
 @media(max-width:640px){ .modal{ padding:.75rem; } }
+/* ============ v1.1 ТЕЛЕФОН: ПРОКРУТКА КАК У ОБЫЧНОЙ СТРАНИЦЫ ============
+   На тач-экранах нет вложенных прокруток: карточка тайтла и все списки
+   тянутся вниз на полную высоту, листается только страница целиком.
+   На ПК с мышью поведение не меняется. */
+@media (hover:none) and (pointer:coarse){
+  .scrollbox{ max-height:none!important; }
+  #preview-history-list{ max-height:none!important; overflow:visible!important; }
+  #genre-list{ max-height:none!important; overflow:visible!important; }
+  #top-genres-list{ max-height:none!important; overflow:visible!important; }
+  /* blur на скроллящейся модалке сильно режет FPS на телефонах —
+      заменяем его плотным фоном (визуально почти то же самое) */
+  .modal{ backdrop-filter:none!important; -webkit-backdrop-filter:none!important;
+          background:color-mix(in srgb,var(--bg) 94%,transparent)!important; }
+  .modal .mbox{ margin-top:.5rem; margin-bottom:.5rem; }
+}
 @media (prefers-reduced-motion: reduce){ *{ animation-duration:.01ms!important; transition-duration:.01ms!important; } }
 </style>
 </head>
