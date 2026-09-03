@@ -285,29 +285,12 @@ body.role-viewer .owner-only{ display:none!important; }
 #scroll-top{ bottom:calc(1.25rem + env(safe-area-inset-bottom)); left:calc(1.25rem + env(safe-area-inset-left)); }
 header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
 @media(max-width:640px){ .modal{ padding:.75rem; } }
-/* ============ v1.5 ТЕЛЕФОН: КАРТОЧКА ОТКРЫВАЕТСЯ КАК ОТДЕЛЬНАЯ СТРАНИЦА ============ */
+<script>
+/* ============ v1.6 ТЕЛЕФОН: РАЗРЕШАЕМ ВЕРТИКАЛЬНЫЙ ЖЕСТ ============ */
 @media(max-width:900px){
-  #app{ animation:none!important; }
-  body.locked,html.locked{ overflow:visible!important; }
-  body.modal-page{ overscroll-behavior-y:none; }
-  body.modal-page #app,body.modal-page #scroll-top{ display:none!important; }
-  .modal.open{
-    display:block!important; position:absolute!important;
-    top:0!important; left:0!important; right:0!important; bottom:auto!important;
-    min-height:100vh; min-height:100svh;
-    padding:.75rem calc(.75rem + env(safe-area-inset-right)) calc(.75rem + env(safe-area-inset-bottom)) calc(.75rem + env(safe-area-inset-left));
-    padding-top:calc(.75rem + env(safe-area-inset-top));
-    background:var(--bg)!important;
-    backdrop-filter:none!important; -webkit-backdrop-filter:none!important;
-    overflow:visible!important;
-  }
-  .modal.open .mbox{ margin:0 auto!important; }
-  .scrollbox{ max-height:none!important; }
-  #preview-history-list,#genre-list,#top-genres-list{ max-height:none!important; }
-  .mbox{ animation:none!important; }
-  [data-tilt]{ transform:none!important; transform-style:flat!important; }
+  .modal{ touch-action:pan-y!important; -webkit-overflow-scrolling:touch; }
+  .modal.open{ display:block!important; }
 }
-@media (prefers-reduced-motion: reduce){ *{ animation-duration:.01ms!important; transition-duration:.01ms!important; } }
 </style>
 </head>
 <body class="booting">
