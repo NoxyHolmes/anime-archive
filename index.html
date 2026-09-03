@@ -135,8 +135,6 @@ body.locked{ overflow:hidden; }
   box-shadow:0 24px 48px -20px rgba(0,0,0,.6), 0 0 34px -8px color-mix(in srgb,var(--tc,var(--pink)) 60%,transparent); }
 .card:active{ transform:perspective(1000px) scale(.97); }
 .card.just{ border-color:var(--pink)!important; box-shadow:0 0 0 1px var(--pink), 0 0 44px -6px var(--pink)!important; }
-
-/* на тач-экранах убираем залипающие hover-эффекты */
 @media(hover:none){
   .card:hover .card-media img{ transform:none; }
   .card:hover .pop{ transform:translateZ(0); }
@@ -184,6 +182,7 @@ body.locked{ overflow:hidden; }
   background:linear-gradient(135deg,var(--pink),var(--purple)); border:none; box-shadow:0 10px 24px -10px color-mix(in srgb,var(--pink) 75%,transparent), inset 0 1px 0 rgba(255,255,255,.22); transition:transform .18s, filter .2s; }
 .btn-primary:hover{ filter:brightness(1.12); transform:translateY(-1.5px); }
 .btn-primary:active{ transform:translateY(1px) scale(.97); }
+.btn-primary:disabled{ opacity:.6; cursor:wait; transform:none; }
 .tab{ padding:.45rem .85rem; border-radius:.65rem; font-size:11px; font-weight:700; font-family:'JetBrains Mono',monospace; color:var(--faint); transition:.2s; white-space:nowrap; }
 .tab:hover{ color:var(--text); }
 .tab.on{ background:linear-gradient(135deg,var(--pink),var(--purple)); color:#fff; box-shadow:0 5px 16px -6px color-mix(in srgb,var(--pink) 60%,transparent); }
@@ -232,7 +231,7 @@ body.locked{ overflow:hidden; }
 .toast-err{ border-color:color-mix(in srgb,var(--red) 50%,transparent); }
 @keyframes tIn{ from{ opacity:0; transform:perspective(700px) translateX(36px) rotateY(-16deg); } }
 
-/* ================= РОЛИ: зритель не видит кнопки редактирования ================= */
+/* ================= РОЛИ ================= */
 body.role-viewer .owner-only{ display:none!important; }
 
 /* ================= KPI / СТАТИСТИКА ================= */
@@ -278,12 +277,10 @@ body.role-viewer .owner-only{ display:none!important; }
 ::-webkit-scrollbar-thumb:hover{ background:var(--pink); }
 
 /* ================= МОБИЛЬНАЯ АДАПТАЦИЯ ================= */
-/* iOS не зумит страницу, если шрифт в полях ≥16px */
 @media(pointer:coarse){
   input.input, select.input, .modal input, .modal select{ font-size:16px!important; }
   .h-row input{ min-width:0; }
 }
-/* выемки под камеру/жесты */
 #toast-wrap{ bottom:calc(1.25rem + env(safe-area-inset-bottom)); right:calc(1.25rem + env(safe-area-inset-right)); }
 #scroll-top{ bottom:calc(1.25rem + env(safe-area-inset-bottom)); left:calc(1.25rem + env(safe-area-inset-left)); }
 header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
@@ -295,6 +292,9 @@ header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
 
 <!-- ПРЕЛОАДЕР -->
 <div id="boot"><div class="b-glyph">ア</div><div class="spin"></div><p class="text-[10px] font-mono" style="color:var(--faint)">загрузка архива…</p></div>
+<noscript><p style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:2rem">Для работы архива включите JavaScript.</p></noscript>
+<!-- страховка: спрятать загрузчик, даже если основной скрипт не запустился -->
+<script>setTimeout(function(){var b=document.getElementById('boot');if(b){b.style.opacity=0;b.style.pointerEvents='none';}},6000);</script>
 
 <!-- ====== ФОН ====== -->
 <div id="bg-sky" class="bg-layer"></div>
@@ -319,7 +319,7 @@ header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
         <div class="w-11 h-11 rounded-2xl flex items-center justify-center font-disp font-black text-lg text-white shadow-lg" style="background:linear-gradient(135deg,var(--pink),var(--purple))">ア</div>
         <div class="min-w-0">
           <h1 class="font-disp text-[13px] tracking-wide" style="color:var(--text)">アニメ アРХИВ</h1>
-          <p class="text-[10px] font-mono" style="color:var(--faint)">sakura edition · v6.5 live</p>
+          <p class="text-[10px] font-mono" style="color:var(--faint)">sakura edition · v1.0</p>
         </div>
         <button onclick="toggleSidebar(false)" class="ml-auto lg:hidden text-lg" style="color:var(--faint)">✕</button>
       </div>
@@ -438,7 +438,7 @@ header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
 
       <footer class="text-center text-[10px] font-mono py-4 space-y-1" style="color:var(--faint)">
         <div id="sync-line">☁️ подключение к серверу…</div>
-        <div>アニメ アーカイブ · сделано с ❤️ и 🌸</div>
+        <div>アニメ アーカイブ · v1.0 · сделано с ❤️ и 🌸</div>
       </footer>
     </main>
   </div>
@@ -565,8 +565,8 @@ header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
         <input id="om-repo" class="input font-mono !text-[11px]" placeholder="username/anime-archive" autocapitalize="off" spellcheck="false"></div>
       <div><label class="block font-mono font-bold mb-1 text-[10px] uppercase tracking-wider" style="color:var(--faint)">Токен доступа (PAT)</label>
         <input id="om-token" type="password" class="input font-mono !text-[11px]" placeholder="github_pat_…" autocapitalize="off" spellcheck="false">
-        <p class="hint">🔐 Токен хранится только в вашем браузере и никуда не отправляется, кроме GitHub API. Создать: GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens. Разрешение: Contents → Read and write, только для этого репозитория.</p></div>
-      <button onclick="ownerLogin()" class="btn-primary w-full !py-2.5">✍️ Войти как владелец</button>
+        <p class="hint">🔐 Токен хранится только в вашем браузере. Создать: GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens. Разрешение: Contents → Read and write, только для этого репозитория.</p></div>
+      <button onclick="ownerLogin()" id="om-login-btn" class="btn-primary w-full !py-2.5">✍️ Войти как владелец</button>
     </div>
     <div id="om-owner" class="space-y-2 hidden">
       <button onclick="commitNow(true)" class="btn-primary w-full !py-2.5">☁️ Опубликовать архив сейчас</button>
@@ -575,7 +575,7 @@ header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
     </div>
     <div id="om-viewer" class="space-y-2 hidden">
       <button onclick="pull(true)" class="btn w-full justify-center !py-2.5">⟳ Обновить архив сейчас</button>
-      <p class="hint">👁 Вы в режиме просмотра: редактировать архив может только владелец. Данные обновляются автоматически каждые 15 секунд.</p>
+      <p class="hint">👁 Вы в режиме просмотра: редактировать архив может только владелец. Данные обновляются автоматически.</p>
     </div>
   </div>
 </div>
@@ -658,10 +658,13 @@ let isEditMode=false, editingIndex=-1, previewIndex=-1, pendingDelete=-1, search
 let histByDate=false, currentView='grid';
 let charts={radar:null,yearly:null,tier:null,format:null};
 let wind=0, windTarget=0, petalColor='255,158,196';
-let revealed=false;
+let revealed=false, firstPull=true;
 
 // ===== СОСТОЯНИЕ СИНХРОНИЗАЦИИ =====
-const R={ token:'', repo:'', sha:null, published:null, dirty:false, flying:false, timer:null, lastMod:'', etag:'', lastPull:0, lastSync:0, pending:false };
+const R={ token:'', repo:'', sha:null, published:null, dirty:false, flying:false, timer:null, lastPull:0, lastSync:0, pending:false, booted:false };
+
+// глушим «шумные» сетевые отказы в консоли — на работу сайта они не влияют
+addEventListener('unhandledrejection',function(e){ e.preventDefault(); });
 
 // ============================================================
 // ХЕЛПЕРЫ
@@ -740,7 +743,7 @@ function matchesTypes(a){
 }
 
 // ============================================================
-// ХРАНИЛИЩЕ + СИНХРОНИЗАЦИЯ С GITHUB
+// ХРАНИЛИЩЕ + СИНХРОНИЗАЦИЯ (v1.0: тихая и защищённая)
 // ============================================================
 function saveLocal(){ try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(animeData)); }catch(e){} }
 function save(){
@@ -781,27 +784,28 @@ async function commitNow(force){
   R.flying=true; R.dirty=false;
   toast('☁️ Отправляю на GitHub…');
   try{
-    if(R.sha===null){ // sha неизвестен — спрашиваем
+    if(R.sha===null){
       const g=await fetch(`${GH_API}/repos/${R.repo}/contents/data.json`,{headers:ownerHeaders()});
-      if(g.ok) R.sha=(await g.json()).sha;
-      else if(g.status===404) R.sha='';
-      else if(g.status===401){ throw {code:401}; }
+      if(g.status===401) throw {code:401};
+      R.sha=g.ok?(await g.json()).sha:(g.status===404?'':null);
+      if(R.sha===null) R.sha='';
     }
     let body={message:`🌐 обновление архива · ${new Date().toLocaleString('ru-RU')}`,content:b64e(JSON.stringify(animeData))};
     if(R.sha) body.sha=R.sha;
     let p=await fetch(`${GH_API}/repos/${R.repo}/contents/data.json`,{method:'PUT',headers:ownerHeaders(),body:JSON.stringify(body)});
-    if(p.status===409){ // файл изменился извне — перечитываем sha и повторяем
+    if(p.status===409){
       const g=await fetch(`${GH_API}/repos/${R.repo}/contents/data.json`,{headers:ownerHeaders()});
       R.sha=g.ok?(await g.json()).sha:'';
       body={...body,sha:R.sha||undefined};
       p=await fetch(`${GH_API}/repos/${R.repo}/contents/data.json`,{method:'PUT',headers:ownerHeaders(),body:JSON.stringify(body)});
     }
     if(p.ok){
-      R.sha=(await p.json()).content.sha;
-      R.published=true; R.lastSync=Date.now(); R.lastPull=Date.now();
+      const j=await p.json();
+      R.sha=j.content&&j.content.sha?j.content.sha:j.sha;
+      R.published=true; R.booted=true; R.lastSync=Date.now(); R.lastPull=Date.now();
       toast('☁️ Опубликовано! Зрители увидят обновление через ~1–2 мин');
       updateOmStatus(); updateSyncLine();
-    }else if(p.status===401){ throw {code:401}; }
+    }else if(p.status===401) throw {code:401};
     else if(p.status===403){ toast('Нет прав на запись: проверьте у токена разрешение Contents → Read and write','err'); R.dirty=true; }
     else{ toast('GitHub отклонил сохранение ('+p.status+')','err'); R.dirty=true; }
   }catch(err){
@@ -811,44 +815,58 @@ async function commitNow(force){
   }
   R.flying=false;
   updateOmStatus();
-  if(R.dirty) scheduleRetry();
+  if(R.dirty){ clearTimeout(R.timer); R.timer=setTimeout(()=>commitNow(false),8000); }
 }
-function scheduleRetry(){
-  clearTimeout(R.timer);
-  R.timer=setTimeout(()=>commitNow(false),8000);
+// ЕДИНЫЙ безопасный запрос данных: никогда не парсит HTML, никогда не бросает исключений
+async function fetchRemote(){
+  try{
+    const r=await fetch('data.json?nc='+Date.now(),{cache:'no-store'});
+    if(r.status===404){ R.published=false; return null; } // архив ещё не опубликован — это не ошибка
+    if(!r.ok) return null;
+    const txt=await r.text();
+    try{ return JSON.parse(txt); }catch(e){ return null; }
+  }catch(e){ return null; }
 }
 async function pull(manual){
   if(R.flying||(R.dirty&&isOwner())) return;
-  try{
-    const t=Date.now();
-    const h=await fetch(`data.json?nc=${t}`,{method:'HEAD',cache:'no-store'});
-    if(h.status===404){ R.published=false; R.lastPull=Date.now(); updateSyncLine(); updateOmStatus(); if(manual) toast('Архив ещё не опубликован владельцем'); return; }
-    if(!h.ok){ if(manual) toast('Сервер недоступен','err'); return; }
-    R.published=true;
-    const lm=h.headers.get('last-modified')||'', et=h.headers.get('etag')||'';
-    if(lm===R.lastMod&&et===R.etag&&R.lastPull){ R.lastPull=Date.now(); if(manual) toast('Данные актуальны ✓'); updateSyncLine(); return; }
-    const g=await fetch(`data.json?nc=${t}`,{cache:'no-store'});
-    if(!g.ok) return;
-    const txt=await g.text();
-    R.lastMod=lm; R.etag=et; R.lastPull=Date.now();
-    let arr; try{ arr=JSON.parse(txt); }catch(e){ return; }
-    if(!Array.isArray(arr)) return;
-    if(JSON.stringify(arr)===JSON.stringify(animeData)){ if(manual) toast('Данные актуальны ✓'); updateSyncLine(); return; }
+  const arr=await fetchRemote();
+  R.lastPull=Date.now();
+  if(arr===null){
+    if(!R.booted){
+      R.booted=true;
+      if(R.published===false&&!isOwner()){ animeData=[]; render(); }
+    }
+    if(manual) toast(R.published===false?'Архив ещё не опубликован владельцем':'Сервер недоступен, попробуйте позже');
+    reveal(); updateSyncLine(); updateOmStatus();
+    return;
+  }
+  R.published=true; R.booted=true;
+  if(Array.isArray(arr)&&JSON.stringify(arr)!==JSON.stringify(animeData)){
     animeData=arr; saveLocal();
     if(document.querySelector('.modal.open')){ R.pending=true; updateSyncLine(); }
-    else{ render(); toast('Архив обновлён 🌸'); }
-    updateSyncLine(); updateOmStatus();
-  }catch(e){ if(manual) toast('Нет связи с сервером','err'); }
+    else{ render(); if(!firstPull) toast('Архив обновлён 🌸'); }
+  }else if(manual) toast('Данные актуальны ✓');
+  firstPull=false;
+  reveal(); updateSyncLine(); updateOmStatus();
+}
+function startPolling(){
+  setInterval(()=>{
+    if(document.visibilityState!=='visible'||R.flying) return;
+    if(R.dirty&&isOwner()) return;
+    // архив не опубликован → редкая тихая проверка раз в 90 сек (не спамим консоль)
+    if(R.published===false&&Date.now()-R.lastPull<90000) return;
+    // архив опубликован → живое обновление каждые ~15 сек
+    if(R.published!==false&&Date.now()-R.lastPull<14000) return;
+    pull(false);
+  },5000);
 }
 async function bootRemote(){
   const det=detectRepo();
   if(det) el('om-repo').value=`${det.owner}/${det.repo}`;
   await pull(false);
-  if(R.published===false&&!isOwner()){ animeData=[]; render(); }
   reveal();
-  setInterval(()=>{ if(document.visibilityState==='visible'&&!R.flying) pull(false); },15000);
-  document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') pull(false); });
-  updateSyncLine(); updateOmStatus();
+  startPolling();
+  document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible'&&Date.now()-R.lastPull>5000) pull(false); });
 }
 function reveal(){
   if(revealed) return; revealed=true;
@@ -897,22 +915,22 @@ async function ownerLogin(){
   const tok=el('om-token').value.trim();
   if(!repo||!tok){ toast('Заполните оба поля','err'); return; }
   if(!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(repo)){ toast('Репозиторий в формате: имя/репозиторий','err'); return; }
-  const btn=el('om-login-btn')||document.querySelector('#om-login .btn-primary');
-  if(btn){ btn.textContent='⏳ Проверяю доступ…'; btn.disabled=true; }
+  const btn=el('om-login-btn');
+  btn.textContent='⏳ Проверяю доступ…'; btn.disabled=true;
   try{
     const r=await fetch(`${GH_API}/repos/${repo}`,{headers:{Authorization:'Bearer '+tok,Accept:'application/vnd.github+json'}});
     if(r.status===401){ toast('Токен неверный или истёк','err'); return; }
     if(r.status===404){ toast('Репозиторий не найден — проверьте имя','err'); return; }
     if(!r.ok){ toast('GitHub ответил ошибкой '+r.status,'err'); return; }
     const j=await r.json();
-    if(j.permissions&&!j.permissions.push){ toast('У токета нет прав на запись в этот репозиторий','err'); return; }
+    if(j.permissions&&!j.permissions.push){ toast('У токена нет прав на запись в этот репозиторий','err'); return; }
     R.token=tok; R.repo=repo; R.sha=null; R.dirty=false;
     try{ localStorage.setItem('oa_token',tok); localStorage.setItem('oa_repo',repo); }catch(e){}
     el('om-token').value='';
     applyRole(); renderOwnerModal();
     toast('Режим владельца активирован ✍️ Теперь можно редактировать');
   }catch(e){ toast('Нет связи с GitHub','err'); }
-  finally{ if(btn){ btn.textContent='✍️ Войти как владелец'; btn.disabled=false; } }
+  finally{ btn.textContent='✍️ Войти как владелец'; btn.disabled=false; }
 }
 function ownerLogout(){
   R.token=''; R.repo=''; R.sha=null; R.dirty=false; clearTimeout(R.timer);
@@ -1274,7 +1292,6 @@ function openPreview(i){
   el('preview-type-badge').textContent=`${(TYPE_META[a.type]||{}).icon||'📺'} ${(TYPE_META[a.type]||{}).label||'Сериал'}`;
   const fb=el('preview-fav-badge');
   fb.classList.toggle('hidden',!a.favorite);
-  fb.textContent=a.favorite?'❤️ Избранное (нажмите, чтобы убрать)':'';
   el('preview-genres').innerHTML=(a.genres||[]).map(g=>`<span class="fchip" style="cursor:default">${esc(g)}</span>`).join('');
   el('preview-episodes').textContent=a.episodes||0;
   el('preview-movies').textContent=a.movies||0;
@@ -1584,7 +1601,7 @@ addEventListener('scroll',()=>{
   setupUpload();
   setupDelegations();
   bootRemote();
-  setTimeout(reveal,2500); // страховка: даже офлайн сайт откроется
+  setTimeout(reveal,2500);
 })();
 </script>
 </body>
