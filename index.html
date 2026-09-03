@@ -44,7 +44,8 @@ tailwind.config = { theme: { extend: { fontFamily: {
 *{ -webkit-tap-highlight-color:transparent; }
 html{ scroll-behavior:smooth; background:var(--bg); }
 body{ background:var(--bg); color:var(--text); font-family:'Golos Text',sans-serif; min-height:100vh; min-height:100svh; overflow-x:hidden; touch-action:manipulation; transition:background .4s,color .4s; }
-body.locked{ overflow:hidden; }
+body.locked,html.locked{ overflow:hidden; }
+html.locked{ overscroll-behavior:none; }
 
 /* ================= ПРЕЛОАДЕР ================= */
 #boot{ position:fixed; inset:0; z-index:99; background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; transition:opacity .45s ease; }
@@ -241,12 +242,21 @@ body.role-viewer .owner-only{ display:none!important; }
 .stat-tile .l{ font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--faint); margin-top:3px; }
 .meta-row{ display:flex; align-items:center; gap:8px; font-size:11.5px; color:var(--dim); flex-wrap:wrap; }
 .meta-row b{ color:var(--text); font-weight:700; }
-.hist-item{ display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:.9rem; background:var(--panel2); border:1px solid var(--border); transition:.15s; }
-.hist-item:hover{ border-color:var(--border-strong); }
-.hist-icon{ width:32px; height:32px; border-radius:.65rem; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; background:color-mix(in srgb,var(--text) 6%,transparent); border:1px solid var(--border); }
 .hist-badge{ font-family:'JetBrains Mono',monospace; font-size:9.5px; padding:3px 7px; border-radius:.5rem; border:1px solid var(--border); color:var(--dim); white-space:nowrap; }
 .tg-bar{ height:5px; border-radius:99px; background:color-mix(in srgb,var(--text) 8%,transparent); overflow:hidden; }
 .tg-bar>div{ height:100%; border-radius:inherit; transition:width .6s cubic-bezier(.16,1,.3,1); }
+
+/* ================= ИСТОРИЯ ПРОСМОТРОВ: ПОЛНЫЙ ТАЙМЛАЙН (без прокрутки) ================= */
+.ptl-year{ font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--faint); margin:16px 2px 8px; display:flex; align-items:center; gap:10px; }
+.ptl-year::after{ content:''; flex:1; height:1px; background:var(--border); }
+.ptl-year:first-child{ margin-top:2px; }
+.ptl-group{ position:relative; }
+.ptl-group::before{ content:''; position:absolute; left:16px; top:8px; bottom:8px; width:2px; border-radius:2px;
+  background:linear-gradient(180deg, color-mix(in srgb,var(--pink) 45%,transparent), color-mix(in srgb,var(--purple) 35%,transparent)); }
+.ptl-item{ position:relative; display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:7px 8px 7px 0; border-radius:.8rem; }
+.ptl-item:hover{ background:color-mix(in srgb,var(--text) 4%,transparent); }
+.ptl-ico{ position:relative; z-index:1; width:34px; height:34px; flex-shrink:0; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px;
+  background:var(--solid); border:1px solid var(--border-strong); box-shadow:0 0 14px -5px color-mix(in srgb,var(--pink) 50%,transparent); }
 
 /* ================= ЗАГРУЗКА ПОСТЕРА ================= */
 #drop-zone{ position:relative; border:1.5px dashed var(--border-strong); border-radius:.9rem; min-height:118px; display:flex; align-items:center; justify-content:center; text-align:center; cursor:pointer;
@@ -285,12 +295,40 @@ body.role-viewer .owner-only{ display:none!important; }
 #scroll-top{ bottom:calc(1.25rem + env(safe-area-inset-bottom)); left:calc(1.25rem + env(safe-area-inset-left)); }
 header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
 @media(max-width:640px){ .modal{ padding:.75rem; } }
-<script>
-/* ============ v1.6 ТЕЛЕФОН: РАЗРЕШАЕМ ВЕРТИКАЛЬНЫЙ ЖЕСТ ============ */
-@media(max-width:900px){
-  .modal{ touch-action:pan-y!important; -webkit-overflow-scrolling:touch; }
-  .modal.open{ display:block!important; }
+
+/* ============ v1.7 ТЕЛЕФОН: КАРТОЧКА = ОТДЕЛЬНАЯ СТРАНИЦА, ОДИН СКРОЛЛ ============ */
+@media(hover:none) and (pointer:coarse){
+  /* 3D-слои внутри прокручиваемого окна ломают тач-скролл — отключаем */
+  [data-tilt]{ transform:none!important; transform-style:flat!important; }
+  .pop,.card-body{ transform:none!important; }
+  .mbox{ animation:none!important; }
+  .card{ animation:vfade .4s ease backwards!important; }
+  .view-section.active{ animation:vfade .35s ease!important; }
+  .toast{ animation:none!important; }
+  .card:active{ transform:scale(.98)!important; }
 }
+@keyframes vfade{ from{ opacity:0; } }
+@media(max-width:900px){
+  #app{ animation:none!important; }
+  body.locked,html.locked{ overflow:visible!important; }
+  body.modal-page{ overscroll-behavior-y:none; }
+  body.modal-page #app,body.modal-page #scroll-top{ display:none!important; }
+  .modal{ touch-action:pan-y!important; -webkit-overflow-scrolling:touch; }
+  .modal.open{
+    display:block!important; position:absolute!important;
+    top:0!important; left:0!important; right:0!important; bottom:auto!important;
+    min-height:100vh; min-height:100svh;
+    padding:.75rem calc(.75rem + env(safe-area-inset-right)) calc(.75rem + env(safe-area-inset-bottom)) calc(.75rem + env(safe-area-inset-left));
+    padding-top:calc(.75rem + env(safe-area-inset-top));
+    background:var(--bg)!important;
+    backdrop-filter:none!important; -webkit-backdrop-filter:none!important;
+    overflow:visible!important;
+  }
+  .modal.open .mbox{ margin:0 auto!important; animation:none!important; }
+  .scrollbox{ max-height:none!important; }
+  #genre-list,#top-genres-list{ max-height:none!important; }
+}
+@media (prefers-reduced-motion: reduce){ *{ animation-duration:.01ms!important; transition-duration:.01ms!important; } }
 </style>
 </head>
 <body class="booting">
@@ -323,8 +361,8 @@ header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
       <div class="flex items-center gap-3">
         <div class="w-11 h-11 rounded-2xl flex items-center justify-center font-disp font-black text-lg text-white shadow-lg" style="background:linear-gradient(135deg,var(--pink),var(--purple))">ア</div>
         <div class="min-w-0">
-          <h1 class="font-disp text-[13px] tracking-wide" style="color:var(--text)">АРХИВ</h1>
-          <p class="text-[10px] font-mono" style="color:var(--faint)">sakura edition · v1.0</p>
+          <h1 class="font-disp text-[13px] tracking-wide" style="color:var(--text)">アニメ АРХИВ</h1>
+          <p class="text-[10px] font-mono" style="color:var(--faint)">sakura edition · v1.7</p>
         </div>
         <button onclick="toggleSidebar(false)" class="ml-auto lg:hidden text-lg" style="color:var(--faint)">✕</button>
       </div>
@@ -443,7 +481,7 @@ header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
 
       <footer class="text-center text-[10px] font-mono py-4 space-y-1" style="color:var(--faint)">
         <div id="sync-line">☁️ подключение к серверу…</div>
-        <div>v1.0 · сделано с ❤️ и 🌸</div>
+        <div>アニメ アーカイブ · v1.7 · сделано с ❤️ и 🌸</div>
       </footer>
     </main>
   </div>
@@ -549,7 +587,7 @@ header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
             <h4 class="text-[10px] font-mono font-bold uppercase tracking-wider" style="color:var(--faint)">🕒 История просмотров</h4>
             <button onclick="toggleHistoryOrder()" id="hist-order-btn" class="btn !py-1 !px-2 !text-[9.5px]">⇅ по порядку</button>
           </div>
-          <div id="preview-history-list" class="space-y-1.5 max-h-52 overflow-y-auto pr-1"></div>
+          <div id="preview-history-list" class="ptl"></div>
         </div>
         <button onclick="editFromPreview()" class="btn w-full justify-center !py-2.5 owner-only">✏️ Редактировать этот тайтл</button>
       </div>
@@ -663,12 +701,15 @@ let isEditMode=false, editingIndex=-1, previewIndex=-1, pendingDelete=-1, search
 let histByDate=false, currentView='grid';
 let charts={radar:null,yearly:null,tier:null,format:null};
 let wind=0, windTarget=0, petalColor='255,158,196';
-let revealed=false, firstPull=true;
+let revealed=false, firstPull=true, pageSavedY=-1;
 
 // ===== СОСТОЯНИЕ СИНХРОНИЗАЦИИ =====
-const R={ token:'', repo:'', sha:null, published:null, dirty:false, flying:false, timer:null, lastPull:0, lastSync:0, pending:false, booted:false };
+// localPublished — последняя успешно отправленная НАМИ версия (строка JSON)
+// lastRemote    — последняя увиденная версия сервера (строка JSON)
+// Сервер НИКОГДА не затирает локальные несинхронизированные правки владельца.
+const R={ token:'', repo:'', sha:null, published:null, dirty:false, flying:false, timer:null,
+          lastPull:0, lastSync:0, pending:null, booted:false, localPublished:null, lastRemote:null };
 
-// глушим «шумные» сетевые отказы в консоли — на работу сайта они не влияют
 addEventListener('unhandledrejection',function(e){ e.preventDefault(); });
 
 // ============================================================
@@ -678,6 +719,7 @@ const el=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function cssVar(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
 const pad=n=>String(n).padStart(2,'0');
+const isMobile=()=>matchMedia('(max-width:900px)').matches;
 function dateTs(s){
   if(!s) return 0; s=String(s).trim(); let m;
   if(m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/)) return +new Date(+m[1],+m[2]-1,+m[3]);
@@ -748,7 +790,7 @@ function matchesTypes(a){
 }
 
 // ============================================================
-// ХРАНИЛИЩЕ + СИНХРОНИЗАЦИЯ (v1.0: тихая и защищённая)
+// ХРАНИЛИЩЕ + СИНХРОНИЗАЦИЯ С GITHUB (v1.7 — без откатов правок)
 // ============================================================
 function saveLocal(){ try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(animeData)); }catch(e){} }
 function save(){
@@ -780,7 +822,7 @@ function markDirty(){
   if(!isOwner()) return;
   R.dirty=true; updateOmStatus();
   clearTimeout(R.timer);
-  R.timer=setTimeout(()=>commitNow(false),1600);
+  R.timer=setTimeout(()=>commitNow(false),1500);
 }
 async function commitNow(force){
   if(!isOwner()){ toast('Сначала войдите как владелец (кнопка 🔒)','err'); return; }
@@ -792,26 +834,25 @@ async function commitNow(force){
     if(R.sha===null){
       const g=await fetch(`${GH_API}/repos/${R.repo}/contents/data.json`,{headers:ownerHeaders()});
       if(g.status===401) throw {code:401};
-      R.sha=g.ok?(await g.json()).sha:(g.status===404?'':null);
-      if(R.sha===null) R.sha='';
+      R.sha=g.ok?(await g.json()).sha:(g.status===404?'':'');
     }
-    let body={message:`🌐 обновление архива · ${new Date().toLocaleString('ru-RU')}`,content:b64e(JSON.stringify(animeData))};
-    if(R.sha) body.sha=R.sha;
-    let p=await fetch(`${GH_API}/repos/${R.repo}/contents/data.json`,{method:'PUT',headers:ownerHeaders(),body:JSON.stringify(body)});
-    if(p.status===409){
+    const payload=JSON.stringify(animeData);
+    const mkBody=()=>{ const b={message:`🌐 обновление архива · ${new Date().toLocaleString('ru-RU')}`,content:b64e(payload)}; if(R.sha) b.sha=R.sha; return JSON.stringify(b); };
+    let p=await fetch(`${GH_API}/repos/${R.repo}/contents/data.json`,{method:'PUT',headers:ownerHeaders(),body:mkBody()});
+    if(p.status===409){ // файл изменили извне — перечитываем sha и повторяем
       const g=await fetch(`${GH_API}/repos/${R.repo}/contents/data.json`,{headers:ownerHeaders()});
       R.sha=g.ok?(await g.json()).sha:'';
-      body={...body,sha:R.sha||undefined};
-      p=await fetch(`${GH_API}/repos/${R.repo}/contents/data.json`,{method:'PUT',headers:ownerHeaders(),body:JSON.stringify(body)});
+      p=await fetch(`${GH_API}/repos/${R.repo}/contents/data.json`,{method:'PUT',headers:ownerHeaders(),body:mkBody()});
     }
     if(p.ok){
       const j=await p.json();
-      R.sha=j.content&&j.content.sha?j.content.sha:j.sha;
+      R.sha=(j.content&&j.content.sha)?j.content.sha:j.sha;
+      R.localPublished=payload;   // считаем эту версию «нашей опубликованной»
       R.published=true; R.booted=true; R.lastSync=Date.now(); R.lastPull=Date.now();
-      toast('☁️ Опубликовано! Зрители увидят обновление через ~1–2 мин');
+      toast('☁️ Опубликовано! Зрители увидят обновление через ~1 мин');
       updateOmStatus(); updateSyncLine();
     }else if(p.status===401) throw {code:401};
-    else if(p.status===403){ toast('Нет прав на запись: проверьте у токена разрешение Contents → Read and write','err'); R.dirty=true; }
+    else if(p.status===403){ toast('Нет прав на запись: у токена нет разрешения Contents → Read and write','err'); R.dirty=true; }
     else{ toast('GitHub отклонил сохранение ('+p.status+')','err'); R.dirty=true; }
   }catch(err){
     if(err&&err.code===401) toast('Токен истёк или неверен — войдите заново через кнопку 🔒','err');
@@ -822,48 +863,73 @@ async function commitNow(force){
   updateOmStatus();
   if(R.dirty){ clearTimeout(R.timer); R.timer=setTimeout(()=>commitNow(false),8000); }
 }
-// ЕДИНЫЙ безопасный запрос данных: никогда не парсит HTML, никогда не бросает исключений
-async function fetchRemote(){
+// безопасный запрос: HTML никогда не парсится, ошибки сети гасятся
+async function fetchRemoteRaw(){
   try{
     const r=await fetch('data.json?nc='+Date.now(),{cache:'no-store'});
-    if(r.status===404){ R.published=false; return null; } // архив ещё не опубликован — это не ошибка
-    if(!r.ok) return null;
-    const txt=await r.text();
-    try{ return JSON.parse(txt); }catch(e){ return null; }
-  }catch(e){ return null; }
+    if(r.status===404) return {status:404,text:null};
+    if(!r.ok) return {status:r.status,text:null};
+    return {status:200,text:await r.text()};
+  }catch(e){ return {status:0,text:null}; }
+}
+// применить серверную версию (с защитой локальных правок)
+function applyRemote(remoteStr,silent){
+  let arr; try{ arr=JSON.parse(remoteStr); }catch(e){ return; }
+  if(!Array.isArray(arr)) return;
+  const localStr=JSON.stringify(animeData);
+  if(isOwner()&&R.localPublished!==null&&localStr!==R.localPublished) return; // есть несинхронные правки — не трогаем
+  if(remoteStr===localStr) return;
+  animeData=arr; saveLocal(); render();
+  if(!silent) toast('Архив обновлён 🌸');
 }
 async function pull(manual){
-  if(R.flying||(R.dirty&&isOwner())) return;
-  const arr=await fetchRemote();
+  if(R.flying) return;
+  if(R.dirty&&isOwner()){ if(manual) toast('Ваши правки ещё отправляются — секунду…'); return; }
+  const res=await fetchRemoteRaw();
   R.lastPull=Date.now();
-  if(arr===null){
-    if(!R.booted){
-      R.booted=true;
-      if(R.published===false&&!isOwner()){ animeData=[]; render(); }
-    }
-    if(manual) toast(R.published===false?'Архив ещё не опубликован владельцем':'Сервер недоступен, попробуйте позже');
+  if(res.status===404){
+    R.published=false; R.booted=true;
+    if(manual) toast('Архив ещё не опубликован владельцем');
     reveal(); updateSyncLine(); updateOmStatus();
     return;
   }
+  if(res.status!==200||!res.text){
+    if(manual) toast('Сервер недоступен, попробуйте позже');
+    reveal(); updateSyncLine();
+    return;
+  }
   R.published=true; R.booted=true;
-  if(Array.isArray(arr)&&JSON.stringify(arr)!==JSON.stringify(animeData)){
-    animeData=arr; saveLocal();
-    if(document.querySelector('.modal.open')){ R.pending=true; updateSyncLine(); }
-    else{ render(); if(!firstPull) toast('Архив обновлён 🌸'); }
-  }else if(manual) toast('Данные актуальны ✓');
-  firstPull=false;
+  const remoteStr=res.text;
+  if(remoteStr===R.lastRemote){ // сервер не менялся
+    if(manual) toast('Данные актуальны ✓');
+    reveal(); updateSyncLine(); updateOmStatus();
+    return;
+  }
+  R.lastRemote=remoteStr;
+  if(remoteStr===R.localPublished){ // наша же публикация добралась до CDN
+    if(manual) toast('Данные актуальны ✓');
+    reveal(); updateSyncLine(); updateOmStatus();
+    return;
+  }
+  // сервер реально изменился (с другого устройства владельца)
+  if(document.querySelector('.modal.open')){
+    // окно открыто: применяем только после закрытия, чтобы не ломать редактирование
+    R.pending=remoteStr; updateSyncLine();
+    if(manual) toast('Обновление применится после закрытия окна');
+    reveal(); return;
+  }
+  const silent=firstPull; firstPull=false;
+  applyRemote(remoteStr,silent);
   reveal(); updateSyncLine(); updateOmStatus();
 }
 function startPolling(){
   setInterval(()=>{
     if(document.visibilityState!=='visible'||R.flying) return;
     if(R.dirty&&isOwner()) return;
-    // архив не опубликован → редкая тихая проверка раз в 90 сек (не спамим консоль)
-    if(R.published===false&&Date.now()-R.lastPull<90000) return;
-    // архив опубликован → живое обновление каждые ~15 сек
-    if(R.published!==false&&Date.now()-R.lastPull<14000) return;
+    const gap=(R.published===false)?90000:8000; // опубликовано → живой опрос ~8 сек
+    if(Date.now()-R.lastPull<gap) return;
     pull(false);
-  },5000);
+  },3000);
 }
 async function bootRemote(){
   const det=detectRepo();
@@ -871,7 +937,7 @@ async function bootRemote(){
   await pull(false);
   reveal();
   startPolling();
-  document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible'&&Date.now()-R.lastPull>5000) pull(false); });
+  document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible'&&Date.now()-R.lastPull>4000) pull(false); });
 }
 function reveal(){
   if(revealed) return; revealed=true;
@@ -905,15 +971,18 @@ function updateOmStatus(){
     ['Публикация',R.published===null?'проверяется…':(R.published?'✓ data.json на сервере':'пока нет данных на сервере')],
     ['Обновлено',R.lastPull?fmtTime(R.lastPull):'—']
   ];
-  if(R.dirty) rows.push(['⚡ Не отправлено','изменения ждут отправки']);
+  if(R.dirty) rows.push(['⚡ Не отправлено','правки ждут отправки']);
   if(R.flying) rows.push(['☁️ Статус','идёт отправка на GitHub…']);
+  if(R.pending) rows.push(['⏳ Скачано','применится после закрытия окна']);
   s.innerHTML=rows.map(([k,v])=>`<div class="flex justify-between gap-3"><span style="color:var(--faint)">${k}</span><span class="text-right" style="color:var(--text)">${esc(v)}</span></div>`).join('');
 }
 function updateSyncLine(){
   const n=el('sync-line'); if(!n) return;
-  n.textContent=isOwner()
-    ? `✍️ режим владельца${R.lastSync?` · опубликовано ${fmtTime(R.lastSync)}`:''}`
-    : (R.published===false?'👁 архив ещё не опубликован владельцем':`👁 только просмотр · обновлено ${R.lastPull?fmtTime(R.lastPull):'—'}`);
+  let line;
+  if(isOwner()) line=`✍️ режим владельца${R.lastSync?` · опубликовано ${fmtTime(R.lastSync)}`:''}`;
+  else line=(R.published===false?'👁 архив ещё не опубликован владельцем':`👁 только просмотр · обновлено ${R.lastPull?fmtTime(R.lastPull):'—'}`);
+  if(R.pending) line+=' · ⏳ обновление после закрытия окна';
+  n.textContent=line;
 }
 async function ownerLogin(){
   let repo=el('om-repo').value.trim().replace(/^https?:\/\/github\.com\//i,'').replace(/\/+$/,'');
@@ -930,10 +999,12 @@ async function ownerLogin(){
     const j=await r.json();
     if(j.permissions&&!j.permissions.push){ toast('У токена нет прав на запись в этот репозиторий','err'); return; }
     R.token=tok; R.repo=repo; R.sha=null; R.dirty=false;
+    R.localPublished=null; R.lastRemote=null; R.pending=null;
     try{ localStorage.setItem('oa_token',tok); localStorage.setItem('oa_repo',repo); }catch(e){}
     el('om-token').value='';
     applyRole(); renderOwnerModal();
-    toast('Режим владельца активирован ✍️ Теперь можно редактировать');
+    toast('Режим владельца активирован ✍️');
+    await pull(false); // сразу подхватываем серверную версию архива
   }catch(e){ toast('Нет связи с GitHub','err'); }
   finally{ btn.textContent='✍️ Войти как владелец'; btn.disabled=false; }
 }
@@ -1048,15 +1119,7 @@ function cardHTML(a,i){
   </article>`;
 }
 function renderGrid(){
-  const c=el('tier-container');
-  if(R.published===false&&!isOwner()){
-    c.innerHTML=`<div class="surface rounded-2xl empty">
-      <div class="e-ico">🌸</div>
-      <h3 class="font-bold text-sm mt-3" style="color:var(--text)">Архив ещё не опубликован</h3>
-      <p class="text-xs mt-1" style="color:var(--dim)">Владелец ещё не загрузил данные на сервер — загляните позже</p></div>`;
-    return;
-  }
-  const list=getFiltered();
+  const list=getFiltered(), c=el('tier-container');
   if(!list.length){
     c.innerHTML=`<div class="surface rounded-2xl empty">
       <div class="e-ico">🌸</div>
@@ -1200,19 +1263,60 @@ function renderTimeline(){
 }
 
 // ============================================================
-// МОДАЛКИ
+// МОДАЛКИ (+ мобильный режим «карточка = страница»)
 // ============================================================
-function syncLock(){
-  const lock=!!document.querySelector('.modal.open');
-  document.body.classList.toggle('locked',lock);
-  document.documentElement.classList.toggle('locked',lock);
+// Chrome на телефоне не сразу пересчитывает высоту страницы после
+// разворачивания карточки — принудительно будим прокрутку.
+function wakeScroll(){
+  try{
+    const de=document.documentElement;
+    de.style.scrollBehavior='auto';
+    de.style.overflow='hidden';
+    void de.offsetHeight;
+    de.style.overflow='';
+    requestAnimationFrame(function(){
+      window.scrollTo(0,1);
+      requestAnimationFrame(function(){ window.scrollTo(0,0); });
+    });
+  }catch(e){}
 }
-function showModal(id){ const m=el(id); m.classList.remove('closing'); m.classList.add('open'); syncLock(); }
+function syncLock(){
+  const open=!!document.querySelector('.modal.open');
+  const mob=isMobile();
+  document.body.classList.toggle('locked',open&&!mob);
+  document.documentElement.classList.toggle('locked',open&&!mob);
+  document.body.classList.toggle('modal-page',open&&mob);
+  if(!open&&mob&&pageSavedY>=0){
+    document.documentElement.style.scrollBehavior='auto';
+    window.scrollTo(0,pageSavedY);
+    pageSavedY=-1;
+    wakeScroll();
+  }
+}
+function showModal(id){
+  const m=el(id); if(!m) return;
+  m.classList.remove('closing'); m.classList.add('open');
+  if(isMobile()){
+    if(pageSavedY<0) pageSavedY=window.scrollY;
+    requestAnimationFrame(function(){
+      document.documentElement.style.scrollBehavior='auto';
+      window.scrollTo(0,0);
+      wakeScroll();
+    });
+  }
+  syncLock();
+}
 function hideModal(id){
   const m=el(id); if(!m.classList.contains('open')) return;
   m.classList.add('closing');
-  setTimeout(()=>{ m.classList.remove('open','closing'); syncLock();
-    if(R.pending&&!document.querySelector('.modal.open')){ R.pending=false; render(); toast('Архив обновлён 🌸'); }
+  setTimeout(()=>{
+    m.classList.remove('open','closing');
+    syncLock();
+    if(R.pending&&!document.querySelector('.modal.open')){
+      const s=R.pending; R.pending=null;
+      applyRemote(s,false);
+      updateSyncLine();
+    }
   },180);
 }
 function closeModal(){ hideModal('modal'); editingIndex=-1; }
@@ -1299,8 +1403,7 @@ function openPreview(i){
   const pb=el('preview-tier-badge'); pb.className='tb tb-lg tb-'+a.tier; pb.textContent=a.tier;
   el('preview-tier-title').textContent=meta.title;
   el('preview-type-badge').textContent=`${(TYPE_META[a.type]||{}).icon||'📺'} ${(TYPE_META[a.type]||{}).label||'Сериал'}`;
-  const fb=el('preview-fav-badge');
-  fb.classList.toggle('hidden',!a.favorite);
+  el('preview-fav-badge').classList.toggle('hidden',!a.favorite);
   el('preview-genres').innerHTML=(a.genres||[]).map(g=>`<span class="fchip" style="cursor:default">${esc(g)}</span>`).join('');
   el('preview-episodes').textContent=a.episodes||0;
   el('preview-movies').textContent=a.movies||0;
@@ -1314,17 +1417,33 @@ function openPreview(i){
   renderPreviewHistory();
   showModal('preview-modal');
 }
+// полный таймлайн истории — без внутренней прокрутки, с группировкой по годам
 function renderPreviewHistory(){
   if(previewIndex<0) return;
   const a=animeData[previewIndex];
   let h=[...(a.history||[])];
   if(histByDate) h.sort((x,y)=>dateTs(y.date)-dateTs(x.date));
-  el('preview-history-list').innerHTML=h.map(r=>`<div class="hist-item">
-    <div class="hist-icon">${historyIcon(r)}</div>
-    <div class="min-w-0 flex-1"><div class="truncate text-[12px] font-bold" style="color:var(--text)">${esc(r.title)}</div>
-    <div class="text-[10px] font-mono" style="color:var(--faint)">${fmtRuDate(r.date)}${r.episodes?` · ${r.episodes} эп`:''}${r.movies?` · ${r.movies} ф`:''}</div></div>
-    <span class="hist-badge">${fmtRuntime((r.episodes||0)*EP_MIN+(r.movies||0)*MOV_MIN)}</span></div>`).join('')
-    ||`<p class="hint">История пуста</p>`;
+  const box=el('preview-history-list');
+  if(!h.length){ box.innerHTML=`<p class="hint">История пуста</p>`; }
+  else{
+    const groups=[];
+    h.forEach(r=>{
+      const ts=dateTs(r.date);
+      const y=ts?new Date(ts).getFullYear():'—';
+      let g=groups[groups.length-1];
+      if(!g||g.year!==y){ g={year:y,items:[]}; groups.push(g); }
+      g.items.push(r);
+    });
+    box.innerHTML=groups.map(g=>`<div class="ptl-year">${g.year}</div><div class="ptl-group">${
+      g.items.map(r=>`<div class="ptl-item">
+        <span class="ptl-ico">${historyIcon(r)}</span>
+        <div class="min-w-0 flex-1">
+          <div class="truncate text-[12.5px] font-bold" style="color:var(--text)">${esc(r.title)}</div>
+          <div class="text-[10px] font-mono" style="color:var(--faint)">${fmtRuDate(r.date)}${r.episodes?` · ${r.episodes} эп`:''}${r.movies?` · ${r.movies} ф`:''}</div>
+        </div>
+        <span class="hist-badge">${fmtRuntime((r.episodes||0)*EP_MIN+(r.movies||0)*MOV_MIN)}</span>
+      </div>`).join('')}</div>`).join('');
+  }
   el('hist-order-btn').textContent=`⇅ ${histByDate?'по дате':'по порядку'}`;
 }
 function toggleHistoryOrder(){ histByDate=!histByDate; renderPreviewHistory(); }
@@ -1612,28 +1731,6 @@ addEventListener('scroll',()=>{
   bootRemote();
   setTimeout(reveal,2500);
 })();
-</script>
-  <script>
-/* ===== v1.5: на телефоне модалка = отдельная страница, листается нативным скроллом ===== */
-var pageSavedY=-1;
-function syncLock(){
-  var open=!!document.querySelector('.modal.open');
-  var mob=matchMedia('(max-width:900px)').matches;
-  document.body.classList.toggle('locked',open&&!mob);
-  document.documentElement.classList.toggle('locked',open&&!mob);
-  document.body.classList.toggle('modal-page',open&&mob);
-  if(!open&&mob&&pageSavedY>=0){ window.scrollTo(0,pageSavedY); pageSavedY=-1; }
-}
-function showModal(id){
-  var m=document.getElementById(id);
-  if(!m) return;
-  m.classList.remove('closing'); m.classList.add('open');
-  if(matchMedia('(max-width:900px)').matches){
-    if(pageSavedY<0) pageSavedY=window.scrollY;
-    window.scrollTo(0,0);
-  }
-  syncLock();
-}
 </script>
 </body>
 </html>
