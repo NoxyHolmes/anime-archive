@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#07060c">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f4f2fb">
+<title>アニメ АРХИВ // Sakura Edition</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Golos+Text:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
+<script>
+tailwind.config = { theme: { extend: { fontFamily: {
+  sans:['"Golos Text"','sans-serif'],
+  mono:['"JetBrains Mono"','monospace'],
+  disp:['Unbounded','sans-serif'] } } } };
+</script>
+<style>
+/* ================= ТЕМЫ ================= */
+:root{
+  --bg:#07060c; --bg2:#0d0b16;
+  --panel:rgba(19,17,31,.6); --panel2:rgba(26,23,42,.5); --solid:#151226;
+  --border:rgba(255,255,255,.09); --border-strong:rgba(255,255,255,.2);
+  --text:#f4f2fc; --dim:#a29dc0; --faint:#6b6590;
+  --pink:#ff5d8f; --purple:#8b5cf6; --teal:#2dd4bf; --gold:#f5c451; --red:#fb7185;
+  --shadow:0 20px 50px -22px rgba(0,0,0,.65);
+  --blob1:rgba(255,93,143,.16); --blob2:rgba(139,92,246,.14); --blob3:rgba(45,212,191,.1);
+  --vig:rgba(2,0,10,.55); --petal:255,158,196;
+  --t-SSS:#f5c451; --t-S:#ff5d8f; --t-A:#a78bfa; --t-B:#38bdf8; --t-C:#34d399; --t-D:#fb923c; --t-E:#f43f5e;
+}
+[data-theme="light"]{
+  --bg:#f4f2fb; --bg2:#ffffff;
+  --panel:rgba(255,255,255,.78); --panel2:rgba(255,255,255,.66); --solid:#ffffff;
+  --border:rgba(30,20,60,.1); --border-strong:rgba(30,20,60,.22);
+  --text:#241c40; --dim:#5d5680; --faint:#9b95b8;
+  --pink:#ec4899; --purple:#7c3aed; --teal:#0d9488; --gold:#d97706; --red:#e11d48;
+  --shadow:0 18px 40px -20px rgba(70,45,130,.28);
+  --blob1:rgba(236,72,153,.15); --blob2:rgba(139,92,246,.13); --blob3:rgba(13,148,136,.1);
+  --vig:rgba(90,70,150,.14); --petal:236,110,165;
+  --t-SSS:#c98a0b; --t-S:#e8366f; --t-A:#7c3aed; --t-B:#0284c7; --t-C:#0d9488; --t-D:#d97706; --t-E:#dc2657;
+}
+*{ -webkit-tap-highlight-color:transparent; }
+html{ scroll-behavior:smooth; background:var(--bg); }
+body{ background:var(--bg); color:var(--text); font-family:'Golos Text',sans-serif; min-height:100vh; min-height:100svh; overflow-x:hidden; touch-action:manipulation; transition:background .4s,color .4s; }
+body.locked{ overflow:hidden; }
+
+/* ================= ПРЕЛОАДЕР ================= */
+#boot{ position:fixed; inset:0; z-index:99; background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; transition:opacity .45s ease; }
+#boot.gone{ opacity:0; pointer-events:none; }
+#boot .b-glyph{ font-family:'Unbounded',sans-serif; font-weight:900; font-size:30px; color:var(--pink); text-shadow:0 0 24px color-mix(in srgb,var(--pink) 70%,transparent); animation:bpulse 1.6s ease-in-out infinite; }
+@keyframes bpulse{ 50%{ transform:scale(1.12); opacity:.75; } }
+.spin{ width:30px; height:30px; border-radius:50%; border:3px solid color-mix(in srgb,var(--pink) 22%,transparent); border-top-color:var(--pink); animation:spin .9s linear infinite; }
+@keyframes spin{ to{ transform:rotate(360deg); } }
+
+/* ================= ФОН ================= */
+.bg-layer{ position:fixed; pointer-events:none; will-change:transform; }
+#bg-sky{ inset:0; z-index:0;
+  background:radial-gradient(1100px 520px at 72% -12%, color-mix(in srgb,var(--purple) 16%,transparent), transparent 60%),
+             radial-gradient(900px 440px at 12% -6%, color-mix(in srgb,var(--pink) 13%,transparent), transparent 60%); }
+#bg-blobs{ inset:-40px; z-index:0; }
+.fx-blob{ position:absolute; border-radius:50%; filter:blur(80px); }
+.b1{ width:52vw;height:52vw;left:-12vw;top:-18vh;background:var(--blob1);animation:drift1 34s ease-in-out infinite alternate; }
+.b2{ width:46vw;height:46vw;right:-14vw;top:22vh;background:var(--blob2);animation:drift2 41s ease-in-out infinite alternate; }
+.b3{ width:40vw;height:40vw;left:26vw;bottom:-24vh;background:var(--blob3);animation:drift3 47s ease-in-out infinite alternate; }
+@keyframes drift1{ to{ transform:translate(14vw,10vh) scale(1.15);} }
+@keyframes drift2{ to{ transform:translate(-10vw,-12vh) scale(.9);} }
+@keyframes drift3{ to{ transform:translate(-8vw,-10vh) scale(1.12);} }
+#bg-floor{ left:-40px; right:-40px; bottom:0; height:38vh; z-index:0; }
+#bg-floor .plane-mask{ position:absolute; inset:0; overflow:hidden; perspective:1200px; perspective-origin:50% 0%;
+  -webkit-mask-image:linear-gradient(to bottom,transparent,#000 16%); mask-image:linear-gradient(to bottom,transparent,#000 16%); }
+#bg-floor .plane{ position:absolute; left:-60%; right:-60%; top:0; height:110vh; transform-origin:50% 0; transform:rotateX(58deg); }
+#bg-floor .plane-grid{ position:absolute; left:0; right:0; top:-48px; bottom:0;
+  background-image:linear-gradient(90deg, color-mix(in srgb,var(--pink) 22%,transparent) 1px, transparent 1px),
+                   linear-gradient(0deg, color-mix(in srgb,var(--purple) 24%,transparent) 1px, transparent 1px);
+  background-size:48px 48px; animation:floorMove 3s linear infinite; will-change:transform; }
+@keyframes floorMove{ to{ transform:translateY(48px); } }
+#bg-floor .horizon{ position:absolute; top:-2px; left:40px; right:40px; height:3px; border-radius:99px; opacity:.75;
+  background:linear-gradient(90deg,transparent,var(--teal),var(--pink),var(--purple),transparent);
+  box-shadow:0 0 18px 2px color-mix(in srgb,var(--pink) 55%,transparent), 0 0 70px 8px color-mix(in srgb,var(--purple) 30%,transparent); }
+#bg-floor .glow{ position:absolute; top:0; left:0; right:0; height:70px; background:linear-gradient(to bottom, color-mix(in srgb,var(--pink) 10%,transparent), transparent); }
+@media(max-width:767px){ #bg-floor{ height:28vh; } }
+#fx-petals{ position:fixed; inset:0; z-index:1; pointer-events:none; }
+.fx-noise{ position:fixed; inset:0; z-index:2; pointer-events:none; opacity:.5; mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E"); }
+.fx-vig{ position:fixed; inset:0; z-index:2; pointer-events:none; background:radial-gradient(120% 90% at 50% 42%, transparent 58%, var(--vig) 100%); }
+#app{ position:relative; z-index:10; animation:appIn .8s cubic-bezier(.16,1,.3,1) backwards; }
+@keyframes appIn{ from{ opacity:0; transform:translateY(18px); } }
+
+/* ================= 3D-ТИЛТ ================= */
+[data-tilt]{ transform-style:preserve-3d;
+  transform:perspective(1000px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateZ(var(--tz,0px));
+  transition:transform .6s cubic-bezier(.16,1,.3,1), border-color .35s, box-shadow .35s; }
+[data-tilt].tilting{ transition:transform .09s linear, border-color .35s, box-shadow .35s; --tz:12px; will-change:transform; }
+
+/* ================= ПАНЕЛИ ================= */
+.surface{ background:var(--panel); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border:1px solid var(--border); }
+.surface2{ background:var(--panel2); border:1px solid var(--border); }
+.panel-glow{ position:relative; }
+.panel-glow::before{ content:''; position:absolute; top:0; left:24px; right:24px; height:2px; border-radius:99px;
+  background:linear-gradient(90deg,transparent,var(--pink),var(--purple),transparent); opacity:.55; transition:opacity .3s; }
+.panel-glow:hover::before{ opacity:1; }
+
+/* ================= КАРТОЧКИ ================= */
+.card{ position:relative; background:var(--panel2); border:1px solid var(--border); border-radius:1.1rem; cursor:pointer;
+  animation:cardIn .6s cubic-bezier(.16,1,.3,1) backwards; animation-delay:calc(var(--d,0)*38ms);
+  -webkit-touch-callout:none; user-select:none; -webkit-user-select:none; }
+@keyframes cardIn{ from{ opacity:0; transform:perspective(1000px) translateY(26px) rotateX(10deg) scale(.95); } }
+.card-media{ position:relative; aspect-ratio:2/3; border-radius:1rem 1rem 0 0; background:var(--bg2); overflow:hidden; }
+.card-media img{ width:100%; height:100%; object-fit:cover; display:block; background:var(--bg2); transition:transform .6s cubic-bezier(.16,1,.3,1); -webkit-touch-callout:none; }
+.card:hover .card-media img{ transform:scale(1.06); }
+.card-media::after{ content:''; position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(to top, rgba(5,3,12,.62), transparent 46%); }
+[data-theme="light"] .card-media::after{ background:linear-gradient(to top, rgba(36,28,64,.42), transparent 46%); }
+.card-shine{ position:absolute; inset:0; border-radius:inherit; pointer-events:none; opacity:0; transition:opacity .35s;
+  background:radial-gradient(340px circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,.14), transparent 62%); }
+.card:hover .card-shine{ opacity:1; }
+.pop{ transform:translateZ(0); transition:transform .55s cubic-bezier(.16,1,.3,1); }
+.card:hover .pop{ transform:translateZ(34px); }
+.type-pill{ position:absolute; top:9px; right:9px; padding:4px 7px; border-radius:.55rem; font-size:12px; line-height:1;
+  background:rgba(8,6,16,.55); border:1px solid rgba(255,255,255,.16); backdrop-filter:blur(5px); -webkit-backdrop-filter:blur(5px); color:#fff; }
+.card-badges{ position:absolute; left:9px; bottom:9px; display:flex; align-items:center; gap:6px; }
+.fav-dot{ width:23px; height:23px; border-radius:.6rem; display:flex; align-items:center; justify-content:center; font-size:11px; cursor:pointer;
+  background:rgba(8,6,16,.55); border:1px solid rgba(255,255,255,.16); color:var(--pink); backdrop-filter:blur(5px); transition:transform .2s; }
+.fav-dot:hover{ transform:scale(1.18); }
+.fav-dot.off{ color:rgba(255,255,255,.5); }
+[data-theme="light"] .type-pill,[data-theme="light"] .fav-dot{ background:rgba(255,255,255,.65); border-color:rgba(30,20,60,.2); }
+.card-body{ padding:10px 12px 12px; transform:translateZ(6px); transition:transform .55s cubic-bezier(.16,1,.3,1); }
+.card:hover .card-body{ transform:translateZ(20px); }
+.card-name{ font-size:13px; font-weight:800; line-height:1.28; color:var(--text); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; min-height:1.7em; }
+.card-meta{ margin-top:4px; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--faint); }
+.card-genres{ margin-top:5px; font-size:10.5px; color:var(--dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.card:hover,.card.tilting{ border-color:color-mix(in srgb,var(--tc,var(--pink)) 55%,var(--border));
+  box-shadow:0 24px 48px -20px rgba(0,0,0,.6), 0 0 34px -8px color-mix(in srgb,var(--tc,var(--pink)) 60%,transparent); }
+.card:active{ transform:perspective(1000px) scale(.97); }
+.card.just{ border-color:var(--pink)!important; box-shadow:0 0 0 1px var(--pink), 0 0 44px -6px var(--pink)!important; }
+
+/* на тач-экранах убираем залипающие hover-эффекты */
+@media(hover:none){
+  .card:hover .card-media img{ transform:none; }
+  .card:hover .pop{ transform:translateZ(0); }
+  .card:hover .card-body{ transform:translateZ(6px); }
+  .card:hover,.card.tilting{ border-color:var(--border); box-shadow:none; }
+  .card:active{ border-color:color-mix(in srgb,var(--tc,var(--pink)) 55%,var(--border)); box-shadow:0 0 26px -8px color-mix(in srgb,var(--tc,var(--pink)) 55%,transparent); }
+}
+
+/* ================= СЕКЦИИ ТИРОВ ================= */
+.tsec{ --tc:var(--t-S); }
+.tsec-head{ display:flex; align-items:center; gap:14px; margin:6px 2px 14px; }
+.tsec-glyph{ font-family:'Unbounded',sans-serif; font-weight:900; font-size:24px; line-height:1; color:var(--tc);
+  text-shadow:0 0 10px color-mix(in srgb,var(--tc) 85%,transparent), 0 0 34px color-mix(in srgb,var(--tc) 45%,transparent); }
+.tsec-t{ font-size:14.5px; font-weight:800; color:var(--text); line-height:1.2; }
+.tsec-c{ font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--faint); margin-top:2px; }
+.tsec-line{ flex:1; height:1px; min-width:30px; background:linear-gradient(90deg, color-mix(in srgb,var(--tc) 60%,transparent), transparent 90%); }
+.tsec.sss .card{ border-color:color-mix(in srgb,var(--tc) 38%,var(--border)); }
+
+/* ================= НЕОНОВЫЕ БЕЙДЖИ ТИРОВ ================= */
+.tb{ display:inline-flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-weight:800; letter-spacing:.06em; font-size:10px; padding:3px 9px; border-radius:.55rem; line-height:1; color:#fff; }
+.tb-lg{ font-size:12px; padding:6px 14px; }
+.tb-sm{ font-size:9px; padding:2px 7px; }
+.tb-SSS{ background:linear-gradient(120deg,#fde68a,#f5c451,#fff7d1,#f5c451); background-size:220% 100%; animation:sss 3s linear infinite; color:#4a3600; text-shadow:0 1px 0 rgba(255,255,255,.5); box-shadow:0 0 14px rgba(245,196,81,.55); }
+@keyframes sss{ to{ background-position:-220% 0; } }
+.tb-S{ background:linear-gradient(135deg,#ff5d8f,#c026d3); box-shadow:0 0 13px rgba(255,93,143,.5); }
+.tb-A{ background:linear-gradient(135deg,#a78bfa,#6d28d9); box-shadow:0 0 13px rgba(167,139,250,.5); }
+.tb-B{ background:linear-gradient(135deg,#38bdf8,#0369a1); box-shadow:0 0 13px rgba(56,189,248,.5); }
+.tb-C{ background:linear-gradient(135deg,#34d399,#047857); box-shadow:0 0 13px rgba(52,211,153,.5); }
+.tb-D{ background:linear-gradient(135deg,#fb923c,#b45309); box-shadow:0 0 13px rgba(251,146,60,.5); }
+.tb-E{ background:linear-gradient(135deg,#f43f5e,#881337); box-shadow:0 0 13px rgba(244,63,94,.5); }
+.tchip{ filter:saturate(.15) brightness(.85); opacity:.6; cursor:pointer; transition:.22s; }
+.tchip:hover{ opacity:.9; filter:saturate(.6); }
+.tchip-on{ filter:none; opacity:1; outline:2px solid color-mix(in srgb,var(--text) 30%,transparent); outline-offset:2px; }
+
+/* ================= КНОПКИ / ИНПУТЫ ================= */
+.input{ width:100%; background:var(--bg2); border:1px solid var(--border); border-radius:.7rem; padding:.55rem .8rem; font-size:12.5px; color:var(--text); outline:none; font-family:'Golos Text',sans-serif; transition:border-color .2s, box-shadow .2s; }
+.input:focus{ border-color:var(--pink); box-shadow:0 0 0 3px color-mix(in srgb,var(--pink) 18%,transparent); }
+.input::placeholder{ color:var(--faint); }
+.btn{ display:inline-flex; align-items:center; gap:6px; padding:.5rem .85rem; border-radius:.7rem; font-size:11px; font-weight:600; font-family:'JetBrains Mono',monospace; white-space:nowrap;
+  background:var(--solid); border:1px solid var(--border); color:var(--dim); transition:transform .18s, color .2s, border-color .2s, box-shadow .2s; cursor:pointer; }
+.btn:hover{ color:var(--text); border-color:var(--border-strong); transform:translateY(-1.5px); }
+.btn:active{ transform:translateY(1px) scale(.97); }
+.btn-on{ background:linear-gradient(135deg,var(--pink),var(--purple)); color:#fff; border-color:transparent; box-shadow:0 6px 16px -6px color-mix(in srgb,var(--pink) 60%,transparent); }
+.btn-primary{ display:inline-flex; align-items:center; justify-content:center; padding:.55rem 1.05rem; border-radius:.7rem; font-size:11px; font-weight:800; font-family:'JetBrains Mono',monospace; color:#fff; cursor:pointer;
+  background:linear-gradient(135deg,var(--pink),var(--purple)); border:none; box-shadow:0 10px 24px -10px color-mix(in srgb,var(--pink) 75%,transparent), inset 0 1px 0 rgba(255,255,255,.22); transition:transform .18s, filter .2s; }
+.btn-primary:hover{ filter:brightness(1.12); transform:translateY(-1.5px); }
+.btn-primary:active{ transform:translateY(1px) scale(.97); }
+.tab{ padding:.45rem .85rem; border-radius:.65rem; font-size:11px; font-weight:700; font-family:'JetBrains Mono',monospace; color:var(--faint); transition:.2s; white-space:nowrap; }
+.tab:hover{ color:var(--text); }
+.tab.on{ background:linear-gradient(135deg,var(--pink),var(--purple)); color:#fff; box-shadow:0 5px 16px -6px color-mix(in srgb,var(--pink) 60%,transparent); }
+.fchip{ display:inline-flex; align-items:center; gap:6px; padding:4px 11px; border-radius:.65rem; background:var(--solid); border:1px solid var(--border); color:var(--dim); font-size:11px; font-family:'JetBrains Mono',monospace; transition:.2s; cursor:pointer; }
+.fchip:hover{ border-color:var(--pink); color:var(--text); transform:translateY(-1px); }
+.fchip.on{ border-color:var(--pink); color:var(--text); background:color-mix(in srgb,var(--pink) 12%,transparent); box-shadow:0 0 14px -5px var(--pink); }
+.fc-x{ opacity:.5; font-weight:800; }
+.side-cap{ font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--faint); margin-bottom:9px; }
+.g-row{ display:flex; align-items:center; gap:8px; padding:5px 8px; border-radius:.6rem; cursor:pointer; font-size:12.5px; color:var(--dim); transition:background .15s; }
+.g-row:hover{ background:color-mix(in srgb,var(--text) 6%,transparent); }
+.g-dot{ width:5px; height:5px; border-radius:50%; background:var(--faint); flex-shrink:0; }
+.g-row.g-on{ background:color-mix(in srgb,var(--pink) 14%,transparent); color:var(--text); box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--pink) 35%,transparent); }
+.g-row.g-on .g-dot{ background:var(--pink); box-shadow:0 0 8px var(--pink); }
+.hint{ font-size:9.5px; font-family:'JetBrains Mono',monospace; color:var(--faint); line-height:1.5; margin-top:8px; }
+.col-btn{ display:flex; flex-direction:column; gap:2px; padding:8px 10px; border-radius:.75rem; border:1px solid var(--border); background:var(--panel2); cursor:pointer; transition:.2s; text-align:left; }
+.col-btn:hover{ border-color:var(--border-strong); transform:translateY(-1px); }
+.col-btn.on{ border-color:var(--pink); background:color-mix(in srgb,var(--pink) 12%,transparent); box-shadow:0 0 16px -6px var(--pink); }
+.col-title{ font-size:11.5px; font-weight:700; color:var(--text); display:flex; align-items:center; gap:5px; }
+.col-count{ font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--faint); }
+.col-btn.on .col-count{ color:var(--pink); }
+.last-row{ display:flex; align-items:center; gap:9px; padding:6px; border-radius:.75rem; cursor:pointer; transition:background .15s, border-color .15s; border:1px solid transparent; }
+.last-row:hover{ background:color-mix(in srgb,var(--text) 5%,transparent); border-color:var(--border); }
+.last-row img{ width:34px; height:46px; object-fit:cover; border-radius:.5rem; background:var(--bg2); -webkit-touch-callout:none; }
+.tl-month{ font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--faint); margin:16px 0 8px; display:flex; align-items:center; gap:10px; }
+.tl-month::after{ content:''; flex:1; height:1px; background:var(--border); }
+.tl-row{ display:flex; gap:12px; align-items:center; padding:10px; border-radius:.85rem; background:var(--panel2); border:1px solid var(--border); cursor:pointer; transition:transform .25s, border-color .25s, box-shadow .25s; }
+.tl-row:hover{ border-color:var(--border-strong); transform:translateX(4px); }
+.view-section{ display:none; }
+.view-section.active{ display:block; animation:viewIn .5s cubic-bezier(.16,1,.3,1); }
+@keyframes viewIn{ from{ opacity:0; transform:perspective(1500px) translateY(24px) rotateX(3deg); } }
+
+/* ================= МОДАЛКИ ================= */
+.modal{ display:none; position:fixed; inset:0; z-index:60; padding:1rem; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch;
+  background:color-mix(in srgb,var(--bg) 82%,transparent); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); align-items:flex-start; justify-content:center; }
+.modal.open{ display:flex; }
+.mbox{ animation:mIn .5s cubic-bezier(.16,1,.3,1); }
+@keyframes mIn{ from{ opacity:0; transform:perspective(1300px) translate3d(0,48px,-100px) rotateX(10deg); } }
+.modal.closing{ animation:mOut .18s ease forwards; }
+.modal.closing .mbox{ animation:mOutBox .18s ease forwards; }
+@keyframes mOut{ to{ opacity:0; } }
+@keyframes mOutBox{ to{ opacity:0; transform:perspective(1300px) translate3d(0,24px,-50px) rotateX(5deg); } }
+.scrollbox{ max-height:92vh; max-height:92dvh; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
+.toast{ background:var(--solid); border:1px solid color-mix(in srgb,var(--pink) 40%,transparent); color:var(--text); font-size:12px; font-family:'JetBrains Mono',monospace;
+  padding:10px 16px; border-radius:.8rem; box-shadow:var(--shadow); animation:tIn .45s cubic-bezier(.16,1,.3,1); transition:.3s; max-width:min(78vw,360px); }
+.toast.out{ opacity:0; transform:translateX(16px); }
+.toast-err{ border-color:color-mix(in srgb,var(--red) 50%,transparent); }
+@keyframes tIn{ from{ opacity:0; transform:perspective(700px) translateX(36px) rotateY(-16deg); } }
+
+/* ================= РОЛИ: зритель не видит кнопки редактирования ================= */
+body.role-viewer .owner-only{ display:none!important; }
+
+/* ================= KPI / СТАТИСТИКА ================= */
+.kpi-num{ font-family:'Unbounded',sans-serif; font-weight:700; font-size:22px; color:var(--text); line-height:1.1; }
+.stat-tile{ padding:10px 8px; border-radius:.9rem; text-align:center; }
+.stat-tile .v{ font-family:'Unbounded',sans-serif; font-weight:700; font-size:16px; line-height:1.2; }
+.stat-tile .l{ font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--faint); margin-top:3px; }
+.meta-row{ display:flex; align-items:center; gap:8px; font-size:11.5px; color:var(--dim); flex-wrap:wrap; }
+.meta-row b{ color:var(--text); font-weight:700; }
+.hist-item{ display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:.9rem; background:var(--panel2); border:1px solid var(--border); transition:.15s; }
+.hist-item:hover{ border-color:var(--border-strong); }
+.hist-icon{ width:32px; height:32px; border-radius:.65rem; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; background:color-mix(in srgb,var(--text) 6%,transparent); border:1px solid var(--border); }
+.hist-badge{ font-family:'JetBrains Mono',monospace; font-size:9.5px; padding:3px 7px; border-radius:.5rem; border:1px solid var(--border); color:var(--dim); white-space:nowrap; }
+.tg-bar{ height:5px; border-radius:99px; background:color-mix(in srgb,var(--text) 8%,transparent); overflow:hidden; }
+.tg-bar>div{ height:100%; border-radius:inherit; transition:width .6s cubic-bezier(.16,1,.3,1); }
+
+/* ================= ЗАГРУЗКА ПОСТЕРА ================= */
+#drop-zone{ position:relative; border:1.5px dashed var(--border-strong); border-radius:.9rem; min-height:118px; display:flex; align-items:center; justify-content:center; text-align:center; cursor:pointer;
+  background:var(--bg2); transition:border-color .25s, background .25s, box-shadow .25s, transform .25s; outline:none; }
+#drop-zone:hover,#drop-zone:focus{ border-color:var(--pink); transform:translateY(-1px); }
+#drop-zone.drag{ border-color:var(--pink); background:color-mix(in srgb,var(--pink) 8%,transparent); box-shadow:0 0 26px -8px var(--pink); transform:scale(1.015); }
+#drop-zone img{ max-height:150px; max-width:100%; object-fit:contain; }
+#drop-clear{ position:absolute; top:6px; right:6px; width:24px; height:24px; border-radius:.55rem; background:var(--solid); border:1px solid var(--border-strong); color:var(--dim); font-size:11px; cursor:pointer; }
+#drop-clear:hover{ color:var(--red); border-color:var(--red); }
+.h-row{ display:grid; gap:6px; align-items:center; grid-template-columns:minmax(0,1fr) 100px 62px 62px 34px; }
+.h-row-head{ display:none; }
+@media(min-width:641px){ .h-row-head{ display:grid; grid-template-columns:minmax(0,1fr) 100px 62px 62px 34px; gap:6px; font-family:'JetBrains Mono',monospace; font-size:9px; text-transform:uppercase; letter-spacing:.08em; color:var(--faint); padding:0 2px; } }
+@media(max-width:640px){ .h-row{ grid-template-columns:84px 48px 48px 30px; } .hr-title{ grid-column:1/-1; } }
+.hr-del{ justify-content:center; padding:.5rem 0; }
+.ladder-t{ cursor:pointer; transition:.2s; opacity:.75; filter:saturate(.4); }
+.ladder-t:hover{ opacity:1; filter:none; transform:translateY(-2px); }
+.ladder-t.on{ opacity:1; filter:none; outline:2px solid color-mix(in srgb,var(--text) 35%,transparent); outline-offset:2px; }
+.empty{ text-align:center; padding:3.5rem 1rem; }
+.empty .e-ico{ font-size:2.6rem; filter:drop-shadow(0 0 18px color-mix(in srgb,var(--pink) 60%,transparent)); }
+#sidebar{ transform:translateX(-102%); transition:transform .34s cubic-bezier(.16,1,.3,1); }
+#sidebar.open{ transform:translateX(0); box-shadow:var(--shadow); }
+@media(min-width:1024px){ #sidebar{ transform:none; box-shadow:none; } }
+#scroll-top{ transition:opacity .3s, transform .25s; }
+#scroll-top:hover{ transform:translateY(-3px); }
+::-webkit-scrollbar{ width:7px; height:7px; }
+::-webkit-scrollbar-track{ background:transparent; }
+::-webkit-scrollbar-thumb{ background:color-mix(in srgb,var(--text) 18%,transparent); border-radius:6px; }
+::-webkit-scrollbar-thumb:hover{ background:var(--pink); }
+
+/* ================= МОБИЛЬНАЯ АДАПТАЦИЯ ================= */
+/* iOS не зумит страницу, если шрифт в полях ≥16px */
+@media(pointer:coarse){
+  input.input, select.input, .modal input, .modal select{ font-size:16px!important; }
+  .h-row input{ min-width:0; }
+}
+/* выемки под камеру/жесты */
+#toast-wrap{ bottom:calc(1.25rem + env(safe-area-inset-bottom)); right:calc(1.25rem + env(safe-area-inset-right)); }
+#scroll-top{ bottom:calc(1.25rem + env(safe-area-inset-bottom)); left:calc(1.25rem + env(safe-area-inset-left)); }
+header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
+@media(max-width:640px){ .modal{ padding:.75rem; } }
+@media (prefers-reduced-motion: reduce){ *{ animation-duration:.01ms!important; transition-duration:.01ms!important; } }
+</style>
+</head>
+<body class="booting">
+
+<!-- ПРЕЛОАДЕР -->
+<div id="boot"><div class="b-glyph">ア</div><div class="spin"></div><p class="text-[10px] font-mono" style="color:var(--faint)">загрузка архива…</p></div>
+
+<!-- ====== ФОН ====== -->
+<div id="bg-sky" class="bg-layer"></div>
+<div id="bg-blobs" class="bg-layer" data-depth="26">
+  <div class="fx-blob b1"></div><div class="fx-blob b2"></div><div class="fx-blob b3"></div>
+</div>
+<div id="bg-floor" class="bg-layer" data-depth="12">
+  <div class="plane-mask"><div class="plane"><div class="plane-grid"></div></div></div>
+  <div class="glow"></div><div class="horizon"></div>
+</div>
+<canvas id="fx-petals"></canvas>
+<div class="fx-noise"></div>
+<div class="fx-vig"></div>
+
+<div id="app" class="flex min-h-screen w-full">
+  <div id="sb-overlay" onclick="toggleSidebar(false)" class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm hidden lg:hidden"></div>
+
+  <!-- ================= САЙДБАР ================= -->
+  <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-[300px] lg:sticky lg:top-0 lg:h-screen flex flex-col overflow-y-auto surface border-r" style="border-right-color:var(--border)">
+    <div class="p-5 border-b" style="border-color:var(--border)">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-2xl flex items-center justify-center font-disp font-black text-lg text-white shadow-lg" style="background:linear-gradient(135deg,var(--pink),var(--purple))">ア</div>
+        <div class="min-w-0">
+          <h1 class="font-disp text-[13px] tracking-wide" style="color:var(--text)">アニメ アРХИВ</h1>
+          <p class="text-[10px] font-mono" style="color:var(--faint)">sakura edition · v6.5 live</p>
+        </div>
+        <button onclick="toggleSidebar(false)" class="ml-auto lg:hidden text-lg" style="color:var(--faint)">✕</button>
+      </div>
+    </div>
+    <div class="p-4 border-b" style="border-color:var(--border)">
+      <div class="side-cap">🔍 Поиск <span class="normal-case tracking-normal opacity-60">(клавиша /)</span></div>
+      <input id="search-input" oninput="onSearchInput(this.value)" placeholder="Название или жанр…" class="input">
+    </div>
+    <div class="p-4 border-b" style="border-color:var(--border)">
+      <div class="side-cap">✨ Подборки</div>
+      <div id="collections" class="grid grid-cols-2 gap-2"></div>
+    </div>
+    <div class="p-4 border-b space-y-5" style="border-color:var(--border)">
+      <div>
+        <div class="side-cap">Ранг</div>
+        <div id="tier-chips" class="flex flex-wrap gap-1.5"></div>
+      </div>
+      <div>
+        <div class="side-cap">Тип контента</div>
+        <div id="type-chips" class="flex flex-wrap gap-1.5"></div>
+        <p class="hint">💡 Умный фильтр: выбор «OVA» покажет и сериалы, где в истории есть OVA. То же для ONA, спешлов и фильмов.</p>
+      </div>
+      <div>
+        <div class="side-cap">Сортировка</div>
+        <select id="sort-select" onchange="setSort(this.value)" class="input font-mono !text-[11px]">
+          <option value="default">Ранг: SSS → E</option>
+          <option value="tier-rev">Ранг: E → SSS</option>
+          <option value="name">Название А→Я</option>
+          <option value="episodes">Больше серий</option>
+          <option value="movies">Больше фильмов</option>
+          <option value="recent">Свежие просмотры</option>
+          <option value="added-new">Недавно добавленные</option>
+        </select>
+      </div>
+    </div>
+    <div class="p-4 border-b" style="border-color:var(--border)">
+      <div class="side-cap">🆕 Последние добавления</div>
+      <div id="last-added" class="space-y-1"></div>
+    </div>
+    <div class="p-4 flex-1">
+      <div class="side-cap flex items-center justify-between"><span>Жанры</span><span id="genre-count-label" class="normal-case tracking-normal" style="color:var(--faint)"></span></div>
+      <input id="genre-search" oninput="buildSidebarGenres(this.value)" placeholder="Найти жанр…" class="input mb-2">
+      <div id="genre-list" class="space-y-0.5 max-h-[300px] overflow-y-auto pr-1"></div>
+    </div>
+    <div class="p-4 border-t" style="border-color:var(--border)">
+      <button onclick="resetFilters()" class="btn w-full justify-center" style="color:var(--red); border-color:color-mix(in srgb,var(--red) 35%,transparent)">✕ Сбросить все фильтры</button>
+    </div>
+  </aside>
+
+  <!-- ================= ОСНОВНАЯ ЧАСТЬ ================= -->
+  <div class="flex-1 min-w-0 flex flex-col">
+    <header class="sticky top-0 z-40 surface border-x-0 border-t-0 px-3 sm:px-6 lg:px-8 py-3">
+      <div class="max-w-[1560px] mx-auto flex items-center gap-3 flex-wrap">
+        <button onclick="toggleSidebar()" class="lg:hidden btn !px-3">☰</button>
+        <div class="min-w-0 flex-1">
+          <h2 id="view-title" class="font-extrabold text-sm sm:text-base truncate" style="color:var(--text)">Сетка тиров</h2>
+          <p id="view-subtitle" class="text-[10px] font-mono truncate" style="color:var(--faint)">Тайтлы, сгруппированные по рангам SSS–E</p>
+        </div>
+        <nav class="order-last sm:order-none w-full sm:w-auto flex items-center gap-1 p-1 rounded-xl surface2 overflow-x-auto">
+          <button onclick="switchView('grid')" id="btn-view-grid" class="tab on">🗂️ Сетка</button>
+          <button onclick="switchView('dashboard')" id="btn-view-dashboard" class="tab">📊 Аналитика</button>
+          <button onclick="switchView('timeline')" id="btn-view-timeline" class="tab">🕒 Хронология</button>
+        </nav>
+        <div class="flex items-center gap-2 ml-auto sm:ml-0">
+          <button onclick="toggleTheme()" id="theme-btn" class="btn !px-3" title="Сменить тему">🌙</button>
+          <button onclick="randomTitle()" class="btn !px-3" title="Случайный тайтл">🎲</button>
+          <button onclick="openOwnerModal()" id="sync-btn" class="btn !px-3" title="Синхронизация / вход владельца">🔒</button>
+          <button onclick="toggleEditMode()" id="edit-mode-btn" class="btn owner-only"><span class="hidden sm:inline">✏️</span> <span class="hidden md:inline">Редакт.</span></button>
+          <button onclick="copyData()" class="btn !px-3" title="Экспорт JSON">⬆</button>
+          <button onclick="openModal()" class="btn-primary owner-only">+ Добавить</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 max-w-[1560px] w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 space-y-5">
+      <section class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
+        <div class="surface panel-glow rounded-2xl p-4" data-tilt><div class="side-cap !mb-2">Всего тайтлов</div><div class="flex items-end justify-between"><span id="kpi-total" class="kpi-num">0</span><span class="text-[10px] font-mono" style="color:var(--faint)">шт.</span></div></div>
+        <div class="surface panel-glow rounded-2xl p-4" data-tilt><div class="side-cap !mb-2">Серий</div><div class="flex items-end justify-between"><span id="kpi-episodes" class="kpi-num" style="color:var(--teal)">0</span><span class="text-[10px] font-mono" style="color:var(--faint)">эп.</span></div></div>
+        <div class="surface panel-glow rounded-2xl p-4" data-tilt><div class="side-cap !mb-2">Фильмов</div><div class="flex items-end justify-between"><span id="kpi-movies" class="kpi-num" style="color:var(--gold)">0</span><span class="text-[10px] font-mono" style="color:var(--faint)">ф.</span></div></div>
+        <div class="surface panel-glow rounded-2xl p-4" data-tilt><div class="side-cap !mb-2">Время</div><div class="flex items-end justify-between"><span id="kpi-hours" class="kpi-num" style="color:var(--purple)">0ч</span><span id="kpi-days" class="text-[10px] font-mono" style="color:var(--faint)">0 дн.</span></div></div>
+        <div class="surface panel-glow rounded-2xl p-4" data-tilt><div class="side-cap !mb-2">Избранное</div><div class="flex items-end justify-between"><span id="kpi-fav" class="kpi-num" style="color:var(--pink)">0</span><span class="text-[10px]">❤️</span></div></div>
+        <div class="surface panel-glow rounded-2xl p-4" data-tilt><div class="side-cap !mb-2">Пантеон</div><div class="flex items-end justify-between"><span id="kpi-top" class="kpi-num" style="color:var(--gold)">0</span><span id="kpi-top-pct" class="text-[10px] font-mono" style="color:var(--faint)">0%</span></div></div>
+      </section>
+
+      <section id="filter-status" class="surface rounded-2xl px-4 py-3 flex flex-wrap items-center gap-2"></section>
+
+      <div id="view-grid" class="view-section active"><div id="tier-container" class="space-y-6"></div></div>
+
+      <div id="view-dashboard" class="view-section space-y-5">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div class="surface panel-glow p-5 rounded-2xl">
+            <h3 class="font-mono font-bold text-[13px] uppercase tracking-wider mb-1">🎯 Профиль жанров</h3>
+            <p class="text-xs mb-4" style="color:var(--dim)">Радар предпочтений</p>
+            <div class="relative h-64"><canvas id="genreRadarChart"></canvas></div>
+          </div>
+          <div class="surface panel-glow p-5 rounded-2xl lg:col-span-2">
+            <h3 class="font-mono font-bold text-[13px] uppercase tracking-wider mb-1">📈 Динамика по годам</h3>
+            <p class="text-xs mb-4" style="color:var(--dim)">Серии (столбцы) и записи (линия)</p>
+            <div class="relative h-64"><canvas id="yearlyChart"></canvas></div>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div class="surface panel-glow p-5 rounded-2xl"><h3 class="font-mono font-bold text-[13px] uppercase tracking-wider mb-1">🏆 Баланс тиров</h3><p class="text-xs mb-4" style="color:var(--dim)">SSS–E</p><div class="relative h-56"><canvas id="tierDoughnutChart"></canvas></div></div>
+          <div class="surface panel-glow p-5 rounded-2xl"><h3 class="font-mono font-bold text-[13px] uppercase tracking-wider mb-1">🎞️ Форматы</h3><p class="text-xs mb-4" style="color:var(--dim)">ТВ / Фильмы / OVA / ONA</p><div class="relative h-56"><canvas id="formatDoughnutChart"></canvas></div></div>
+          <div class="surface panel-glow p-5 rounded-2xl"><h3 class="font-mono font-bold text-[13px] uppercase tracking-wider mb-1">🔥 Топ жанров</h3><p class="text-xs mb-4" style="color:var(--dim)">Частые теги</p><div id="top-genres-list" class="space-y-2.5 overflow-y-auto max-h-56 pr-1 font-mono text-xs"></div></div>
+        </div>
+      </div>
+
+      <div id="view-timeline" class="view-section">
+        <div class="surface panel-glow p-5 md:p-6 rounded-2xl">
+          <h3 class="font-mono font-bold text-[13px] uppercase tracking-wider mb-1">📜 Полный журнал просмотра</h3>
+          <p class="text-xs mb-6" style="color:var(--dim)">Все записи истории — реагирует на фильтры слева. Клик по строке открывает карточку тайтла.</p>
+          <div id="timeline-log" class="space-y-2"></div>
+        </div>
+      </div>
+
+      <footer class="text-center text-[10px] font-mono py-4 space-y-1" style="color:var(--faint)">
+        <div id="sync-line">☁️ подключение к серверу…</div>
+        <div>アニメ アーカイブ · сделано с ❤️ и 🌸</div>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" class="btn fixed bottom-5 left-5 z-40 !px-3.5 !py-2.5 rounded-full opacity-0 pointer-events-none">↑</button>
+
+<!-- МОДАЛКА: ДОБАВИТЬ/РЕДАКТИРОВАТЬ -->
+<div id="modal" class="modal" onclick="closeModal()">
+  <div class="mbox surface w-full max-w-2xl rounded-3xl p-5 md:p-6 space-y-4 my-8" onclick="event.stopPropagation()">
+    <div class="flex items-center justify-between border-b pb-3" style="border-color:var(--border)">
+      <h3 id="modal-title" class="font-mono font-bold text-sm uppercase tracking-wider" style="color:var(--pink)">Новый тайтл</h3>
+      <button onclick="closeModal()" class="text-lg" style="color:var(--faint)">✕</button>
+    </div>
+    <form onsubmit="saveTitle(event)" class="space-y-4 text-xs">
+      <div><label class="block font-mono font-bold mb-1.5 text-[10px] uppercase tracking-wider" style="color:var(--faint)">Название</label><input type="text" id="form-name" required placeholder="Например: Вайолет Эвергарден" class="input"></div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="space-y-2">
+          <label class="block font-mono font-bold text-[10px] uppercase tracking-wider" style="color:var(--faint)">Постер — файл прямо с устройства</label>
+          <div id="drop-zone" tabindex="0" title="Клик — выбрать файл">
+            <input type="file" id="form-file" accept="image/*" hidden>
+            <div id="drop-empty">
+              <div class="text-2xl mb-1">🖼️</div>
+              <div class="font-bold text-[11.5px]" style="color:var(--text)">Перетащите файл или кликните</div>
+              <div class="text-[10px] font-mono mt-1" style="color:var(--faint)">сожмётся до ~520px и останется в архиве</div>
+            </div>
+            <img id="drop-preview" class="hidden" alt="превью постера">
+            <button type="button" id="drop-clear" class="hidden" title="Убрать постер">✕</button>
+          </div>
+          <input type="text" id="form-img" placeholder="…или ссылка на картинку https://…" class="input">
+        </div>
+        <div><label class="block font-mono font-bold mb-1.5 text-[10px] uppercase tracking-wider" style="color:var(--faint)">Тип</label>
+          <select id="form-type" class="input"><option value="series">📺 ТВ Сериал</option><option value="movie">🎬 Фильм</option><option value="ova">💿 OVA</option><option value="ona">🌐 ONA</option><option value="special">✨ Спешл</option></select>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+        <div><label class="block font-mono font-bold mb-1.5 text-[10px] uppercase tracking-wider" style="color:var(--faint)">Тир (ранг)</label>
+          <select id="form-tier" class="input font-mono font-bold"><option value="SSS">SSS — Абсолютный пантеон</option><option value="S">S — Шедевры</option><option value="A">A — Близко к идеалу</option><option value="B">B — Крепкая основа</option><option value="C">C — Средне</option><option value="D">D — На один раз</option><option value="E">E — Ужасно</option></select>
+        </div>
+        <div class="pt-5"><label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="form-favorite" style="accent-color:var(--pink)" class="w-4 h-4"><span class="font-mono font-bold text-[11px]" style="color:var(--pink)">❤️ В избранное</span></label></div>
+      </div>
+      <div><label class="block font-mono font-bold mb-1.5 text-[10px] uppercase tracking-wider" style="color:var(--faint)">Жанры (через запятую)</label><input type="text" id="form-genres" placeholder="Драма, Романтика, Фэнтези" class="input font-mono !text-[11px]"></div>
+      <div class="space-y-2">
+        <label class="block font-mono font-bold text-[10px] uppercase tracking-wider" style="color:var(--faint)">История сезонов и просмотров <span class="normal-case">(дата: ДД.ММ.ГГГГ или ГГГГ-ММ-ДД)</span></label>
+        <div class="h-row-head"><span>Запись / сезон</span><span>Дата</span><span>Серий</span><span>Фильмов</span><span></span></div>
+        <div id="form-history-container" class="space-y-2"></div>
+        <button type="button" onclick="addHistoryRow()" class="btn w-full justify-center !py-2.5 border-dashed">+ Добавить запись / сезон</button>
+      </div>
+      <div class="flex items-center justify-between border-t pt-4" style="border-color:var(--border)">
+        <button type="button" id="btn-delete" onclick="promptDelete()" class="btn hidden" style="color:var(--red); border-color:color-mix(in srgb,var(--red) 35%,transparent)">🗑️ Удалить</button>
+        <div class="flex items-center gap-2 ml-auto"><button type="button" onclick="closeModal()" class="btn">Отмена</button><button type="submit" class="btn-primary">Сохранить</button></div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- МОДАЛКА: ПОДТВЕРЖДЕНИЕ -->
+<div id="confirm-modal" class="modal" onclick="closeConfirmModal()">
+  <div class="mbox surface w-full max-w-sm rounded-3xl p-6 space-y-4 text-center my-8" style="border-color:color-mix(in srgb,var(--red) 40%,transparent)" onclick="event.stopPropagation()">
+    <div class="w-12 h-12 rounded-full flex items-center justify-center mx-auto text-xl font-mono font-bold" style="background:color-mix(in srgb,var(--red) 12%,transparent); border:1px solid color-mix(in srgb,var(--red) 35%,transparent); color:var(--red)">⚠️</div>
+    <div><h3 class="font-mono font-bold text-sm" style="color:var(--text)">Удалить тайтл?</h3><p class="text-xs mt-1" style="color:var(--dim)">Действие необратимо — релиз исчезнет из архива навсегда.</p></div>
+    <div class="flex items-center justify-center gap-3 pt-2"><button onclick="closeConfirmModal()" class="btn">Отмена</button><button onclick="confirmDeleteTitle()" class="btn-primary" style="background:var(--red)">Да, удалить</button></div>
+  </div>
+</div>
+
+<!-- МОДАЛКА: КАРТОЧКА ТАЙТЛА -->
+<div id="preview-modal" class="modal" onclick="closePreviewModal()">
+  <div class="mbox surface w-full max-w-3xl rounded-3xl overflow-hidden relative scrollbox my-8" onclick="event.stopPropagation()">
+    <button onclick="closePreviewModal()" class="absolute top-4 right-4 z-10 w-9 h-9 rounded-full flex items-center justify-center font-mono" style="background:color-mix(in srgb,var(--bg) 75%,transparent); border:1px solid var(--border); color:var(--text)">✕</button>
+    <div class="flex flex-col md:flex-row">
+      <div class="w-full md:w-[36%] relative h-60 sm:h-72 md:h-auto" data-tilt>
+        <img id="preview-img" src="" alt="" class="w-full h-full object-cover">
+        <div class="absolute inset-0" style="background:linear-gradient(to top,var(--bg),transparent 55%)"></div>
+        <div class="absolute bottom-3 left-3 right-3 owner-only">
+          <div id="preview-ladder" class="flex flex-wrap gap-1"></div>
+          <p class="text-[9px] font-mono mt-1.5 opacity-60" style="color:var(--dim)">клик по рангу — мгновенно переназначить</p>
+        </div>
+      </div>
+      <div class="w-full md:w-[64%] p-5 md:p-6 space-y-4">
+        <div>
+          <div class="flex items-center gap-2 mb-2 flex-wrap">
+            <span id="preview-tier-badge" class="tb tb-lg">S</span>
+            <span id="preview-tier-title" class="text-[11px] font-bold" style="color:var(--dim)">Шедевры</span>
+            <span id="preview-type-badge" class="px-2.5 py-0.5 rounded-lg text-[10px] font-mono uppercase surface2" style="color:var(--dim)">📺 Сериал</span>
+            <span id="preview-fav-badge" class="text-[11px] font-mono owner-only" style="color:var(--pink)">❤️ Избранное (нажмите, чтобы убрать)</span>
+          </div>
+          <h2 id="preview-title" class="text-xl md:text-2xl font-extrabold leading-tight" style="color:var(--text)">—</h2>
+        </div>
+        <div id="preview-genres" class="flex flex-wrap gap-1.5"></div>
+        <div class="grid grid-cols-4 gap-2">
+          <div class="stat-tile surface2"><div id="preview-episodes" class="v" style="color:var(--teal)">0</div><div class="l">серий</div></div>
+          <div class="stat-tile surface2"><div id="preview-movies" class="v" style="color:var(--gold)">0</div><div class="l">фильмов</div></div>
+          <div class="stat-tile surface2"><div id="preview-records" class="v" style="color:var(--purple)">0</div><div class="l">записей</div></div>
+          <div class="stat-tile surface2"><div id="preview-time" class="v !text-[13px] pt-0.5" style="color:var(--pink)">—</div><div class="l">время</div></div>
+        </div>
+        <div class="space-y-1.5 pt-1">
+          <div class="meta-row">📅 Период просмотра: <b id="preview-period">—</b></div>
+          <div class="meta-row">➕ Добавлено в архив: <b id="preview-added">—</b></div>
+          <div class="meta-row">🎬 Последняя активность: <b id="preview-last">—</b></div>
+        </div>
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="text-[10px] font-mono font-bold uppercase tracking-wider" style="color:var(--faint)">🕒 История просмотров</h4>
+            <button onclick="toggleHistoryOrder()" id="hist-order-btn" class="btn !py-1 !px-2 !text-[9.5px]">⇅ по порядку</button>
+          </div>
+          <div id="preview-history-list" class="space-y-1.5 max-h-52 overflow-y-auto pr-1"></div>
+        </div>
+        <button onclick="editFromPreview()" class="btn w-full justify-center !py-2.5 owner-only">✏️ Редактировать этот тайтл</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- МОДАЛКА: СИНХРОНИЗАЦИЯ / ВХОД ВЛАДЕЛЬЦА -->
+<div id="owner-modal" class="modal" onclick="closeOwnerModal()">
+  <div class="mbox surface w-full max-w-md rounded-3xl p-5 md:p-6 space-y-4 my-8" onclick="event.stopPropagation()">
+    <div class="flex items-center justify-between border-b pb-3" style="border-color:var(--border)">
+      <h3 class="font-mono font-bold text-sm uppercase tracking-wider" style="color:var(--pink)">☁️ Синхронизация</h3>
+      <button onclick="closeOwnerModal()" class="text-lg" style="color:var(--faint)">✕</button>
+    </div>
+    <div id="om-status" class="surface2 rounded-xl p-3 text-[11px] font-mono space-y-1"></div>
+    <div id="om-login" class="space-y-3">
+      <div><label class="block font-mono font-bold mb-1 text-[10px] uppercase tracking-wider" style="color:var(--faint)">Репозиторий (owner/repo)</label>
+        <input id="om-repo" class="input font-mono !text-[11px]" placeholder="username/anime-archive" autocapitalize="off" spellcheck="false"></div>
+      <div><label class="block font-mono font-bold mb-1 text-[10px] uppercase tracking-wider" style="color:var(--faint)">Токен доступа (PAT)</label>
+        <input id="om-token" type="password" class="input font-mono !text-[11px]" placeholder="github_pat_…" autocapitalize="off" spellcheck="false">
+        <p class="hint">🔐 Токен хранится только в вашем браузере и никуда не отправляется, кроме GitHub API. Создать: GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens. Разрешение: Contents → Read and write, только для этого репозитория.</p></div>
+      <button onclick="ownerLogin()" class="btn-primary w-full !py-2.5">✍️ Войти как владелец</button>
+    </div>
+    <div id="om-owner" class="space-y-2 hidden">
+      <button onclick="commitNow(true)" class="btn-primary w-full !py-2.5">☁️ Опубликовать архив сейчас</button>
+      <button onclick="pull(true)" class="btn w-full justify-center !py-2.5">⟳ Обновить данные с сервера</button>
+      <button onclick="ownerLogout()" class="btn w-full justify-center !py-2.5" style="color:var(--red); border-color:color-mix(in srgb,var(--red) 35%,transparent)">⏏ Выйти из режима владельца</button>
+    </div>
+    <div id="om-viewer" class="space-y-2 hidden">
+      <button onclick="pull(true)" class="btn w-full justify-center !py-2.5">⟳ Обновить архив сейчас</button>
+      <p class="hint">👁 Вы в режиме просмотра: редактировать архив может только владелец. Данные обновляются автоматически каждые 15 секунд.</p>
+    </div>
+  </div>
+</div>
+
+<div id="toast-wrap" class="fixed bottom-5 right-5 z-[70] space-y-2"></div>
+
+<script>
+// ============================================================
+// ДАННЫЕ — 36 ТАЙТЛОВ (стартовый набор владельца)
+// ============================================================
+const FALLBACK_IMG='https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=400&q=80';
+const DEFAULT_DATA=[
+{name:'Вайолет Эвергарден',tier:'S',type:'series',episodes:26,movies:1,favorite:true,genres:['Драма','Романтика','Фэнтези'],img:'https://s.fotora.ru/4239d044156cab07.png',history:[{title:'1 сезон',date:'2026-02-01',episodes:13,movies:0},{title:'2 сезон',date:'2026-02',episodes:12,movies:0},{title:'Фильм',date:'2026-03-27',episodes:0,movies:1}]},
+{name:'Мастера Меча Онлайн',tier:'S',type:'series',episodes:122,movies:3,favorite:true,genres:['Виртуальная реальность','Военная тематика','Драма','Игры','Перестрелки','Приключения','Романтика','Сражения на мечах','Сёнэн','Фантастика','Фэнтези','Экшен'],img:'https://s.fotora.ru/d006c363e4ceda04.png',history:[{title:'1 сезон',date:'2025-12',episodes:25,movies:0},{title:'Фильм-1',date:'2025-12',episodes:0,movies:1},{title:'Фильм-2',date:'2025-12',episodes:0,movies:1},{title:'Спешл',date:'2025-12',episodes:1,movies:0},{title:'2 сезон',date:'2025-12',episodes:24,movies:0},{title:'3 сезон',date:'2025-12',episodes:12,movies:0},{title:'Фильм-3',date:'2025-12',episodes:0,movies:1},{title:'4 сезон',date:'2025-12',episodes:25,movies:0},{title:'5 сезон | 1 часть',date:'2025-12',episodes:12,movies:0},{title:'5 сезон | 2 часть',date:'2025-12',episodes:11,movies:0},{title:'6 сезон',date:'2025-12',episodes:12,movies:0}]},
+{name:'Провожающая в последний путь Фрирен',tier:'S',type:'series',episodes:38,movies:0,favorite:true,genres:['Драма','Магия','Повседневность','Приключения','Сёнэн','Фэнтези','Целый фэнтези мир','Эльфы'],img:'https://s.fotora.ru/197694b02c3612ab.png',history:[{title:'1 сезон',date:'2026-04-04',episodes:28,movies:0},{title:'2 сезон',date:'2026-04-06',episodes:10,movies:0}]},
+{name:'Монолог фармацевта',tier:'S',type:'series',episodes:48,movies:0,favorite:true,genres:['Детектив','Драма','Исторический','Комедия','Романтика','Сэйнэн'],img:'https://s.fotora.ru/33342ab79b72b105.png',history:[{title:'1 сезон',date:'2026-04-01',episodes:24,movies:0},{title:'2 сезон',date:'2026-04-03',episodes:24,movies:0}]},
+{name:'Песнь ночных сов',tier:'S',type:'series',episodes:26,movies:0,favorite:true,genres:['Вампиры','Комедия','Романтика','Сверхъестественное','Сёнэн','Фэнтези'],img:'https://s.fotora.ru/ae4d827aafa896c0.png',history:[{title:'1 сезон',date:'2026-05',episodes:13,movies:0},{title:'2 сезон',date:'2026-05',episodes:13,movies:0}]},
+{name:'Атака титанов',tier:'S',type:'series',episodes:97,movies:0,favorite:true,genres:['Альтернативная реальность','Военная тематика','Детектив','Драма','Постапокалиптика','Приключения','Сверхъестественное','Суперспособности','Сёнэн','Триллер','Ужасы','Фантастика','Фэнтези','Экшен'],img:'https://s.fotora.ru/5f8128eaca87af1d.png',history:[{title:'1 сезон',date:'2026-04',episodes:25,movies:0},{title:'OVA',date:'2026-04',episodes:3,movies:0},{title:'2 сезон',date:'2026-04',episodes:12,movies:0},{title:'3 сезон | Часть 1',date:'2026-04',episodes:12,movies:0},{title:'3 сезон | Часть 2',date:'2026-04',episodes:10,movies:0},{title:'Финал | Часть 1',date:'2026-04',episodes:16,movies:0},{title:'Финал | Часть 2',date:'2026-04',episodes:12,movies:0},{title:'Спешл',date:'2026-04',episodes:2,movies:0},{title:'OVA-2',date:'2026-04',episodes:2,movies:0},{title:'OVA-3',date:'2026-04',episodes:3,movies:0}]},
+{name:'Добро пожаловать в класс превосходства',tier:'S',type:'series',episodes:38,movies:0,favorite:true,genres:['Драма','Повседневность','Психология','Романтика','Сэйнэн','Триллер','Школьная жизнь'],img:'https://s.fotora.ru/39423a10099c761c.png',history:[{title:'1 сезон',date:'2018',episodes:12,movies:0},{title:'2 сезон',date:'2022-09-26',episodes:13,movies:0},{title:'3 сезон',date:'2024-03-27',episodes:13,movies:0}]},
+{name:'Восемьдесят шесть',tier:'S',type:'series',episodes:24,movies:0,favorite:true,genres:['Антиутопия','Военная тематика','Драма','Меха','Приключения','Сэйнэн','Фантастика','Экшен'],img:'https://s.fotora.ru/8c93ef1540d75ba2.png',history:[{title:'1 часть',date:'2026-02',episodes:12,movies:0},{title:'2 часть',date:'2026-02',episodes:12,movies:0}]},
+{name:'Корзинка фруктов',tier:'S',type:'series',episodes:63,movies:1,favorite:true,genres:['Бисёнэн','Гарем (для девочек)','Драма','Комедия','Повседневность','Романтика','Сверхъестественное','Сёдзё','Фэнтези','Школьная жизнь'],img:'https://s.fotora.ru/4fbc1dca7e02cf1a.png',history:[{title:'1 сезон',date:'2026-02',episodes:25,movies:0},{title:'2 сезон',date:'2026-02',episodes:25,movies:0},{title:'3 сезон',date:'2026-02',episodes:13,movies:0},{title:'Фильм',date:'2026-02',episodes:0,movies:1}]},
+{name:'Звёздное дитя',tier:'S',type:'series',episodes:35,movies:0,favorite:true,genres:['Детектив','Драма','Музыка','Повседневность','Романтика','Сверхъестественное','Сэйнэн'],img:'https://s.fotora.ru/ec19ab15406bc0c9.png',history:[{title:'1 сезон',date:'2026-02',episodes:11,movies:0},{title:'2 сезон',date:'2026-02',episodes:13,movies:0},{title:'3 сезон',date:'2026-03-28',episodes:11,movies:0}]},
+{name:'Ателье колдовских колпаков',tier:'S',type:'series',episodes:13,movies:0,favorite:true,genres:['Комедия','Магия','Сэйнэн','Фэнтези'],img:'https://s.fotora.ru/74e72e3c9db08a36.png',history:[{title:'1 сезон',date:'2026-07-01',episodes:13,movies:0}]},
+{name:'Призматическое рондо',tier:'S',type:'series',episodes:20,movies:0,favorite:true,genres:['Драма','Искусство','Исторический','Приключения','Романтика'],img:'https://s.fotora.ru/1d63fbe08fe8ea11.png',history:[{title:'Полный сезон',date:'2026-05-31',episodes:20,movies:0}]},
+{name:'Ликорис Рикоил',tier:'S',type:'series',episodes:19,movies:0,favorite:true,genres:['Перестрелки','Повседневность','Сэйнэн','Экшен'],img:'https://s.fotora.ru/fab793e062e9c7c9.png',history:[{title:'1 сезон',date:'2026-03',episodes:13,movies:0},{title:'ONA',date:'2026-03',episodes:6,movies:0}]},
+{name:'Молчаливая ведьма: Тайна молчаливой колдуньи',tier:'S',type:'series',episodes:13,movies:0,favorite:false,genres:['Ведьмы','Дзёсэй','Фэнтези','Школьная жизнь'],img:'https://s.fotora.ru/aab6877d7a63eb7d.png',history:[{title:'1 сезон',date:'2026-07-05',episodes:13,movies:0}]},
+{name:'Я хочу съесть твою поджелудочную',tier:'S',type:'movie',episodes:0,movies:1,favorite:true,genres:['Драма','Повседневность','Романтика','Сэйнэн','Школьная жизнь'],img:'https://s.fotora.ru/4a7318c712245627.png',history:[{title:'Фильм',date:'2026-05-30',episodes:0,movies:1}]},
+{name:'Наруто',tier:'S',type:'series',episodes:720,movies:10,favorite:true,genres:['Боевые искусства','Комедия','Ниндзя','Приключения','Суперспособности','Сёнэн','Убийцы','Фэнтези','Экшен'],img:'https://s.fotora.ru/60183ed2f9f943ff.png',history:[{title:'1 сезон',date:'2012',episodes:220,movies:0},{title:'Фильм-1',date:'2016',episodes:0,movies:1},{title:'Фильм-2',date:'2016',episodes:0,movies:1},{title:'Фильм-3',date:'2016',episodes:0,movies:1},{title:'Фильм-4',date:'2016',episodes:0,movies:1},{title:'Фильм-5',date:'2016',episodes:0,movies:1},{title:'Фильм-6',date:'2016',episodes:0,movies:1},{title:'Фильм-7',date:'2016',episodes:0,movies:1},{title:'Фильм-8',date:'2016',episodes:0,movies:1},{title:'Фильм-9',date:'2016',episodes:0,movies:1},{title:'Фильм-10',date:'2016',episodes:0,movies:1},{title:'2 сезон',date:'2017-03-23',episodes:500,movies:0}]},
+{name:'Аватар: Легенда об Аанге',tier:'S',type:'ona',episodes:61,movies:1,favorite:true,genres:['Боевые искусства','Военная тематика','Война','Драма','Комедия','Магия','Не японское','Приключения','Романтика','Сверхъестественное','Сёнэн','Фантастика','Фэнтези','Целый фэнтези мир','Экшен'],img:'https://s.fotora.ru/b40fe5145a677e17.png',history:[{title:'1 сезон',date:'2012',episodes:20,movies:0},{title:'2 сезон',date:'2012',episodes:20,movies:0},{title:'3 сезон',date:'2012',episodes:21,movies:0},{title:'Фильм',date:'2026-04',episodes:0,movies:1}]},
+{name:'Чёрный клевер',tier:'A',type:'series',episodes:170,movies:1,favorite:false,genres:['Комедия','Магия','Приключения','Суперспособности','Сёнэн','Фэнтези','Экшен','Эльфы'],img:'https://s.fotora.ru/6420b7f0d02a54cb.png',history:[{title:'Фильм',date:'2025-11',episodes:0,movies:1},{title:'1 сезон',date:'2025-11',episodes:170,movies:0}]},
+{name:'Тусовщик Кунмин',tier:'A',type:'series',episodes:12,movies:0,favorite:true,genres:['Исторический','Исэкай','Комедия','Музыка'],img:'https://s.fotora.ru/9e2fb659d9df3644.png',history:[{title:'1 сезон',date:'2022-06-21',episodes:12,movies:0}]},
+{name:'Убийца Акамэ',tier:'A',type:'series',episodes:24,movies:0,favorite:false,genres:['Драма','Нелинейный сюжет','Приключения','Сражения на мечах','Суперспособности','Сёнэн','Убийцы','Фэнтези','Экшен'],img:'https://s.fotora.ru/23f28929e76dfeee.png',history:[{title:'1 сезон',date:'2026-02',episodes:24,movies:0}]},
+{name:'Кабанэри железной крепости',tier:'A',type:'series',episodes:12,movies:1,favorite:false,genres:['Драма','Зомби','Исторический','Сверхъестественное','Стимпанк','Сёнэн','Триллер','Ужасы','Фэнтези','Экшен'],img:'https://s.fotora.ru/6ccb63c40c65ceac.png',history:[{title:'1 сезон',date:'2026-05-25',episodes:12,movies:0},{title:'Фильм',date:'2026-05-26',episodes:0,movies:1}]},
+{name:'Агенты четырёх сезонов: Весенний танец',tier:'A',type:'series',episodes:14,movies:0,favorite:false,genres:['Драма','Романтика','Фэнтези'],img:'https://s.fotora.ru/4d68877f9ddf4098.png',history:[{title:'1 сезон',date:'2026-07-04',episodes:14,movies:0}]},
+{name:'ID: Вторжение',tier:'A',type:'series',episodes:13,movies:0,favorite:false,genres:['Детектив','Мистика','Полицейские','Психология','Триллер','Убийцы','Фантастика'],img:'https://s.fotora.ru/d082bf4e3cbf8993.png',history:[{title:'1 сезон',date:'2026-05-25',episodes:13,movies:0}]},
+{name:'Один танец',tier:'A',type:'series',episodes:12,movies:0,favorite:false,genres:['Искусство','Повседневность','Романтика','Спорт','Сэйнэн','Школьная жизнь'],img:'https://s.fotora.ru/ef658b3c1a0b5505.png',history:[{title:'1 сезон',date:'2026-05-30',episodes:12,movies:0}]},
+{name:'Королева со скальпелем',tier:'B',type:'series',episodes:12,movies:0,favorite:false,genres:['Исэкай','Комедия','Повседневность','Романтика','Фэнтези'],img:'https://s.fotora.ru/7abe10a4c9a2648e.png',history:[{title:'1 сезон',date:'2026-06-23',episodes:12,movies:0}]},
+{name:'Боруто',tier:'B',type:'series',episodes:293,movies:1,favorite:false,genres:['Боевые искусства','Ниндзя','Приключения','Суперспособности','Сёнэн','Фэнтези','Экшен'],img:'https://s.fotora.ru/1b9bda85a4ece741.png',history:[{title:'Фильм',date:'2015',episodes:0,movies:1},{title:'1 сезон',date:'2023-03-26',episodes:293,movies:0}]},
+{name:'Аватар: Легенда о Корре',tier:'B',type:'ona',episodes:52,movies:0,favorite:false,genres:['Боевые искусства','Драма','Комедия','Магия','Не японское','Приключения','Сверхъестественное','Сёнэн','Фэнтези','Экшен'],img:'https://s.fotora.ru/cde0eb227ece4d5f.png',history:[{title:'1 сезон',date:'2012-04',episodes:12,movies:0},{title:'2 сезон',date:'2013',episodes:14,movies:0},{title:'3 сезон',date:'2014',episodes:13,movies:0},{title:'4 сезон',date:'2015',episodes:13,movies:0}]},
+{name:'Проект «Мир»: Сломанный мир и не поющая Мику',tier:'B',type:'movie',episodes:0,movies:1,favorite:false,genres:['Музыка'],img:'https://s.fotora.ru/841e06583532c35e.png',history:[{title:'Фильм',date:'2026-04',episodes:0,movies:1}]},
+{name:'Мастера на все руки выгнали из отряда героев',tier:'B',type:'series',episodes:12,movies:0,favorite:false,genres:['Магия','Приключения','Сражения на мечах','Фэнтези','Экшен'],img:'https://s.fotora.ru/027b4661caee3034.png',history:[{title:'1 сезон',date:'2026-03-18',episodes:12,movies:0}]},
+{name:'Кошечка из Сакурасо',tier:'B',type:'series',episodes:24,movies:0,favorite:false,genres:['Драма','Комедия','Любовный треугольник','Манга','Повседневность','Романтика','Сэйнэн','Школьная жизнь','Этти'],img:'https://s.fotora.ru/b65b95bd90b7106d.png',history:[{title:'1 сезон',date:'2025-11',episodes:24,movies:0}]},
+{name:'Ангел кровопролития',tier:'C',type:'series',episodes:16,movies:0,favorite:false,genres:['Приключения','Психология','Триллер','Убийцы','Ужасы'],img:'https://s.fotora.ru/d0790cb69f1976c2.png',history:[{title:'1 сезон',date:'2026-06-27',episodes:16,movies:0}]},
+{name:'Волшебник ледяного клинка правит миром',tier:'C',type:'series',episodes:12,movies:0,favorite:false,genres:['Магия','Фэнтези','Школьная жизнь','Экшен'],img:'https://s.fotora.ru/29802bef496558d9.png',history:[{title:'1 сезон',date:'2024',episodes:12,movies:0}]},
+{name:'Убийца гоблинов',tier:'C',type:'series',episodes:24,movies:1,favorite:false,genres:['Приключения','Сэйнэн','Темное фэнтези','Фэнтези','Экшен'],img:'https://s.fotora.ru/8707f77fe7902a6b.png',history:[{title:'1 сезон',date:'2026-05-28',episodes:12,movies:0},{title:'Фильм',date:'2026-05-28',episodes:0,movies:1},{title:'2 сезон',date:'2026-05-29',episodes:12,movies:0}]},
+{name:'Отчаянные бойцы Бакуган',tier:'D',type:'series',episodes:189,movies:0,favorite:false,genres:['Игры','Приключения','Прокси бои','Сёнэн','Фэнтези','Экшен'],img:'https://s.fotora.ru/cd225f8ae0ae764a.png',history:[{title:'1 сезон',date:'2018',episodes:52,movies:0},{title:'2 сезон',date:'2018',episodes:52,movies:0},{title:'3 сезон',date:'2018',episodes:39,movies:0},{title:'4 сезон',date:'2016',episodes:46,movies:0}]},
+{name:'Покемон',tier:'D',type:'series',episodes:82,movies:0,favorite:false,genres:['Комедия','Приключения','Прокси бои','Сёнэн','Фэнтези','Экшен'],img:'https://s.fotora.ru/5c713efe04e0afd5.png',history:[{title:'1 сезон',date:'2018',episodes:82,movies:0}]},
+{name:'Безэмоциональная Касивада и эмоциональный Ота',tier:'E',type:'series',episodes:12,movies:0,favorite:false,genres:['Комедия','Повседневность','Романтика','Школьная жизнь'],img:'https://s.fotora.ru/06934fcfe11dc327.png',history:[{title:'1 сезон',date:'2026-01',episodes:12,movies:0}]}
+];
+
+// ============================================================
+// КОНФИГ
+// ============================================================
+const STORAGE_KEY='anime_archive_v7';
+const GH_API='https://api.github.com';
+const TIER_ORDER=['SSS','S','A','B','C','D','E'];
+const TIERS=[
+ {key:'SSS',title:'Абсолютный пантеон',desc:'Вне конкуренции — эталоны на все времена'},
+ {key:'S',title:'Шедевры',desc:'Канон и высшая рекомендация'},
+ {key:'A',title:'Близко к идеалу',desc:'Выдающиеся произведения'},
+ {key:'B',title:'Крепкая основа',desc:'Качественные тайтлы на вечер'},
+ {key:'C',title:'Средне',desc:'На любителя или под настроение'},
+ {key:'D',title:'На один раз',desc:'Проходной контент'},
+ {key:'E',title:'Ужасно',desc:'Не рекомендуется к просмотру'}];
+const TYPE_META={series:{label:'Сериалы',icon:'📺'},movie:{label:'Фильмы',icon:'🎬'},ova:{label:'OVA',icon:'💿'},ona:{label:'ONA',icon:'🌐'},special:{label:'Спешлы',icon:'✨'}};
+const VIEW_META={grid:{t:'Сетка тиров',s:'Тайтлы, сгруппированные по рангам SSS–E'},dashboard:{t:'Аналитика',s:'Статистика по всему архиву'},timeline:{t:'Хронология',s:'Полный журнал просмотров'}};
+const COLLECTIONS=[
+ {key:'fav',icon:'❤️',title:'Избранное',test:a=>a.favorite},
+ {key:'pantheon',icon:'👑',title:'Пантеон',test:a=>a.tier==='SSS'||a.tier==='S'},
+ {key:'long',icon:'🐉',title:'Эпики 100+',test:a=>(a.episodes||0)>=100},
+ {key:'short',icon:'⚡',title:'Короткие ≤13',test:a=>(a.episodes||0)>0&&(a.episodes||0)<=13},
+ {key:'cinema',icon:'🍿',title:'Киноночь',test:a=>a.type==='movie'||(a.movies||0)>0||typeCounts(a).movie>0},
+ {key:'multi',icon:'📚',title:'Многосезонки',test:a=>(a.history||[]).filter(h=>/сезон/i.test(h.title||'')).length>=2}];
+const TIER_HEX={SSS:'#f5c451',S:'#ff5d8f',A:'#a78bfa',B:'#38bdf8',C:'#34d399',D:'#fb923c',E:'#f43f5e'};
+const EP_MIN=24, MOV_MIN=100;
+const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+let animeData=[], filters={query:'',genres:[],types:[],tiers:[],collection:'',sort:'default'};
+let isEditMode=false, editingIndex=-1, previewIndex=-1, pendingDelete=-1, searchTimer=null;
+let histByDate=false, currentView='grid';
+let charts={radar:null,yearly:null,tier:null,format:null};
+let wind=0, windTarget=0, petalColor='255,158,196';
+let revealed=false;
+
+// ===== СОСТОЯНИЕ СИНХРОНИЗАЦИИ =====
+const R={ token:'', repo:'', sha:null, published:null, dirty:false, flying:false, timer:null, lastMod:'', etag:'', lastPull:0, lastSync:0, pending:false };
+
+// ============================================================
+// ХЕЛПЕРЫ
+// ============================================================
+const el=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function cssVar(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+const pad=n=>String(n).padStart(2,'0');
+function dateTs(s){
+  if(!s) return 0; s=String(s).trim(); let m;
+  if(m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/)) return +new Date(+m[1],+m[2]-1,+m[3]);
+  if(m=s.match(/^(\d{4})-(\d{1,2})$/)) return +new Date(+m[1],+m[2]-1,1);
+  if(m=s.match(/^(\d{4})$/)) return +new Date(+m[1],0,1);
+  if(m=s.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/)) return +new Date(+m[3],+m[2]-1,+m[1]);
+  const t=Date.parse(s); return Number.isFinite(t)?t:0;
+}
+function normDate(s){
+  s=(s||'').trim(); if(!s) return ''; let m;
+  if(m=s.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/)) return `${m[3]}-${pad(m[2])}-${pad(m[1])}`;
+  if(m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/)) return `${m[1]}-${pad(m[2])}-${pad(m[3])}`;
+  if(m=s.match(/^(\d{4})-(\d{1,2})$/)) return `${m[1]}-${pad(m[2])}`;
+  if(m=s.match(/^(\d{4})$/)) return m[1];
+  return s;
+}
+function fmtRuDate(s){
+  if(!s) return '—'; s=String(s).trim(); let m;
+  if(m=s.match(/^(\d{4})-(\d{2})-(\d{2})$/)) return `${m[3]}.${m[2]}.${m[1]}`;
+  if(m=s.match(/^(\d{4})-(\d{2})$/)) return `${m[2]}.${m[1]}`;
+  if(m=s.match(/^(\d{4})$/)) return m[1];
+  return s;
+}
+const fmtDate=ts=>new Date(ts).toLocaleDateString('ru-RU');
+const fmtTime=ts=>new Date(ts).toLocaleTimeString('ru-RU');
+function lastDate(a){ return (a.history||[]).reduce((m,h)=>(h.date&&dateTs(h.date)>dateTs(m)?h.date:m),''); }
+function seedAdded(a,idx){ const t=dateTs(lastDate(a)); return t>0?t:Date.now()-idx*86400000; }
+const minutesOf=a=>(a.episodes||0)*EP_MIN+(a.movies||0)*MOV_MIN;
+function fmtRuntime(mins){
+  if(mins<=0) return '—';
+  if(mins>=1440) return `${Math.floor(mins/1440)} д ${Math.floor((mins%1440)/60)} ч`;
+  return `${Math.floor(mins/60)} ч ${mins%60} м`;
+}
+function historyIcon(h){
+  const t=(h.title||'').toLowerCase();
+  if((h.movies||0)>0) return '🎬';
+  if(/ova/.test(t)) return '💿';
+  if(/ona/.test(t)) return '🌐';
+  if(/спешл|special/.test(t)) return '✨';
+  if(/финал/.test(t)) return '🏁';
+  if(/часть/.test(t)) return '📖';
+  if(/сезон/.test(t)) return '📺';
+  return '▶️';
+}
+function typeCounts(item){
+  const c={series:0,movie:0,ova:0,ona:0,special:0};
+  (item.history||[]).forEach(h=>{
+    const t=(h.title||'').toLowerCase();
+    if((h.movies||0)>0) c.movie++;
+    else if(/ova/.test(t)) c.ova++;
+    else if(/ona/.test(t)) c.ona++;
+    else if(/спешл|special/.test(t)) c.special++;
+    else c.series++;
+  });
+  return c;
+}
+function matchesTypes(a){
+  if(!filters.types.length) return true;
+  const tc=typeCounts(a);
+  return filters.types.some(t=>{
+    if(t==='series') return a.type==='series';
+    if(t==='movie') return a.type==='movie'||tc.movie>0;
+    if(t==='ova') return a.type==='ova'||tc.ova>0;
+    if(t==='ona') return a.type==='ona'||tc.ona>0;
+    if(t==='special') return a.type==='special'||tc.special>0;
+    return false;
+  });
+}
+
+// ============================================================
+// ХРАНИЛИЩЕ + СИНХРОНИЗАЦИЯ С GITHUB
+// ============================================================
+function saveLocal(){ try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(animeData)); }catch(e){} }
+function save(){
+  try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(animeData)); }
+  catch(e){ toast('Локальное хранилище переполнено — постеры слишком тяжёлые','err'); }
+  markDirty();
+}
+function loadData(){
+  try{ const raw=localStorage.getItem(STORAGE_KEY); if(raw) animeData=JSON.parse(raw); }catch(e){}
+  if(!Array.isArray(animeData)) animeData=JSON.parse(JSON.stringify(DEFAULT_DATA));
+  let dirty=false;
+  animeData.forEach((a,i)=>{ if(!a.addedAt){ a.addedAt=seedAdded(a,i); dirty=true; } });
+  if(dirty) saveLocal();
+}
+const isOwner=()=>!!(R.token&&R.repo);
+function detectRepo(){
+  try{
+    const h=location.hostname;
+    if(!/\.github\.io$/.test(h)) return null;
+    const owner=h.split('.')[0];
+    const parts=location.pathname.split('/').filter(Boolean);
+    if(!parts.length) return {owner,repo:owner+'.github.io'};
+    return {owner,repo:parts[0]};
+  }catch(e){ return null; }
+}
+function ownerHeaders(){ const h={Accept:'application/vnd.github+json'}; if(R.token) h.Authorization='Bearer '+R.token; return h; }
+function b64e(str){ const u=new TextEncoder().encode(str); let s=''; u.forEach(b=>s+=String.fromCharCode(b)); return btoa(s); }
+function markDirty(){
+  if(!isOwner()) return;
+  R.dirty=true; updateOmStatus();
+  clearTimeout(R.timer);
+  R.timer=setTimeout(()=>commitNow(false),1600);
+}
+async function commitNow(force){
+  if(!isOwner()){ toast('Сначала войдите как владелец (кнопка 🔒)','err'); return; }
+  if(R.flying) return;
+  if(!R.dirty&&!force) return;
+  R.flying=true; R.dirty=false;
+  toast('☁️ Отправляю на GitHub…');
+  try{
+    if(R.sha===null){ // sha неизвестен — спрашиваем
+      const g=await fetch(`${GH_API}/repos/${R.repo}/contents/data.json`,{headers:ownerHeaders()});
+      if(g.ok) R.sha=(await g.json()).sha;
+      else if(g.status===404) R.sha='';
+      else if(g.status===401){ throw {code:401}; }
+    }
+    let body={message:`🌐 обновление архива · ${new Date().toLocaleString('ru-RU')}`,content:b64e(JSON.stringify(animeData))};
+    if(R.sha) body.sha=R.sha;
+    let p=await fetch(`${GH_API}/repos/${R.repo}/contents/data.json`,{method:'PUT',headers:ownerHeaders(),body:JSON.stringify(body)});
+    if(p.status===409){ // файл изменился извне — перечитываем sha и повторяем
+      const g=await fetch(`${GH_API}/repos/${R.repo}/contents/data.json`,{headers:ownerHeaders()});
+      R.sha=g.ok?(await g.json()).sha:'';
+      body={...body,sha:R.sha||undefined};
+      p=await fetch(`${GH_API}/repos/${R.repo}/contents/data.json`,{method:'PUT',headers:ownerHeaders(),body:JSON.stringify(body)});
+    }
+    if(p.ok){
+      R.sha=(await p.json()).content.sha;
+      R.published=true; R.lastSync=Date.now(); R.lastPull=Date.now();
+      toast('☁️ Опубликовано! Зрители увидят обновление через ~1–2 мин');
+      updateOmStatus(); updateSyncLine();
+    }else if(p.status===401){ throw {code:401}; }
+    else if(p.status===403){ toast('Нет прав на запись: проверьте у токена разрешение Contents → Read and write','err'); R.dirty=true; }
+    else{ toast('GitHub отклонил сохранение ('+p.status+')','err'); R.dirty=true; }
+  }catch(err){
+    if(err&&err.code===401) toast('Токен истёк или неверен — войдите заново через кнопку 🔒','err');
+    else toast('Нет связи с GitHub','err');
+    R.dirty=true;
+  }
+  R.flying=false;
+  updateOmStatus();
+  if(R.dirty) scheduleRetry();
+}
+function scheduleRetry(){
+  clearTimeout(R.timer);
+  R.timer=setTimeout(()=>commitNow(false),8000);
+}
+async function pull(manual){
+  if(R.flying||(R.dirty&&isOwner())) return;
+  try{
+    const t=Date.now();
+    const h=await fetch(`data.json?nc=${t}`,{method:'HEAD',cache:'no-store'});
+    if(h.status===404){ R.published=false; R.lastPull=Date.now(); updateSyncLine(); updateOmStatus(); if(manual) toast('Архив ещё не опубликован владельцем'); return; }
+    if(!h.ok){ if(manual) toast('Сервер недоступен','err'); return; }
+    R.published=true;
+    const lm=h.headers.get('last-modified')||'', et=h.headers.get('etag')||'';
+    if(lm===R.lastMod&&et===R.etag&&R.lastPull){ R.lastPull=Date.now(); if(manual) toast('Данные актуальны ✓'); updateSyncLine(); return; }
+    const g=await fetch(`data.json?nc=${t}`,{cache:'no-store'});
+    if(!g.ok) return;
+    const txt=await g.text();
+    R.lastMod=lm; R.etag=et; R.lastPull=Date.now();
+    let arr; try{ arr=JSON.parse(txt); }catch(e){ return; }
+    if(!Array.isArray(arr)) return;
+    if(JSON.stringify(arr)===JSON.stringify(animeData)){ if(manual) toast('Данные актуальны ✓'); updateSyncLine(); return; }
+    animeData=arr; saveLocal();
+    if(document.querySelector('.modal.open')){ R.pending=true; updateSyncLine(); }
+    else{ render(); toast('Архив обновлён 🌸'); }
+    updateSyncLine(); updateOmStatus();
+  }catch(e){ if(manual) toast('Нет связи с сервером','err'); }
+}
+async function bootRemote(){
+  const det=detectRepo();
+  if(det) el('om-repo').value=`${det.owner}/${det.repo}`;
+  await pull(false);
+  if(R.published===false&&!isOwner()){ animeData=[]; render(); }
+  reveal();
+  setInterval(()=>{ if(document.visibilityState==='visible'&&!R.flying) pull(false); },15000);
+  document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') pull(false); });
+  updateSyncLine(); updateOmStatus();
+}
+function reveal(){
+  if(revealed) return; revealed=true;
+  const b=el('boot'); if(b){ b.classList.add('gone'); setTimeout(()=>b.remove(),500); }
+}
+
+// ============================================================
+// ВХОД ВЛАДЕЛЬЦА
+// ============================================================
+function applyRole(){
+  document.body.classList.toggle('role-viewer',!isOwner());
+  el('sync-btn').textContent=isOwner()?'✍️':'🔒';
+  updateSyncLine();
+}
+function openOwnerModal(){ renderOwnerModal(); showModal('owner-modal'); setTimeout(()=>{ (isOwner()?el('om-token'):el('om-repo')).focus(); },120); }
+function closeOwnerModal(){ hideModal('owner-modal'); }
+function renderOwnerModal(){
+  const own=isOwner();
+  el('om-login').classList.toggle('hidden',own);
+  el('om-owner').classList.toggle('hidden',!own);
+  el('om-viewer').classList.toggle('hidden',own);
+  if(!el('om-repo').value){ const d=detectRepo(); if(d) el('om-repo').value=`${d.owner}/${d.repo}`; }
+  updateOmStatus();
+}
+function updateOmStatus(){
+  const s=el('om-status'); if(!s) return;
+  const own=isOwner();
+  const rows=[
+    ['Режим',own?'✍️ владелец — редактирование разрешено':'👁 только просмотр'],
+    ['Репозиторий',R.repo||(detectRepo()?detectRepo().owner+'/'+detectRepo().repo:'—')],
+    ['Публикация',R.published===null?'проверяется…':(R.published?'✓ data.json на сервере':'пока нет данных на сервере')],
+    ['Обновлено',R.lastPull?fmtTime(R.lastPull):'—']
+  ];
+  if(R.dirty) rows.push(['⚡ Не отправлено','изменения ждут отправки']);
+  if(R.flying) rows.push(['☁️ Статус','идёт отправка на GitHub…']);
+  s.innerHTML=rows.map(([k,v])=>`<div class="flex justify-between gap-3"><span style="color:var(--faint)">${k}</span><span class="text-right" style="color:var(--text)">${esc(v)}</span></div>`).join('');
+}
+function updateSyncLine(){
+  const n=el('sync-line'); if(!n) return;
+  n.textContent=isOwner()
+    ? `✍️ режим владельца${R.lastSync?` · опубликовано ${fmtTime(R.lastSync)}`:''}`
+    : (R.published===false?'👁 архив ещё не опубликован владельцем':`👁 только просмотр · обновлено ${R.lastPull?fmtTime(R.lastPull):'—'}`);
+}
+async function ownerLogin(){
+  let repo=el('om-repo').value.trim().replace(/^https?:\/\/github\.com\//i,'').replace(/\/+$/,'');
+  const tok=el('om-token').value.trim();
+  if(!repo||!tok){ toast('Заполните оба поля','err'); return; }
+  if(!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(repo)){ toast('Репозиторий в формате: имя/репозиторий','err'); return; }
+  const btn=el('om-login-btn')||document.querySelector('#om-login .btn-primary');
+  if(btn){ btn.textContent='⏳ Проверяю доступ…'; btn.disabled=true; }
+  try{
+    const r=await fetch(`${GH_API}/repos/${repo}`,{headers:{Authorization:'Bearer '+tok,Accept:'application/vnd.github+json'}});
+    if(r.status===401){ toast('Токен неверный или истёк','err'); return; }
+    if(r.status===404){ toast('Репозиторий не найден — проверьте имя','err'); return; }
+    if(!r.ok){ toast('GitHub ответил ошибкой '+r.status,'err'); return; }
+    const j=await r.json();
+    if(j.permissions&&!j.permissions.push){ toast('У токета нет прав на запись в этот репозиторий','err'); return; }
+    R.token=tok; R.repo=repo; R.sha=null; R.dirty=false;
+    try{ localStorage.setItem('oa_token',tok); localStorage.setItem('oa_repo',repo); }catch(e){}
+    el('om-token').value='';
+    applyRole(); renderOwnerModal();
+    toast('Режим владельца активирован ✍️ Теперь можно редактировать');
+  }catch(e){ toast('Нет связи с GitHub','err'); }
+  finally{ if(btn){ btn.textContent='✍️ Войти как владелец'; btn.disabled=false; } }
+}
+function ownerLogout(){
+  R.token=''; R.repo=''; R.sha=null; R.dirty=false; clearTimeout(R.timer);
+  try{ localStorage.removeItem('oa_token'); localStorage.removeItem('oa_repo'); }catch(e){}
+  applyRole(); renderOwnerModal();
+  toast('Вышли из режима владельца');
+}
+
+// ============================================================
+// ТОСТЫ
+// ============================================================
+function toast(msg,type){
+  const w=el('toast-wrap'), t=document.createElement('div');
+  t.className='toast'+(type==='err'?' toast-err':''); t.innerHTML=msg;
+  w.appendChild(t);
+  while(w.children.length>4) w.firstChild.remove();
+  setTimeout(()=>{ t.classList.add('out'); setTimeout(()=>t.remove(),320); },2800);
+}
+
+// ============================================================
+// ФИЛЬТРАЦИЯ
+// ============================================================
+function getFiltered(){
+  let list=animeData.map((a,i)=>({...a,_i:i}));
+  const q=filters.query.trim().toLowerCase();
+  if(q) list=list.filter(a=>a.name.toLowerCase().includes(q)||(a.genres||[]).some(g=>g.toLowerCase().includes(q)));
+  if(filters.tiers.length) list=list.filter(a=>filters.tiers.includes(a.tier));
+  list=list.filter(matchesTypes);
+  if(filters.collection){ const c=COLLECTIONS.find(x=>x.key===filters.collection); if(c) list=list.filter(c.test); }
+  if(filters.genres.length) list=list.filter(a=>filters.genres.every(g=>(a.genres||[]).includes(g)));
+  const ti=t=>TIER_ORDER.indexOf(t);
+  list.sort((a,b)=>{
+    switch(filters.sort){
+      case 'tier-rev': return ti(b.tier)-ti(a.tier)||a.name.localeCompare(b.name,'ru');
+      case 'name': return a.name.localeCompare(b.name,'ru');
+      case 'episodes': return (b.episodes||0)-(a.episodes||0);
+      case 'movies': return (b.movies||0)-(a.movies||0);
+      case 'recent': return dateTs(lastDate(b))-dateTs(lastDate(a));
+      case 'added-new': return (b.addedAt||0)-(a.addedAt||0);
+      default: return ti(a.tier)-ti(b.tier)||a.name.localeCompare(b.name,'ru');
+    }
+  });
+  return list;
+}
+
+// ============================================================
+// РЕНДЕР
+// ============================================================
+function render(){
+  renderKPIs(); renderFilterStatus(); renderGrid(); buildSidebar();
+  if(currentView==='dashboard') renderDashboard();
+  if(currentView==='timeline') renderTimeline();
+}
+function countUp(node,to,suffix=''){
+  const from=parseFloat(node.dataset.v||'0')||0; node.dataset.v=to;
+  const t0=performance.now(), dur=650;
+  (function step(t){
+    const k=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-k,3);
+    node.textContent=Math.round(from+(to-from)*e).toLocaleString('ru-RU')+suffix;
+    if(k<1) requestAnimationFrame(step);
+  })(t0);
+}
+function renderKPIs(){
+  const list=getFiltered();
+  let eps=0,mov=0,fav=0,pan=0;
+  list.forEach(a=>{ eps+=a.episodes||0; mov+=a.movies||0; if(a.favorite)fav++; if(a.tier==='SSS'||a.tier==='S')pan++; });
+  const mins=eps*EP_MIN+mov*MOV_MIN;
+  countUp(el('kpi-total'),list.length);
+  countUp(el('kpi-episodes'),eps);
+  countUp(el('kpi-movies'),mov);
+  countUp(el('kpi-hours'),Math.floor(mins/60),'ч');
+  el('kpi-days').textContent=`≈ ${(mins/1440).toFixed(1)} дн.`;
+  countUp(el('kpi-fav'),fav);
+  countUp(el('kpi-top'),pan);
+  el('kpi-top-pct').textContent=(list.length?Math.round(pan/list.length*100):0)+'%';
+}
+function renderFilterStatus(){
+  const list=getFiltered(); const chips=[];
+  if(filters.query) chips.push({k:'q',l:`🔍 «${filters.query}»`});
+  if(filters.collection){ const c=COLLECTIONS.find(x=>x.key===filters.collection); if(c) chips.push({k:'col',l:`${c.icon} ${c.title}`}); }
+  if(filters.tiers.length) chips.push({k:'tiers',l:`⭐ Ранг: ${filters.tiers.join(' · ')}`});
+  if(filters.types.length) chips.push({k:'types',l:`🎞 Тип: ${filters.types.map(t=>TYPE_META[t].label).join(' · ')}`});
+  filters.genres.forEach(g=>chips.push({k:'g',v:g,l:`# ${g}`}));
+  el('filter-status').innerHTML=
+    `<span class="font-mono text-[10px] uppercase tracking-wider mr-1" style="color:var(--faint)">Показано</span>
+     <span class="font-mono text-[11px] font-bold" style="color:var(--text)">${list.length}</span>
+     <span class="font-mono text-[10px] mr-2" style="color:var(--faint)">из ${animeData.length}</span>`+
+    chips.map(c=>`<button class="fchip" data-clear="${c.k}" data-v="${esc(c.v||'')}">${esc(c.l)} <b class="fc-x">✕</b></button>`).join('')+
+    (chips.length?`<button class="fchip" data-clear="all" style="color:var(--red);border-color:color-mix(in srgb,var(--red) 35%,transparent)">✕ сбросить</button>`:'');
+}
+function cardHTML(a,i){
+  const eps=a.episodes||0, mov=a.movies||0;
+  const meta=[eps?eps+' эп':null,mov?mov+' ф':null,fmtRuDate(lastDate(a))].filter(Boolean).join(' · ')||'—';
+  const gens=(a.genres||[]).slice(0,3).join(' · ');
+  return `<article class="card" data-tilt data-idx="${a._i}" style="--d:${Math.min(i,14)}">
+    <div class="card-media">
+      <img loading="lazy" src="${esc(a.img||FALLBACK_IMG)}" alt="${esc(a.name)}" onerror="this.onerror=null;this.src='${FALLBACK_IMG}'">
+      <div class="card-shine"></div>
+      <span class="pop type-pill">${(TYPE_META[a.type]||{}).icon||'📺'}</span>
+      <div class="pop card-badges">
+        <span class="tb tb-sm tb-${a.tier}">${a.tier}</span>
+        <span class="fav-dot owner-only${a.favorite?'':' off'}" data-fav="${a._i}" title="Избранное">${a.favorite?'❤':'♡'}</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-name">${esc(a.name)}</div>
+      <div class="card-meta">${meta}</div>
+      ${gens?`<div class="card-genres">${esc(gens)}</div>`:''}
+    </div>
+  </article>`;
+}
+function renderGrid(){
+  const c=el('tier-container');
+  if(R.published===false&&!isOwner()){
+    c.innerHTML=`<div class="surface rounded-2xl empty">
+      <div class="e-ico">🌸</div>
+      <h3 class="font-bold text-sm mt-3" style="color:var(--text)">Архив ещё не опубликован</h3>
+      <p class="text-xs mt-1" style="color:var(--dim)">Владелец ещё не загрузил данные на сервер — загляните позже</p></div>`;
+    return;
+  }
+  const list=getFiltered();
+  if(!list.length){
+    c.innerHTML=`<div class="surface rounded-2xl empty">
+      <div class="e-ico">🌸</div>
+      <h3 class="font-bold text-sm mt-3" style="color:var(--text)">В этом срезе пусто</h3>
+      <p class="text-xs mt-1 mb-4" style="color:var(--dim)">Ни один тайтл не проходит текущие фильтры</p>
+      <button onclick="resetFilters()" class="btn">✕ Сбросить фильтры</button></div>`;
+    return;
+  }
+  let html='';
+  TIER_ORDER.forEach(t=>{
+    const items=list.filter(a=>a.tier===t); if(!items.length) return;
+    const meta=TIERS.find(x=>x.key===t);
+    const mins=items.reduce((s,a)=>s+minutesOf(a),0);
+    html+=`<section class="tsec${t==='SSS'?' sss':''}" style="--tc:var(--t-${t})">
+      <header class="tsec-head">
+        <span class="tsec-glyph">${t}</span>
+        <div class="min-w-0"><div class="tsec-t">${meta.title}</div>
+        <div class="tsec-c">${items.length} тайтлов · ${fmtRuntime(mins)} · ${meta.desc.toLowerCase()}</div></div>
+        <span class="tsec-line"></span>
+      </header>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3.5">
+        ${items.map((a,i)=>cardHTML(a,i)).join('')}
+      </div></section>`;
+  });
+  c.innerHTML=html;
+}
+
+// ============================================================
+// САЙДБАР
+// ============================================================
+function buildSidebar(){
+  el('collections').innerHTML=COLLECTIONS.map(c=>{
+    const n=animeData.filter(c.test).length;
+    return `<button class="col-btn ${filters.collection===c.key?'on':''}" data-col="${c.key}">
+      <span class="col-title">${c.icon} ${c.title}</span><span class="col-count">${n}</span></button>`;
+  }).join('');
+  el('tier-chips').innerHTML=TIER_ORDER.map(t=>{
+    const n=animeData.filter(a=>a.tier===t).length;
+    return `<button class="tb tb-sm tb-${t} tchip ${filters.tiers.includes(t)?'tchip-on':''}" data-tier="${t}">${t}<span class="opacity-70"> ${n}</span></button>`;
+  }).join('');
+  el('type-chips').innerHTML=Object.entries(TYPE_META).map(([k,m])=>{
+    const n=animeData.filter(a=>a.type===k).length;
+    return `<button class="fchip ${filters.types.includes(k)?'on':''}" data-type="${k}">${m.icon} ${m.label} <span style="color:var(--faint)">${n}</span></button>`;
+  }).join('');
+  buildSidebarGenres(el('genre-search').value);
+  buildLastAdded();
+}
+function buildSidebarGenres(q=''){
+  const counts={};
+  animeData.forEach(a=>(a.genres||[]).forEach(g=>counts[g]=(counts[g]||0)+1));
+  let arr=Object.entries(counts).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],'ru'));
+  if(q) arr=arr.filter(([g])=>g.toLowerCase().includes(q.toLowerCase()));
+  el('genre-count-label').textContent=`${arr.length} / ${Object.keys(counts).length}`;
+  el('genre-list').innerHTML=arr.map(([g,n])=>`
+    <div class="g-row ${filters.genres.includes(g)?'g-on':''}" data-genre="${esc(g)}">
+      <span class="g-dot"></span><span class="truncate">${esc(g)}</span>
+      <span class="ml-auto font-mono text-[10px]" style="color:var(--faint)">${n}</span></div>`).join('')
+    ||`<p class="hint">Жанр не найден</p>`;
+}
+function buildLastAdded(){
+  const top=[...animeData].sort((a,b)=>(b.addedAt||0)-(a.addedAt||0)).slice(0,4);
+  el('last-added').innerHTML=top.map(a=>`
+    <div class="last-row" data-goto="${animeData.indexOf(a)}">
+      <img src="${esc(a.img||FALLBACK_IMG)}" alt="" onerror="this.onerror=null;this.src='${FALLBACK_IMG}'">
+      <div class="min-w-0 flex-1"><div class="truncate text-[12px] font-bold" style="color:var(--text)">${esc(a.name)}</div>
+      <div class="text-[9.5px] font-mono" style="color:var(--faint)">${fmtDate(a.addedAt)}</div></div>
+      <span class="tb tb-sm tb-${a.tier}">${a.tier}</span></div>`).join('');
+}
+
+// ============================================================
+// ДАШБОРД
+// ============================================================
+function renderTopGenres(list){
+  const gc={}; list.forEach(a=>(a.genres||[]).forEach(g=>gc[g]=(gc[g]||0)+1));
+  const top=Object.entries(gc).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const max=top[0]?.[1]||1;
+  const pal=['#ff5d8f','#a78bfa','#38bdf8','#34d399','#f5c451','#fb923c','#f43f5e'];
+  el('top-genres-list').innerHTML=top.length?top.map(([g,n],i)=>`
+    <div><div class="flex justify-between items-baseline mb-1"><span class="truncate">${esc(g)}</span><span style="color:var(--faint)">×${n}</span></div>
+    <div class="tg-bar"><div style="width:${(n/max*100).toFixed(1)}%;background:linear-gradient(90deg,${pal[i%pal.length]}66,${pal[i%pal.length]})"></div></div></div>`).join('')
+    :`<p class="hint">Нет данных — подберите другие фильтры.</p>`;
+}
+function renderDashboard(){
+  const list=getFiltered();
+  renderTopGenres(list);
+  if(typeof Chart==='undefined') return;
+  Chart.defaults.font.family="'JetBrains Mono',monospace";
+  Chart.defaults.color=cssVar('--dim');
+  const g=cssVar('--border'), dim=cssVar('--dim'), faint=cssVar('--faint');
+  Object.keys(charts).forEach(k=>{ if(charts[k]) charts[k].destroy(); charts[k]=null; });
+  const gc={}; list.forEach(a=>(a.genres||[]).forEach(x=>gc[x]=(gc[x]||0)+1));
+  const topG=Object.entries(gc).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  charts.radar=new Chart(el('genreRadarChart'),{type:'radar',
+    data:{labels:topG.map(x=>x[0]),datasets:[{data:topG.map(x=>x[1]),backgroundColor:'rgba(255,93,143,.16)',borderColor:cssVar('--pink'),borderWidth:2,pointBackgroundColor:cssVar('--pink'),pointBorderColor:'transparent',pointRadius:3.5}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{r:{grid:{color:g},angleLines:{color:g},pointLabels:{color:dim,font:{size:10}},ticks:{display:false},suggestedMin:0}}}});
+  const ys={};
+  list.forEach(a=>(a.history||[]).forEach(h=>{ const t=dateTs(h.date); if(!t) return; const y=new Date(t).getFullYear(); ys[y]=ys[y]||{e:0,r:0}; ys[y].e+=h.episodes||0; ys[y].r++; }));
+  const years=Object.keys(ys).sort();
+  charts.yearly=new Chart(el('yearlyChart'),{
+    data:{labels:years,datasets:[
+      {type:'bar',label:'Серий',data:years.map(y=>ys[y].e),backgroundColor:'rgba(45,212,191,.5)',borderColor:cssVar('--teal'),borderWidth:1,borderRadius:6,maxBarThickness:46},
+      {type:'line',label:'Записей',yAxisID:'y1',data:years.map(y=>ys[y].r),borderColor:cssVar('--pink'),backgroundColor:'rgba(255,93,143,.12)',tension:.42,pointRadius:3.5,pointBackgroundColor:cssVar('--pink'),fill:true}]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{labels:{color:dim,boxWidth:10,boxHeight:10,font:{size:10}}}},
+      scales:{x:{grid:{display:false},ticks:{color:faint,font:{size:9}}},
+        y:{grid:{color:g},ticks:{color:faint,font:{size:9}}},
+        y1:{position:'right',grid:{drawOnChartArea:false},ticks:{color:faint,font:{size:9},precision:0}}}}});
+  const tShow=TIER_ORDER.map(t=>({t,n:list.filter(a=>a.tier===t).length})).filter(x=>x.n>0);
+  charts.tier=new Chart(el('tierDoughnutChart'),{type:'doughnut',
+    data:{labels:tShow.map(x=>x.t),datasets:[{data:tShow.map(x=>x.n),backgroundColor:tShow.map(x=>TIER_HEX[x.t]),borderWidth:2,borderColor:cssVar('--bg'),hoverOffset:10}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:'bottom',labels:{color:dim,boxWidth:9,boxHeight:9,padding:10,font:{size:10}}}}}});
+  const keys=Object.keys(TYPE_META);
+  const fShow=keys.map(k=>({k,n:list.filter(a=>a.type===k).length})).filter(x=>x.n>0);
+  const fPal=['#ff5d8f','#f5c451','#a78bfa','#38bdf8','#34d399'];
+  charts.format=new Chart(el('formatDoughnutChart'),{type:'doughnut',
+    data:{labels:fShow.map(x=>TYPE_META[x.k].icon+' '+TYPE_META[x.k].label),datasets:[{data:fShow.map(x=>x.n),backgroundColor:fShow.map(x=>fPal[keys.indexOf(x.k)]),borderWidth:2,borderColor:cssVar('--bg'),hoverOffset:10}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:'bottom',labels:{color:dim,boxWidth:9,boxHeight:9,padding:10,font:{size:10}}}}}});
+}
+
+// ============================================================
+// ХРОНОЛОГИЯ
+// ============================================================
+function renderTimeline(){
+  const list=getFiltered(); const entries=[];
+  list.forEach(a=>(a.history||[]).forEach(h=>entries.push({h,a})));
+  entries.sort((x,y)=>dateTs(y.h.date)-dateTs(x.h.date));
+  let html='', lastYM='';
+  entries.forEach(({h,a})=>{
+    const ts=dateTs(h.date);
+    const ym=ts?new Date(ts).toLocaleDateString('ru-RU',{month:'long',year:'numeric'}):'Без даты';
+    if(ym!==lastYM){ lastYM=ym; html+=`<div class="tl-month">${ym}</div>`; }
+    html+=`<div class="tl-row" data-idx="${a._i}">
+      <div class="hist-icon">${historyIcon(h)}</div>
+      <div class="flex-1 min-w-0"><div class="text-[12.5px] font-bold truncate" style="color:var(--text)">${esc(h.title)}</div>
+      <div class="text-[10.5px] truncate" style="color:var(--dim)">${esc(a.name)} · ${fmtRuDate(h.date)}</div></div>
+      <div class="hidden sm:block font-mono text-[10px]" style="color:var(--faint)">${h.episodes?h.episodes+' эп ':''}${h.movies?h.movies+' ф':''}</div>
+      <span class="tb tb-sm tb-${a.tier}">${a.tier}</span></div>`;
+  });
+  el('timeline-log').innerHTML=html||`<div class="empty"><div class="e-ico">🕒</div><p class="text-xs mt-3" style="color:var(--dim)">Записей нет под текущие фильтры</p></div>`;
+}
+
+// ============================================================
+// МОДАЛКИ
+// ============================================================
+function syncLock(){ document.body.classList.toggle('locked',!!document.querySelector('.modal.open')); }
+function showModal(id){ const m=el(id); m.classList.remove('closing'); m.classList.add('open'); syncLock(); }
+function hideModal(id){
+  const m=el(id); if(!m.classList.contains('open')) return;
+  m.classList.add('closing');
+  setTimeout(()=>{ m.classList.remove('open','closing'); syncLock();
+    if(R.pending&&!document.querySelector('.modal.open')){ R.pending=false; render(); toast('Архив обновлён 🌸'); }
+  },180);
+}
+function closeModal(){ hideModal('modal'); editingIndex=-1; }
+function closeConfirmModal(){ hideModal('confirm-modal'); }
+function closePreviewModal(){ hideModal('preview-modal'); previewIndex=-1; }
+
+function addHistoryRow(h={}){
+  const row=document.createElement('div'); row.className='h-row';
+  row.innerHTML=`
+    <input class="input hr-title !text-[11.5px]" placeholder="1 сезон / OVA / Фильм…" value="${esc(h.title||'')}">
+    <input class="input hr-date font-mono !text-[10.5px]" placeholder="дд.мм.гггг" inputmode="numeric" value="${h.date?esc(fmtRuDate(h.date)):''}">
+    <input class="input hr-eps font-mono !text-[10.5px]" type="number" min="0" inputmode="numeric" placeholder="эп" value="${(h.episodes||0)>0?h.episodes:''}">
+    <input class="input hr-mov font-mono !text-[10.5px]" type="number" min="0" inputmode="numeric" placeholder="ф" value="${(h.movies||0)>0?h.movies:''}">
+    <button type="button" class="btn hr-del" title="Удалить запись">✕</button>`;
+  row.querySelector('.hr-del').onclick=()=>row.remove();
+  el('form-history-container').appendChild(row);
+}
+function resetForm(){
+  ['form-name','form-img','form-genres'].forEach(id=>el(id).value='');
+  el('form-favorite').checked=false;
+  el('form-history-container').innerHTML='';
+  el('form-file').value='';
+}
+function openModal(i){
+  if(!isOwner()){ toast('Редактировать может только владелец','err'); return; }
+  editingIndex=(typeof i==='number')?i:-1;
+  resetForm();
+  const isEdit=editingIndex>=0;
+  el('modal-title').textContent=isEdit?'✏️ Редактирование':'✨ Новый тайтл';
+  el('btn-delete').classList.toggle('hidden',!isEdit);
+  const a=isEdit?animeData[editingIndex]:null;
+  el('form-name').value=a?a.name:'';
+  el('form-img').value=a?(a.img||''):'';
+  el('form-type').value=a?a.type:'series';
+  el('form-tier').value=a?a.tier:'SSS';
+  el('form-favorite').checked=a?!!a.favorite:false;
+  el('form-genres').value=a?(a.genres||[]).join(', '):'';
+  const hist=(a&&a.history&&a.history.length)?a.history:[{title:'1 сезон',date:'',episodes:'',movies:''}];
+  hist.forEach(h=>addHistoryRow(h));
+  syncDropPreview();
+  showModal('modal');
+  setTimeout(()=>el('form-name').focus(),120);
+}
+function saveTitle(e){
+  e.preventDefault();
+  const name=el('form-name').value.trim();
+  if(!name){ toast('Введите название','err'); return; }
+  const img=el('form-img').value.trim();
+  const genres=el('form-genres').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const history=[];
+  document.querySelectorAll('#form-history-container .h-row').forEach(r=>{
+    const title=r.querySelector('.hr-title').value.trim();
+    const d=normDate(r.querySelector('.hr-date').value.trim());
+    const eps=Math.max(0,parseInt(r.querySelector('.hr-eps').value)||0);
+    const mov=Math.max(0,parseInt(r.querySelector('.hr-mov').value)||0);
+    if(title||eps||mov) history.push({title:title||'Просмотр',date:d,episodes:eps,movies:mov});
+  });
+  const item={name,img,type:el('form-type').value,tier:el('form-tier').value,favorite:el('form-favorite').checked,genres,
+    episodes:history.reduce((s,h)=>s+h.episodes,0),movies:history.reduce((s,h)=>s+h.movies,0),history};
+  if(editingIndex>=0){ item.addedAt=animeData[editingIndex].addedAt||Date.now(); animeData[editingIndex]=item; toast('Тайтл обновлён ✨'); }
+  else{ item.addedAt=Date.now(); animeData.unshift(item); toast('Тайтл добавлен в архив 🌸'); }
+  save();
+  closeModal(); render();
+  const card=document.querySelector(`.card[data-idx="${animeData.indexOf(item)}"]`);
+  if(card){ card.classList.add('just'); card.scrollIntoView({behavior:'smooth',block:'center'}); setTimeout(()=>card.classList.remove('just'),2000); }
+}
+function promptDelete(){ pendingDelete=editingIndex; showModal('confirm-modal'); }
+function confirmDeleteTitle(){
+  if(pendingDelete>=0&&pendingDelete<animeData.length) animeData.splice(pendingDelete,1);
+  pendingDelete=-1; hideModal('confirm-modal'); closeModal(); save(); render(); toast('Тайтл удалён из архива');
+}
+
+// ============================================================
+// КАРТОЧКА ТАЙТЛА
+// ============================================================
+function openPreview(i){
+  if(i<0||i>=animeData.length) return;
+  previewIndex=i;
+  const a=animeData[i];
+  const im=el('preview-img'); im.src=a.img||FALLBACK_IMG;
+  im.onerror=function(){ this.onerror=null; this.src=FALLBACK_IMG; };
+  el('preview-title').textContent=a.name;
+  const meta=TIERS.find(t=>t.key===a.tier)||TIERS[1];
+  const pb=el('preview-tier-badge'); pb.className='tb tb-lg tb-'+a.tier; pb.textContent=a.tier;
+  el('preview-tier-title').textContent=meta.title;
+  el('preview-type-badge').textContent=`${(TYPE_META[a.type]||{}).icon||'📺'} ${(TYPE_META[a.type]||{}).label||'Сериал'}`;
+  const fb=el('preview-fav-badge');
+  fb.classList.toggle('hidden',!a.favorite);
+  fb.textContent=a.favorite?'❤️ Избранное (нажмите, чтобы убрать)':'';
+  el('preview-genres').innerHTML=(a.genres||[]).map(g=>`<span class="fchip" style="cursor:default">${esc(g)}</span>`).join('');
+  el('preview-episodes').textContent=a.episodes||0;
+  el('preview-movies').textContent=a.movies||0;
+  el('preview-records').textContent=(a.history||[]).length;
+  el('preview-time').textContent=fmtRuntime(minutesOf(a));
+  const ds=(a.history||[]).map(h=>h.date).filter(Boolean).sort((x,y)=>dateTs(x)-dateTs(y));
+  el('preview-period').textContent=ds.length?(ds.length>1?`${fmtRuDate(ds[0])} — ${fmtRuDate(ds[ds.length-1])}`:fmtRuDate(ds[0])):'—';
+  el('preview-added').textContent=fmtDate(a.addedAt||Date.now());
+  el('preview-last').textContent=fmtRuDate(lastDate(a));
+  el('preview-ladder').innerHTML=TIER_ORDER.map(t=>`<button class="tb tb-sm tb-${t} ladder-t${t===a.tier?' on':''}" data-t="${t}" title="${TIERS.find(x=>x.key===t).title}">${t}</button>`).join('');
+  renderPreviewHistory();
+  showModal('preview-modal');
+}
+function renderPreviewHistory(){
+  if(previewIndex<0) return;
+  const a=animeData[previewIndex];
+  let h=[...(a.history||[])];
+  if(histByDate) h.sort((x,y)=>dateTs(y.date)-dateTs(x.date));
+  el('preview-history-list').innerHTML=h.map(r=>`<div class="hist-item">
+    <div class="hist-icon">${historyIcon(r)}</div>
+    <div class="min-w-0 flex-1"><div class="truncate text-[12px] font-bold" style="color:var(--text)">${esc(r.title)}</div>
+    <div class="text-[10px] font-mono" style="color:var(--faint)">${fmtRuDate(r.date)}${r.episodes?` · ${r.episodes} эп`:''}${r.movies?` · ${r.movies} ф`:''}</div></div>
+    <span class="hist-badge">${fmtRuntime((r.episodes||0)*EP_MIN+(r.movies||0)*MOV_MIN)}</span></div>`).join('')
+    ||`<p class="hint">История пуста</p>`;
+  el('hist-order-btn').textContent=`⇅ ${histByDate?'по дате':'по порядку'}`;
+}
+function toggleHistoryOrder(){ histByDate=!histByDate; renderPreviewHistory(); }
+function editFromPreview(){ hideModal('preview-modal'); openModal(previewIndex); }
+
+// ============================================================
+// ДЕЙСТВИЯ
+// ============================================================
+function switchView(v){
+  currentView=v;
+  document.querySelectorAll('.view-section').forEach(s=>s.classList.remove('active'));
+  el('view-'+v).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  el('btn-view-'+v).classList.add('on');
+  el('view-title').textContent=VIEW_META[v].t;
+  el('view-subtitle').textContent=VIEW_META[v].s;
+  if(v==='dashboard') renderDashboard();
+  if(v==='timeline') renderTimeline();
+}
+function setSort(v){ filters.sort=v; render(); }
+function onSearchInput(v){
+  clearTimeout(searchTimer);
+  searchTimer=setTimeout(()=>{ filters.query=v; render(); },180);
+}
+function resetFilters(silent){
+  filters={query:'',genres:[],types:[],tiers:[],collection:'',sort:'default'};
+  el('search-input').value=''; el('genre-search').value=''; el('sort-select').value='default';
+  if(!silent) toast('Фильтры сброшены');
+  render();
+}
+function randomTitle(){
+  const list=getFiltered();
+  if(!list.length){ toast('Под фильтры ничего не подходит','err'); return; }
+  openPreview(list[Math.floor(Math.random()*list.length)]._i);
+}
+function toggleTheme(){
+  const dark=document.documentElement.dataset.theme==='dark';
+  document.documentElement.dataset.theme=dark?'light':'dark';
+  el('theme-btn').textContent=dark?'☀️':'🌙';
+  try{ localStorage.setItem('anime_theme',document.documentElement.dataset.theme); }catch(e){}
+  petalColor=cssVar('--petal');
+  if(currentView==='dashboard') renderDashboard();
+}
+function toggleEditMode(){
+  if(!isOwner()){ toast('Режим редактирования доступен только владельцу','err'); return; }
+  isEditMode=!isEditMode;
+  el('edit-mode-btn').classList.toggle('btn-on',isEditMode);
+  toast(isEditMode?'Режим редактирования: клик по карточке открывает форму':'Обычный режим просмотра');
+}
+function copyData(){
+  const json=JSON.stringify(animeData,null,2);
+  const dl=()=>{ const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([json],{type:'application/json'}));
+    a.download='anime-archive.json'; a.click();
+    toast('Экспорт: файл anime-archive.json скачан'); };
+  if(navigator.clipboard&&navigator.clipboard.writeText)
+    navigator.clipboard.writeText(json).then(()=>toast(`Экспорт: ${animeData.length} тайтлов → буфер обмена`)).catch(dl);
+  else dl();
+}
+function toggleSidebar(force){
+  const sb=el('sidebar');
+  const open=typeof force==='boolean'?force:!sb.classList.contains('open');
+  sb.classList.toggle('open',open);
+  el('sb-overlay').classList.toggle('hidden',!open);
+}
+
+// ============================================================
+// ЗАГРУЗКА КАРТИНОК
+// ============================================================
+function handleImageFile(f){
+  if(!f) return;
+  if(!f.type.startsWith('image/')){ toast('Это не изображение','err'); return; }
+  if(f.size>10*1024*1024){ toast('Файл больше 10 МБ — выберите поменьше','err'); return; }
+  const img=new Image();
+  img.onload=()=>{
+    const MAX=520, k=Math.min(1,MAX/Math.max(img.width,img.height));
+    const c=document.createElement('canvas');
+    c.width=Math.max(1,Math.round(img.width*k)); c.height=Math.max(1,Math.round(img.height*k));
+    const x=c.getContext('2d');
+    x.fillStyle='#151226'; x.fillRect(0,0,c.width,c.height);
+    x.drawImage(img,0,0,c.width,c.height);
+    const data=c.toDataURL('image/jpeg',.86);
+    el('form-img').value=data;
+    syncDropPreview();
+    toast(`Постер загружен · ~${Math.round(data.length*0.75/1024)} КБ в архиве`);
+    URL.revokeObjectURL(img.src);
+  };
+  img.onerror=()=>toast('Не удалось прочитать файл','err');
+  img.src=URL.createObjectURL(f);
+}
+function syncDropPreview(){
+  const v=el('form-img').value.trim();
+  const ok=v&&(v.startsWith('data:image')||/^https?:\/\//.test(v));
+  el('drop-preview').classList.toggle('hidden',!ok);
+  el('drop-empty').classList.toggle('hidden',!!ok);
+  el('drop-clear').classList.toggle('hidden',!ok);
+  if(ok) el('drop-preview').src=v;
+}
+function setupUpload(){
+  const dz=el('drop-zone'), file=el('form-file'), url=el('form-img');
+  dz.addEventListener('click',e=>{ if(e.target.closest('#drop-clear')) return; file.click(); });
+  dz.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); file.click(); } });
+  file.addEventListener('change',()=>{ if(file.files[0]) handleImageFile(file.files[0]); file.value=''; });
+  ['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{ e.preventDefault(); dz.classList.add('drag'); }));
+  ['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{ e.preventDefault(); dz.classList.remove('drag'); }));
+  dz.addEventListener('drop',e=>{ const f=e.dataTransfer.files[0]; if(f) handleImageFile(f); });
+  url.addEventListener('input',syncDropPreview);
+  el('drop-clear').addEventListener('click',e=>{ e.stopPropagation(); url.value=''; syncDropPreview(); });
+  document.addEventListener('paste',e=>{
+    if(!el('modal').classList.contains('open')) return;
+    const it=[...(e.clipboardData?.items||[])].find(i=>i.type.startsWith('image/'));
+    if(it){ handleImageFile(it.getAsFile()); }
+  });
+}
+
+// ============================================================
+// ДЕЛЕГИРОВАНИЕ КЛИКОВ
+// ============================================================
+function setupDelegations(){
+  el('sidebar').addEventListener('click',e=>{
+    const col=e.target.closest('[data-col]');
+    if(col){ const k=col.dataset.col; filters.collection=filters.collection===k?'':k; render(); return; }
+    const tier=e.target.closest('[data-tier]');
+    if(tier){ const t=tier.dataset.tier; filters.tiers=filters.tiers.includes(t)?filters.tiers.filter(x=>x!==t):[...filters.tiers,t]; render(); return; }
+    const type=e.target.closest('[data-type]');
+    if(type){ const k=type.dataset.type; filters.types=filters.types.includes(k)?filters.types.filter(x=>x!==k):[...filters.types,k]; render(); return; }
+    const genre=e.target.closest('[data-genre]');
+    if(genre){ const g=genre.dataset.genre; filters.genres=filters.genres.includes(g)?filters.genres.filter(x=>x!==g):[...filters.genres,g]; render(); return; }
+    const go=e.target.closest('[data-goto]');
+    if(go){ openPreview(+go.dataset.goto); toggleSidebar(false); }
+  });
+  el('tier-container').addEventListener('click',e=>{
+    const fav=e.target.closest('.fav-dot');
+    if(fav){ e.stopPropagation();
+      if(!isOwner()){ toast('Редактировать может только владелец','err'); return; }
+      const i=+fav.dataset.fav; animeData[i].favorite=!animeData[i].favorite;
+      save(); render(); toast(animeData[i].favorite?'❤ Добавлено в избранное':'Убрано из избранного'); return; }
+    const card=e.target.closest('.card');
+    if(!card) return;
+    const i=+card.dataset.idx;
+    if(isEditMode&&isOwner()) openModal(i); else openPreview(i);
+  });
+  el('timeline-log').addEventListener('click',e=>{
+    const r=e.target.closest('.tl-row'); if(r) openPreview(+r.dataset.idx);
+  });
+  el('filter-status').addEventListener('click',e=>{
+    const b=e.target.closest('[data-clear]'); if(!b) return;
+    const k=b.dataset.clear;
+    if(k==='q'){ filters.query=''; el('search-input').value=''; }
+    else if(k==='col') filters.collection='';
+    else if(k==='tiers') filters.tiers=[];
+    else if(k==='types') filters.types=[];
+    else if(k==='g') filters.genres=filters.genres.filter(x=>x!==b.dataset.v);
+    else if(k==='all') return resetFilters(true);
+    render();
+  });
+  el('preview-modal').addEventListener('click',e=>{
+    if(previewIndex<0) return;
+    const lt=e.target.closest('.ladder-t');
+    if(lt){
+      if(!isOwner()){ toast('Редактировать может только владелец','err'); return; }
+      animeData[previewIndex].tier=lt.dataset.t; save(); render(); openPreview(previewIndex); toast(`Ранг обновлён: ${lt.dataset.t}`); return; }
+    if(e.target.closest('#preview-fav-badge')){
+      if(!isOwner()) return;
+      const a=animeData[previewIndex]; a.favorite=!a.favorite;
+      save(); render(); openPreview(previewIndex); toast(a.favorite?'❤ Добавлено в избранное':'Убрано из избранного');
+    }
+  });
+  el('owner-modal').addEventListener('submit',e=>e.preventDefault());
+}
+
+// ============================================================
+// 3D-ТИЛТ
+// ============================================================
+function initTilt(){
+  if(REDUCED||!matchMedia('(pointer:fine)').matches) return;
+  let cur=null;
+  const reset=elm=>{ if(!elm) return; elm.classList.remove('tilting');
+    ['--rx','--ry','--mx','--my'].forEach(p=>elm.style.removeProperty(p)); };
+  addEventListener('pointermove',e=>{
+    const t=e.target instanceof Element?e.target.closest('[data-tilt]'):null;
+    if(cur&&cur!==t){ reset(cur); cur=null; }
+    if(!t) return;
+    const r=t.getBoundingClientRect(); if(!r.width) return;
+    const px=(e.clientX-r.left)/r.width, py=(e.clientY-r.top)/r.height;
+    t.classList.add('tilting');
+    t.style.setProperty('--ry',((px-.5)*13).toFixed(2)+'deg');
+    t.style.setProperty('--rx',((.5-py)*11).toFixed(2)+'deg');
+    t.style.setProperty('--mx',(px*100).toFixed(1)+'%');
+    t.style.setProperty('--my',(py*100).toFixed(1)+'%');
+    cur=t;
+  },{passive:true});
+  document.addEventListener('pointerleave',()=>{ reset(cur); cur=null; });
+  addEventListener('blur',()=>{ reset(cur); cur=null; });
+}
+
+// ============================================================
+// ПАРАЛЛАКС ФОНА
+// ============================================================
+function initParallax(){
+  if(REDUCED||!matchMedia('(pointer:fine)').matches) return;
+  const layers=[...document.querySelectorAll('.bg-layer[data-depth]')].map(n=>({n,d:+n.dataset.depth}));
+  let tx=0,ty=0,cx=0,cy=0;
+  addEventListener('pointermove',e=>{ tx=e.clientX/innerWidth-.5; ty=e.clientY/innerHeight-.5; },{passive:true});
+  (function loop(){
+    cx+=(tx-cx)*.055; cy+=(ty-cy)*.055;
+    windTarget=cx;
+    layers.forEach(l=>{ l.n.style.transform=`translate3d(${(-cx*l.d).toFixed(2)}px,${(-cy*l.d*.7).toFixed(2)}px,0)`; });
+    requestAnimationFrame(loop);
+  })();
+}
+
+// ============================================================
+// ЛЕПЕСТКИ САКУРЫ
+// ============================================================
+function initPetals(){
+  const cv=el('fx-petals'); const ctx=cv.getContext('2d');
+  let W=0,H=0;
+  const size=()=>{ const dpr=Math.min(devicePixelRatio||1,2);
+    W=innerWidth; H=innerHeight; cv.width=W*dpr; cv.height=H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); };
+  size(); addEventListener('resize',size);
+  addEventListener('orientationchange',()=>setTimeout(size,150));
+  petalColor=cssVar('--petal');
+  if(REDUCED) return;
+  const mk=y=>({x:Math.random()*W,y:y??-24,s:.55+Math.random()*.95,vy:.4+Math.random()*.8,
+    ph:Math.random()*Math.PI*2,sw:.5+Math.random()*.9,rot:Math.random()*Math.PI*2,vr:(Math.random()-.5)*.012,a:.35+Math.random()*.4});
+  const petals=Array.from({length:W<768?14:26},()=>mk(Math.random()*H));
+  (function loop(){
+    wind+=(windTarget-wind)*.03;
+    ctx.clearRect(0,0,W,H);
+    for(const p of petals){
+      p.ph+=.012*p.sw;
+      p.x+=Math.sin(p.ph)*.8+wind*1.1;
+      p.y+=p.vy;
+      p.rot+=p.vr+wind*.006;
+      if(p.y>H+26) Object.assign(p,mk(-26));
+      if(p.x<-30) p.x=W+24; else if(p.x>W+30) p.x=-24;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot); ctx.scale(p.s,p.s);
+      ctx.fillStyle=`rgba(${petalColor},${p.a})`;
+      ctx.beginPath(); ctx.moveTo(0,-7);
+      ctx.bezierCurveTo(5.5,-7,6,1,0,8);
+      ctx.bezierCurveTo(-6,1,-5.5,-7,0,-7);
+      ctx.fill(); ctx.restore();
+    }
+    requestAnimationFrame(loop);
+  })();
+}
+
+// ============================================================
+// КЛАВИАТУРА / СКРОЛЛ / СТАРТ
+// ============================================================
+document.addEventListener('keydown',e=>{
+  const tag=(document.activeElement||{}).tagName||'';
+  if(e.key==='/'&&!/INPUT|TEXTAREA|SELECT/.test(tag)){ e.preventDefault(); el('search-input').focus(); return; }
+  if(e.key==='Escape'){
+    if(el('confirm-modal').classList.contains('open')) return closeConfirmModal();
+    if(el('modal').classList.contains('open')) return closeModal();
+    if(el('preview-modal').classList.contains('open')) return closePreviewModal();
+    if(el('owner-modal').classList.contains('open')) return closeOwnerModal();
+    toggleSidebar(false);
+  }
+});
+addEventListener('scroll',()=>{
+  const on=scrollY>600, b=el('scroll-top');
+  b.style.opacity=on?1:0; b.style.pointerEvents=on?'auto':'none';
+},{passive:true});
+
+(function init(){
+  const t=localStorage.getItem('anime_theme')||'dark';
+  document.documentElement.dataset.theme=t;
+  el('theme-btn').textContent=t==='dark'?'🌙':'☀️';
+  try{
+    R.token=localStorage.getItem('oa_token')||'';
+    R.repo=localStorage.getItem('oa_repo')||'';
+    if(!R.repo){ const d=detectRepo(); if(d) R.repo=`${d.owner}/${d.repo}`; }
+  }catch(e){}
+  loadData();
+  applyRole();
+  render();
+  initPetals();
+  initParallax();
+  initTilt();
+  setupUpload();
+  setupDelegations();
+  bootRemote();
+  setTimeout(reveal,2500); // страховка: даже офлайн сайт откроется
+})();
+</script>
+</body>
+</html>
