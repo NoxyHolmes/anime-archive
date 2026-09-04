@@ -308,27 +308,33 @@ header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
 }
 @keyframes vfade{ from{ opacity:0; } }
 
-/* ============ ТЕЛЕФОН: модалка = обычная часть страницы ============
-   Карточка лежит в общем потоке документа (position:relative),
-   листается родным скроллом браузера — свайп работает всегда. */
+/* ============ ТЕЛЕФОН: модалка = полноэкранный слой со СВОИМ скроллом ============
+   position:fixed + overflow-y:auto — модалка сама является скролл-контейнером,
+   никаких вложенных прокруток: один палец листает всю карточку до конца. */
 @media(max-width:900px){
   #app{ animation:none!important; }
   body.locked,html.locked{ overflow:visible!important; }
-  body.modal-page{ overscroll-behavior-y:none; }
-  body.modal-page #app,body.modal-page #scroll-top{ display:none!important; }
-  .modal{ touch-action:pan-y!important; -webkit-overflow-scrolling:touch; }
+  .modal{
+    touch-action:pan-y!important;
+    -webkit-overflow-scrolling:touch!important;
+    overscroll-behavior:contain!important;
+  }
   .modal.open{
-    display:block!important; position:relative!important; inset:auto!important;
-    min-height:100vh; min-height:100svh;
+    display:block!important;
+    position:fixed!important;
+    inset:0!important;
+    height:100%!important;
+    height:100dvh!important;
     padding:.75rem calc(.75rem + env(safe-area-inset-right)) calc(.75rem + env(safe-area-inset-bottom)) calc(.75rem + env(safe-area-inset-left));
     padding-top:calc(.75rem + env(safe-area-inset-top));
     background:var(--bg)!important;
     backdrop-filter:none!important; -webkit-backdrop-filter:none!important;
-    overflow:visible!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
   }
-  .modal.open .mbox{ margin:0 auto!important; animation:none!important; }
-  .scrollbox{ max-height:none!important; }
-  #genre-list,#top-genres-list{ max-height:none!important; }
+  .modal.open .mbox{ margin:0 auto 2rem!important; animation:none!important; }
+  .scrollbox{ max-height:none!important; overflow:visible!important; }
+  #preview-history-list,#genre-list,#top-genres-list{ max-height:none!important; overflow:visible!important; }
 }
 @media (prefers-reduced-motion: reduce){ *{ animation-duration:.01ms!important; transition-duration:.01ms!important; } }
 </style>
@@ -1201,7 +1207,14 @@ function buildSidebar(){
     return `<button class="tb tb-sm tb-${t} tchip ${filters.tiers.includes(t)?'tchip-on':''}" data-tier="${t}">${t}<span class="opacity-70"> ${n}</span></button>`;
   }).join('');
   el('type-chips').innerHTML=Object.entries(TYPE_META).map(([k,m])=>{
-    const n=animeData.filter(a=>a.type===k).length;
+    const n=animeData.filter(a=>{
+      const tc=typeCounts(a);
+      if(k==='movie') return a.type==='movie'||tc.movie>0;
+      if(k==='ova') return a.type==='ova'||tc.ova>0;
+      if(k==='ona') return a.type==='ona'||tc.ona>0;
+      if(k==='special') return a.type==='special'||tc.special>0;
+      return a.type===k;
+    }).length;
     return `<button class="fchip ${filters.types.includes(k)?'on':''}" data-type="${k}">${m.icon} ${m.label} <span style="color:var(--faint)">${n}</span></button>`;
   }).join('');
   buildSidebarGenres(el('genre-search').value);
@@ -1309,44 +1322,18 @@ function renderTimeline(){
 // ============================================================
 // МОДАЛКИ (телефон: карточка = обычная часть страницы)
 // ============================================================
-function wakeScroll(){
-  try{
-    const de=document.documentElement;
-    de.style.scrollBehavior='auto';
-    de.style.overflow='hidden';
-    void de.offsetHeight;
-    de.style.overflow='';
-    requestAnimationFrame(function(){
-      window.scrollTo(0,1);
-      requestAnimationFrame(function(){ window.scrollTo(0,0); });
-    });
-  }catch(e){}
-}
 function syncLock(){
   const open=!!document.querySelector('.modal.open');
   const mob=isMobile();
   document.body.classList.toggle('locked',open&&!mob);
   document.documentElement.classList.toggle('locked',open&&!mob);
-  document.body.classList.toggle('modal-page',open&&mob);
-  if(!open&&mob&&pageSavedY>=0){
-    document.documentElement.style.scrollBehavior='auto';
-    window.scrollTo(0,pageSavedY);
-    pageSavedY=-1;
-    wakeScroll();
-  }
+  document.documentElement.style.scrollBehavior='auto';
 }
 function showModal(id){
   const m=el(id); if(!m) return;
   m.classList.remove('closing'); m.classList.add('open');
-  if(isMobile()){
-    if(pageSavedY<0) pageSavedY=window.scrollY;
-    requestAnimationFrame(function(){
-      document.documentElement.style.scrollBehavior='auto';
-      window.scrollTo(0,0);
-      wakeScroll();
-    });
-  }
   syncLock();
+  if(isMobile()) m.scrollTop=0;
 }
 function hideModal(id){
   const m=el(id); if(!m.classList.contains('open')) return;
