@@ -336,6 +336,21 @@ header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
   .scrollbox{ max-height:none!important; overflow:visible!important; }
   #preview-history-list,#genre-list,#top-genres-list{ max-height:none!important; overflow:visible!important; }
 }
+  /* v2.1: кнопки действий прилипают к низу экрана на телефоне — видны всегда */
+@media(max-width:900px){
+  #preview-actions,#form-actions{
+    position:sticky;
+    bottom:calc(.5rem + env(safe-area-inset-bottom));
+    z-index:5;
+    padding:.75rem .6rem;
+    margin-top:.9rem;
+    border-radius:.9rem;
+    background:color-mix(in srgb,var(--bg) 90%,transparent);
+    backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    border:1px solid var(--border);
+    box-shadow:0 -8px 28px -12px rgba(0,0,0,.65);
+  }
+}
 @media (prefers-reduced-motion: reduce){ *{ animation-duration:.01ms!important; transition-duration:.01ms!important; } }
 </style>
 </head>
@@ -537,7 +552,7 @@ header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
         <div id="form-history-container" class="space-y-2"></div>
         <button type="button" onclick="addHistoryRow()" class="btn w-full justify-center !py-2.5 border-dashed">+ Добавить запись / сезон</button>
       </div>
-      <div class="flex items-center justify-between border-t pt-4" style="border-color:var(--border)">
+      <div id="form-actions" class="flex items-center justify-between border-t pt-4" style="border-color:var(--border)">
         <button type="button" id="btn-delete" onclick="promptDelete()" class="btn hidden" style="color:var(--red); border-color:color-mix(in srgb,var(--red) 35%,transparent)">🗑️ Удалить</button>
         <div class="flex items-center gap-2 ml-auto"><button type="button" onclick="closeModal()" class="btn">Отмена</button><button type="submit" class="btn-primary">Сохранить</button></div>
       </div>
@@ -596,8 +611,10 @@ header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
           </div>
           <div id="preview-history-list" class="ptl"></div>
         </div>
-        <button onclick="editFromPreview()" class="btn w-full justify-center !py-2.5 owner-only">✏️ Редактировать этот тайтл</button>
-        <button onclick="closePreviewModal()" class="btn w-full justify-center !py-2.5">✕ Закрыть</button>
+        <div id="preview-actions" class="space-y-2">
+          <button onclick="editFromPreview()" class="btn w-full justify-center !py-2.5 owner-only">✏️ Редактировать этот тайтл</button>
+          <button onclick="closePreviewModal()" class="btn w-full justify-center !py-2.5">✕ Закрыть</button>
+        </div>
       </div>
     </div>
   </div>
