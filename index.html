@@ -512,7 +512,7 @@ header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
 <button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" class="btn fixed bottom-5 left-5 z-40 !px-3.5 !py-2.5 rounded-full opacity-0 pointer-events-none">↑</button>
 
 <!-- МОДАЛКА: ДОБАВИТЬ/РЕДАКТИРОВАТЬ -->
-<div id="modal" class="modal" onclick="closeModal()">
+<div id="modal" class="modal">
   <div class="mbox surface w-full max-w-2xl rounded-3xl p-5 md:p-6 space-y-4 my-8" onclick="event.stopPropagation()">
     <div class="flex items-center justify-between border-b pb-3" style="border-color:var(--border)">
       <h3 id="modal-title" class="font-mono font-bold text-sm uppercase tracking-wider" style="color:var(--pink)">Новый тайтл</h3>
@@ -611,10 +611,10 @@ header.sticky{ padding-top:calc(.75rem + env(safe-area-inset-top)); }
           </div>
           <div id="preview-history-list" class="ptl"></div>
         </div>
-        <div id="preview-actions" class="space-y-2">
-          <button onclick="editFromPreview()" class="btn w-full justify-center !py-2.5 owner-only">✏️ Редактировать этот тайтл</button>
-          <button onclick="closePreviewModal()" class="btn w-full justify-center !py-2.5">✕ Закрыть</button>
+        <div id="preview-actions" class="owner-only">
+          <button onclick="editFromPreview()" class="btn w-full justify-center !py-2.5">✏️ Редактировать этот тайтл</button>
         </div>
+        <button onclick="closePreviewModal()" class="btn w-full justify-center !py-2.5">✕ Закрыть</button>
       </div>
     </div>
   </div>
