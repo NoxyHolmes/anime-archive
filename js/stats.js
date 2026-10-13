@@ -1,198 +1,120 @@
-/**
- * Статистика и Календарь
- */
-
-let chartGenres = null;
-let chartTiers = null;
-let chartMonthly = null;
+let chartGenres = null, chartTiers = null, chartMonthly = null;
 
 function updateStats() {
-    let totalTitles = state.titles.length;
-    let totalEpisodes = 0;
-    let totalTimeMinutes = 0;
-    let movieTimeMinutes = 0;
-    
+    let totalTitles = state.titles.length, totalEpisodes = 0, totalTimeMinutes = 0, movieTimeMinutes = 0;
     const genreCounts = {};
     const tierCounts = { 'SSS': 0, 'S': 0, 'A': 0, 'B': 0, 'C': 0, 'D': 0, 'E': 0 };
     const monthlyCounts = {};
 
     state.titles.forEach(title => {
         tierCounts[title.tier] = (tierCounts[title.tier] || 0) + 1;
-
-        title.genres.forEach(g => {
-            genreCounts[g] = (genreCounts[g] || 0) + 1;
-        });
-
+        title.genres.forEach(g => { genreCounts[g] = (genreCounts[g] || 0) + 1; });
         title.entries.forEach(entry => {
-            let time = 0;
-            let eps = entry.episodes || 0;
+            let time = 0, eps = entry.episodes || 0;
             totalEpisodes += eps;
-
-            if (entry.durationMinutes) {
-                time = entry.durationMinutes;
-            } else if (entry.minutesPerEpisode) {
-                time = eps * entry.minutesPerEpisode;
-            } else {
+            if (entry.durationMinutes) time = entry.durationMinutes;
+            else if (entry.minutesPerEpisode) time = eps * entry.minutesPerEpisode;
+            else {
                 const isMovie = entry.kind.toLowerCase().includes('фильм') || title.type === 'Фильм';
                 time = eps * (isMovie ? state.settings.defaultMovieTime : state.settings.defaultEpTime);
             }
-
             totalTimeMinutes += time;
-
-            if (entry.kind.toLowerCase().includes('фильм') || title.type === 'Фильм') {
-                movieTimeMinutes += time;
-            }
-
-            // Динамика по месяцам
+            if (entry.kind.toLowerCase().includes('фильм') || title.type === 'Фильм') movieTimeMinutes += time;
             if (entry.watchDate) {
-                // Поддержка формата "ГГГГ-ММ-ДД" или "ГГГГ-ММ-ДД – ГГГГ-ММ-ДД"
                 const dates = entry.watchDate.split('–').map(d => d.trim());
                 const startDate = dates[0];
-                
                 if (startDate.match(/^\d{4}-\d{2}/)) {
-                    const monthKey = startDate.substring(0, 7); // "YYYY-MM"
+                    const monthKey = startDate.substring(0, 7);
                     monthlyCounts[monthKey] = (monthlyCounts[monthKey] || 0) + 1;
                 }
             }
         });
     });
 
-    // Обновление карточек
     document.getElementById('stat-total-titles').textContent = totalTitles;
     document.getElementById('stat-total-episodes').textContent = totalEpisodes;
     document.getElementById('stat-total-time').textContent = formatTime(totalTimeMinutes);
     document.getElementById('stat-movies-time').textContent = formatTime(movieTimeMinutes);
-
     renderCharts(genreCounts, tierCounts, monthlyCounts);
 }
 
 function formatTime(minutes) {
     if (minutes < 60) return `${minutes} мин`;
-    const h = Math.floor(minutes / 60);
-    const m = minutes % 60;
+    const h = Math.floor(minutes / 60), m = minutes % 60;
     return m > 0 ? `${h} ч ${m} мин` : `${h} ч`;
 }
 
 function renderCharts(genres, tiers, monthly) {
     const isDark = state.settings.theme === 'dark';
     const textColor = isDark ? '#a0a0b0' : '#555566';
-    const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+    const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+    const commonOptions = {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: textColor, font: { size: 11 }, boxWidth: 12 } } },
+        scales: {
+            x: { ticks: { color: textColor, font: { size: 10 } }, grid: { color: gridColor } },
+            y: { ticks: { color: textColor, font: { size: 10 } }, grid: { color: gridColor } }
+        }
+    };
 
-    // 1. Жанры (Top 10)
-    const sortedGenres = Object.entries(genres).sort((a, b) => b[1] - a[1]).slice(0, 10);
+    const sortedGenres = Object.entries(genres).sort((a, b) => b[1] - a[1]).slice(0, 8);
     const ctxGenres = document.getElementById('chart-genres').getContext('2d');
     if (chartGenres) chartGenres.destroy();
-    
     chartGenres = new Chart(ctxGenres, {
         type: 'bar',
         data: {
-            labels: sortedGenres.map(g => g[0]),
-            datasets: [{
-                label: 'Количество упоминаний',
-                data: sortedGenres.map(g => g[1]),
-                backgroundColor: state.settings.accent + '80',
-                borderColor: state.settings.accent,
-                borderWidth: 1,
-                borderRadius: 4
-            }]
+            labels: sortedGenres.map(g => g[0].length > 15 ? g[0].substring(0, 15) + '...' : g[0]),
+            datasets: [{ data: sortedGenres.map(g => g[1]), backgroundColor: state.settings.accent + '60', borderColor: state.settings.accent, borderWidth: 1, borderRadius: 4 }]
         },
-        options: {
-            indexAxis: 'y',
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                x: { ticks: { color: textColor }, grid: { color: gridColor } },
-                y: { ticks: { color: textColor }, grid: { display: false } }
-            }
-        }
+        options: { ...commonOptions, indexAxis: 'y', plugins: { legend: { display: false } } }
     });
 
-    // 2. Тиры (Doughnut)
     const ctxTiers = document.getElementById('chart-tiers').getContext('2d');
     if (chartTiers) chartTiers.destroy();
-
     chartTiers = new Chart(ctxTiers, {
         type: 'doughnut',
         data: {
             labels: Object.keys(tiers),
-            datasets: [{
-                data: Object.values(tiers),
-                backgroundColor: ['#ffd700', '#ff6b00', '#ff2a2a', '#00e676', '#00bfff', '#9c27b0', '#ff0055'],
-                borderWidth: 0
-            }]
+            datasets: [{ data: Object.values(tiers), backgroundColor: ['#ffd700', '#ff6b00', '#ff2a2a', '#00e676', '#00bfff', '#9c27b0', '#ff0055'], borderWidth: 0, hoverOffset: 4 }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { position: 'right', labels: { color: textColor } }
-            }
+            ...commonOptions, cutout: '65%',
+            plugins: { legend: { position: 'right', labels: { color: textColor, font: { size: 10 }, padding: 8 } } }
         }
     });
 
-    // 3. Динамика по месяцам (Line)
-    const sortedMonths = Object.keys(monthly).sort();
+    const sortedMonths = Object.keys(monthly).sort().slice(-12);
     const ctxMonthly = document.getElementById('chart-monthly').getContext('2d');
     if (chartMonthly) chartMonthly.destroy();
-
     chartMonthly = new Chart(ctxMonthly, {
         type: 'line',
         data: {
             labels: sortedMonths,
-            datasets: [{
-                label: 'Просмотрено частей',
-                data: sortedMonths.map(m => monthly[m]),
-                borderColor: state.settings.accent,
-                backgroundColor: state.settings.accent + '30',
-                fill: true,
-                tension: 0.4,
-                pointRadius: 4
-            }]
+            datasets: [{ label: 'Просмотрено', data: sortedMonths.map(m => monthly[m]), borderColor: state.settings.accent, backgroundColor: state.settings.accent + '20', fill: true, tension: 0.3, pointRadius: 3, pointHoverRadius: 5 }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                x: { ticks: { color: textColor }, grid: { color: gridColor } },
-                y: { ticks: { color: textColor, stepSize: 1 }, grid: { color: gridColor }, beginAtZero: true }
-            }
+            ...commonOptions, plugins: { legend: { display: false } },
+            scales: { ...commonOptions.scales, y: { ...commonOptions.scales.y, beginAtZero: true, ticks: { stepSize: 1 } } }
         }
     });
 }
 
-// ==========================================
 // КАЛЕНДАРЬ
-// ==========================================
 let currentCalDate = new Date();
-
-document.getElementById('cal-prev').addEventListener('click', () => {
-    currentCalDate.setMonth(currentCalDate.getMonth() - 1);
-    renderCalendar();
-});
-
-document.getElementById('cal-next').addEventListener('click', () => {
-    currentCalDate.setMonth(currentCalDate.getMonth() + 1);
-    renderCalendar();
-});
-
+document.getElementById('cal-prev').addEventListener('click', () => { currentCalDate.setMonth(currentCalDate.getMonth() - 1); renderCalendar(); });
+document.getElementById('cal-next').addEventListener('click', () => { currentCalDate.setMonth(currentCalDate.getMonth() + 1); renderCalendar(); });
 document.querySelectorAll('.view-toggle button').forEach(btn => {
     btn.addEventListener('click', () => {
         document.querySelectorAll('.view-toggle button').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        renderCalendar();
+        btn.classList.add('active'); renderCalendar();
     });
 });
 
 function renderCalendar() {
     const view = document.querySelector('.view-toggle button.active').dataset.view;
-    const year = currentCalDate.getFullYear();
-    const month = currentCalDate.getMonth();
-    
+    const year = currentCalDate.getFullYear(), month = currentCalDate.getMonth();
     const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
     document.getElementById('cal-month-year').textContent = `${monthNames[month]} ${year}`;
-
     if (view === 'grid') {
         document.getElementById('calendar-grid').classList.remove('hidden');
         document.getElementById('calendar-list').classList.add('hidden');
@@ -207,37 +129,24 @@ function renderCalendar() {
 function renderCalendarGrid(year, month) {
     const grid = document.getElementById('calendar-grid');
     grid.innerHTML = '';
-
-    // Заголовки дней недели
-    const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-    daysOfWeek.forEach(d => {
+    ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].forEach(d => {
         const div = document.createElement('div');
-        div.className = 'cal-day-header';
-        div.textContent = d;
+        div.className = 'cal-day-header'; div.textContent = d;
         grid.appendChild(div);
     });
-
-    const firstDay = new Date(year, month, 1).getDay(); // 0 = Вс, 1 = Пн
-    const offset = firstDay === 0 ? 6 : firstDay - 1; // Сдвиг для Пн=0
+    const firstDay = new Date(year, month, 1).getDay();
+    const offset = firstDay === 0 ? 6 : firstDay - 1;
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-    // Пустые ячейки
     for (let i = 0; i < offset; i++) {
-        const div = document.createElement('div');
-        div.className = 'cal-day empty';
+        const div = document.createElement('div'); div.className = 'cal-day empty';
         grid.appendChild(div);
     }
-
-    // Собираем данные о просмотрах за месяц
     const dailyData = {};
     state.titles.forEach(title => {
         title.entries.forEach(entry => {
             if (!entry.watchDate) return;
             const dates = entry.watchDate.split('–').map(d => d.trim());
-            const start = new Date(dates[0]);
-            const end = dates[1] ? new Date(dates[1]) : start;
-
-            // Если диапазон пересекается с текущим месяцем
+            const start = new Date(dates[0]), end = dates[1] ? new Date(dates[1]) : start;
             for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
                 if (d.getFullYear() === year && d.getMonth() === month) {
                     const day = d.getDate();
@@ -247,28 +156,15 @@ function renderCalendarGrid(year, month) {
             }
         });
     });
-
     const today = new Date();
-
     for (let day = 1; day <= daysInMonth; day++) {
         const div = document.createElement('div');
         div.className = 'cal-day';
-        if (year === today.getFullYear() && month === today.getMonth() && day === today.getDate()) {
-            div.classList.add('today');
-        }
-
+        if (year === today.getFullYear() && month === today.getMonth() && day === today.getDate()) div.classList.add('today');
         const dots = dailyData[day] ? dailyData[day].slice(0, 5).map(() => '<div class="cal-dot"></div>').join('') : '';
         const more = dailyData[day] && dailyData[day].length > 5 ? `<div class="cal-dot" style="background:transparent; color:var(--text-secondary); font-size:10px; width:auto;">+${dailyData[day].length - 5}</div>` : '';
-
-        div.innerHTML = `
-            <div class="cal-day-number">${day}</div>
-            <div class="cal-day-dots">${dots}${more}</div>
-        `;
-
-        if (dailyData[day]) {
-            div.title = dailyData[day].map(t => t.title).join('\n');
-        }
-
+        div.innerHTML = `<div class="cal-day-number">${day}</div><div class="cal-day-dots">${dots}${more}</div>`;
+        if (dailyData[day]) div.title = dailyData[day].map(t => t.title).join('\n');
         grid.appendChild(div);
     }
 }
@@ -276,31 +172,21 @@ function renderCalendarGrid(year, month) {
 function renderCalendarList(year, month) {
     const list = document.getElementById('calendar-list');
     list.innerHTML = '';
-
     const monthViews = [];
     state.titles.forEach(title => {
         title.entries.forEach(entry => {
             if (!entry.watchDate) return;
             const dates = entry.watchDate.split('–').map(d => d.trim());
             const start = new Date(dates[0]);
-            
-            if (start.getFullYear() === year && start.getMonth() === month) {
-                monthViews.push({
-                    date: start,
-                    title: title,
-                    entry: entry
-                });
-            }
+            if (start.getFullYear() === year && start.getMonth() === month)
+                monthViews.push({ date: start, title, entry });
         });
     });
-
     monthViews.sort((a, b) => a.date - b.date);
-
     if (monthViews.length === 0) {
         list.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-secondary)">В этом месяце ничего не просматривалось</div>';
         return;
     }
-
     monthViews.forEach(item => {
         const div = document.createElement('div');
         div.className = 'cal-list-item';
@@ -310,8 +196,7 @@ function renderCalendarList(year, month) {
             <div>
                 <div style="font-weight:600">${item.title.title}</div>
                 <div style="font-size:0.8rem; color:var(--text-secondary)">${item.entry.kind} • ${dateStr}</div>
-            </div>
-        `;
+            </div>`;
         div.onclick = () => openDetailModal(item.title.id);
         list.appendChild(div);
     });
