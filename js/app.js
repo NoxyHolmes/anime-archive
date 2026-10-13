@@ -1,5 +1,5 @@
 /**
- * Основная логика приложения Аниме-Архив
+ * Основная логика приложения Аниме-Архив (Обновлённая версия)
  */
 
 // Глобальное состояние
@@ -63,11 +63,9 @@ function checkOwnerMode() {
 async function loadData() {
     showToast('info', 'Загрузка данных...');
     try {
-        // Пытаемся загрузить из GitHub (если есть настройки) или локальный data.json
         const response = await fetch('data.json');
         if (response.ok) {
             const jsonTitles = await response.json();
-            // Объединяем с локальными изменениями (если есть)
             const localData = localStorage.getItem('animeArchive_localData');
             state.titles = localData ? JSON.parse(localData) : jsonTitles;
         } else {
@@ -81,28 +79,97 @@ async function loadData() {
     
     renderArchive();
     renderRecent();
-    updateStats(); // Вызываем из stats.js
+    if (typeof updateStats === 'function') updateStats();
     showToast('success', 'Данные загружены');
+}
+
+// Рендеринг статистики сверху архива
+function renderArchiveStats() {
+    const container = document.getElementById('archive-stats-container');
+    if (!container) return;
+
+    let totalTitles = state.titles.length;
+    let totalEpisodes = 0;
+    let totalMovies = 0;
+    let totalTimeMinutes = 0;
+    let favorites = 0;
+
+    state.titles.forEach(title => {
+        if (title.favorite) favorites++;
+        title.entries.forEach(entry => {
+            let eps = entry.episodes || 0;
+            totalEpisodes += eps;
+            if (entry.kind.toLowerCase().includes('фильм') || title.type === 'Фильм') {
+                totalMovies++;
+            }
+            let time = 0;
+            if (entry.durationMinutes) {
+                time = entry.durationMinutes;
+            } else if (entry.minutesPerEpisode) {
+                time = eps * entry.minutesPerEpisode;
+            } else {
+                const isMovie = entry.kind.toLowerCase().includes('фильм') || title.type === 'Фильм';
+                time = eps * (isMovie ? state.settings.defaultMovieTime : state.settings.defaultEpTime);
+            }
+            totalTimeMinutes += time;
+        });
+    });
+
+    const hours = Math.floor(totalTimeMinutes / 60);
+    const days = Math.floor(hours / 24);
+
+    container.innerHTML = `
+        <div class="archive-stat-card">
+            <div class="archive-stat-value">${totalTitles}</div>
+            <div class="archive-stat-label">Тайтлов</div>
+        </div>
+        <div class="archive-stat-card">
+            <div class="archive-stat-value">${totalEpisodes}</div>
+            <div class="archive-stat-label">Серий</div>
+        </div>
+        <div class="archive-stat-card">
+            <div class="archive-stat-value">${totalMovies}</div>
+            <div class="archive-stat-label">Фильмов</div>
+        </div>
+        <div class="archive-stat-card">
+            <div class="archive-stat-value">${hours}ч</div>
+            <div class="archive-stat-label">Время</div>
+        </div>
+        <div class="archive-stat-card">
+            <div class="archive-stat-value">${days}д</div>
+            <div class="archive-stat-label">Дней</div>
+        </div>
+        <div class="archive-stat-card">
+            <div class="archive-stat-value">${favorites}</div>
+            <div class="archive-stat-label">Избранных</div>
+        </div>
+    `;
 }
 
 // Рендеринг архива
 function renderArchive() {
+    renderArchiveStats(); // Обновляем статистику сверху
+    
     const container = document.getElementById('tiers-container');
     container.innerHTML = '';
 
     TIERS.forEach(tier => {
-        // Фильтрация
         let filtered = state.titles.filter(t => t.tier === tier);
         if (state.filters.tier !== 'all' && state.filters.tier !== tier) filtered = [];
         if (state.filters.type !== 'all') filtered = filtered.filter(t => t.type === state.filters.type);
         if (state.filters.favorite) filtered = filtered.filter(t => t.favorite);
+        
         if (state.filters.search) {
             const q = state.filters.search.toLowerCase();
-            filtered = filtered.filter(t => t.title.toLowerCase().includes(q) || t.titleOriginal.toLowerCase().includes(q));
+            filtered = filtered.filter(t => 
+                t.title.toLowerCase().includes(q) || 
+                t.titleOriginal.toLowerCase().includes(q) ||
+                t.genres.some(g => g.toLowerCase().includes(q)) // Поиск по жанрам
+            );
         }
 
         if (filtered.length === 0 && state.filters.tier === 'all' && state.filters.type === 'all' && !state.filters.favorite && !state.filters.search) {
-            return; // Не показываем пустые тиры при полном сбросе
+            return;
         }
 
         const totalInTier = state.titles.filter(t => t.tier === tier).length;
@@ -110,6 +177,7 @@ function renderArchive() {
 
         const section = document.createElement('div');
         section.className = 'tier-section';
+        section.dataset.tier = tier;
         section.innerHTML = `
             <div class="tier-header">
                 <div class="tier-3d-letter letter-${tier.toLowerCase()}">${tier}</div>
@@ -124,7 +192,6 @@ function renderArchive() {
             grid.appendChild(createCard(title));
         });
 
-        // Инициализация Drag & Drop для этой сетки
         initSortable(grid);
     });
 }
@@ -137,11 +204,17 @@ function createCard(title) {
     div.onclick = () => openDetailModal(title.id);
 
     const totalTime = calculateTitleTime(title);
-    const timeStr = totalTime > 0 ? `${Math.round(totalTime / 60)} ч` : '';
+    const totalEps = title.entries.reduce((sum, e) => sum + (e.episodes || 0), 0);
+    const movieCount = title.entries.filter(e => e.kind.toLowerCase().includes('фильм') || title.type === 'Фильм').length;
+    const timeStr = totalTime > 0 ? `${Math.round(totalTime / 60)}ч` : '0ч';
 
     div.innerHTML = `
         <div class="card-cover-wrapper">
-            <img src="${title.cover || 'https://via.placeholder.com/300x420?text=No+Cover'}" alt="${title.title}" class="card-cover" loading="lazy">
+            <img src="${title.cover || 'https://via.placeholder.com/300x420?text=No+Cover'}" 
+                 alt="${title.title}" 
+                 class="card-cover" 
+                 loading="lazy"
+                 onerror="this.src='https://via.placeholder.com/300x420?text=Error'">
             <div class="card-badges">
                 ${title.tier === 'SSS' ? '<i class="fa-solid fa-crown badge-crown"></i>' : ''}
                 ${title.favorite ? '<i class="fa-solid fa-heart badge-fav"></i>' : ''}
@@ -150,8 +223,14 @@ function createCard(title) {
         <div class="card-info">
             <div class="card-title">${title.title}</div>
             <div class="card-meta">
-                <span>${title.type}</span>
-                <span>${timeStr}</span>
+                <div class="card-meta-row">
+                    <span>${title.type}</span>
+                    <span>${totalEps} сер.</span>
+                </div>
+                <div class="card-meta-row">
+                    <span>${movieCount} фил.</span>
+                    <span>${timeStr}</span>
+                </div>
             </div>
         </div>
     `;
@@ -169,7 +248,7 @@ function renderRecent() {
         div.className = 'recent-item';
         div.onclick = () => openDetailModal(title.id);
         div.innerHTML = `
-            <img src="${title.cover || 'https://via.placeholder.com/80x110?text=No'}" alt="${title.title}">
+            <img src="${title.cover || 'https://via.placeholder.com/80x110?text=No'}" alt="${title.title}" onerror="this.src='https://via.placeholder.com/80x110?text=Err'">
             <span>${title.title}</span>
         `;
         container.appendChild(div);
@@ -179,16 +258,16 @@ function renderRecent() {
 // Drag & Drop (SortableJS)
 function initSortable(gridElement) {
     new Sortable(gridElement, {
-        group: 'tiers', // Позволяет перетаскивать между разными тирами
+        group: 'tiers',
         animation: 200,
         ghostClass: 'sortable-ghost',
         dragClass: 'sortable-drag',
-        delayOnTouchOnly: true, // Для тач-экранов
+        delayOnTouchOnly: true,
         touchStartThreshold: 5,
         onEnd: function (evt) {
             if (!state.isOwner) {
                 showToast('error', 'Только владелец может менять порядок');
-                renderArchive(); // Откат
+                renderArchive();
                 return;
             }
 
@@ -198,9 +277,9 @@ function initSortable(gridElement) {
 
             if (title && title.tier !== newTier) {
                 title.tier = newTier;
-                saveData(); // Автосохранение
+                saveData();
                 showToast('success', `Тир изменён на ${newTier}`);
-                renderArchive(); // Перерисовка для обновления счётчиков
+                renderArchive();
             }
         }
     });
@@ -215,7 +294,6 @@ function calculateTitleTime(title) {
         } else if (entry.episodes && entry.minutesPerEpisode) {
             total += entry.episodes * entry.minutesPerEpisode;
         } else if (entry.episodes) {
-            // Если не указано, берём из настроек
             const isMovie = entry.kind.toLowerCase().includes('фильм') || title.type === 'Фильм';
             const defaultTime = isMovie ? state.settings.defaultMovieTime : state.settings.defaultEpTime;
             total += entry.episodes * defaultTime;
@@ -236,7 +314,7 @@ function openDetailModal(id) {
     
     const tierBadge = document.getElementById('detail-tier');
     tierBadge.textContent = title.tier;
-    tierBadge.style.background = `var(--tier-${title.tier.toLowerCase()})`;
+    tierBadge.style.background = `var(--accent)`;
 
     document.getElementById('detail-fav').classList.toggle('hidden', !title.favorite);
 
@@ -249,7 +327,6 @@ function openDetailModal(id) {
 
     title.entries.forEach(entry => {
         let time = 0;
-        let timeStr = '0 мин';
         if (entry.durationMinutes) {
             time = entry.durationMinutes;
         } else if (entry.episodes && entry.minutesPerEpisode) {
@@ -259,7 +336,7 @@ function openDetailModal(id) {
             time = entry.episodes * (isMovie ? state.settings.defaultMovieTime : state.settings.defaultEpTime);
         }
         totalTime += time;
-        timeStr = time >= 60 ? `${Math.floor(time/60)} ч ${time%60} мин` : `${time} мин`;
+        const timeStr = time >= 60 ? `${Math.floor(time/60)} ч ${time%60} мин` : `${time} мин`;
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -275,7 +352,6 @@ function openDetailModal(id) {
     const totalStr = totalTime >= 60 ? `${Math.floor(totalTime/60)} ч ${totalTime%60} мин` : `${totalTime} мин`;
     document.getElementById('detail-total-time').textContent = totalStr;
 
-    // Кнопки владельца
     document.querySelector('.detail-actions').classList.toggle('hidden', !state.isOwner);
     document.getElementById('btn-edit-title').onclick = () => {
         closeModal('modal-title-detail');
@@ -288,7 +364,7 @@ function openDetailModal(id) {
             closeModal('modal-title-detail');
             renderArchive();
             renderRecent();
-            updateStats();
+            if (typeof updateStats === 'function') updateStats();
             showToast('success', 'Тайтл удалён');
         }
     };
@@ -296,7 +372,7 @@ function openDetailModal(id) {
     openModal('modal-title-detail');
 }
 
-// Модальное окно: Форма (Добавление/Редактирование)
+// Модальное окно: Форма
 let currentFormGenres = [];
 
 function openFormModal(title = null) {
@@ -315,7 +391,6 @@ function openFormModal(title = null) {
         document.getElementById('form-cover').value = title.cover;
         document.getElementById('form-favorite').checked = title.favorite;
         currentFormGenres = [...title.genres];
-        
         title.entries.forEach(entry => addEntryRow(entry));
     } else {
         document.getElementById('form-id').value = crypto.randomUUID();
@@ -331,10 +406,10 @@ function addEntryRow(data = {}) {
     const div = document.createElement('div');
     div.className = 'entry-row';
     div.innerHTML = `
-        <input type="text" placeholder="Название части (напр. Сезон 1)" class="entry-kind" value="${data.kind || ''}" required>
+        <input type="text" placeholder="Название части" class="entry-kind" value="${data.kind || ''}" required>
         <input type="number" placeholder="Серий" class="entry-ep" value="${data.episodes || ''}">
         <input type="number" placeholder="Мин/серия" class="entry-min" value="${data.minutesPerEpisode || ''}">
-        <input type="text" placeholder="Дата (ГГГГ-ММ-ДД)" class="entry-date" value="${data.watchDate || ''}">
+        <input type="text" placeholder="Дата" class="entry-date" value="${data.watchDate || ''}">
         <button type="button" class="btn-remove-entry" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash"></i></button>
     `;
     container.appendChild(div);
@@ -398,36 +473,37 @@ document.getElementById('title-form').addEventListener('submit', (e) => {
     closeModal('modal-title-form');
     renderArchive();
     renderRecent();
-    updateStats();
+    if (typeof updateStats === 'function') updateStats();
     showToast('success', 'Тайтл сохранён');
 });
 
 // Сохранение данных (Debounced)
 let saveTimeout;
 function saveData() {
-    // 1. Мгновенно в localStorage
     localStorage.setItem('animeArchive_localData', JSON.stringify(state.titles));
     updateSaveStatus('Локально сохранено');
 
-    // 2. Отложенная отправка на GitHub (если владелец и настроен)
     if (state.isOwner) {
         clearTimeout(saveTimeout);
-        updateSaveStatus('Синхронизация...');
+        updateSaveStatus('Синхронизация...', false, true);
         saveTimeout = setTimeout(() => {
-            syncWithGitHub();
-        }, 1500); // 1.5 секунды debounce
+            if (typeof syncWithGitHub === 'function') syncWithGitHub();
+        }, 1500);
     }
 }
 
 // Управление модальными окнами
 function openModal(id) {
-    document.getElementById(id).classList.add('active');
-    document.getElementById(id).classList.remove('hidden');
+    const modal = document.getElementById(id);
+    modal.classList.remove('hidden');
+    // Небольшая задержка для активации CSS-анимации
+    setTimeout(() => modal.classList.add('active'), 10);
 }
 
 function closeModal(id) {
-    document.getElementById(id).classList.remove('active');
-    setTimeout(() => document.getElementById(id).classList.add('hidden'), 300);
+    const modal = document.getElementById(id);
+    modal.classList.remove('active');
+    setTimeout(() => modal.classList.add('hidden'), 300);
 }
 
 // Тосты
@@ -445,7 +521,8 @@ function showToast(type, message) {
 }
 
 function updateSaveStatus(text, isError = false, isSyncing = false) {
-    const el = document.getElementById('save-status').querySelector('.status-indicator');
+    const el = document.getElementById('save-status')?.querySelector('.status-indicator');
+    if (!el) return;
     el.textContent = `Статус: ${text}`;
     el.className = 'status-indicator';
     if (isError) el.classList.add('error');
@@ -455,7 +532,7 @@ function updateSaveStatus(text, isError = false, isSyncing = false) {
 // Настройки и фильтры
 function applySettings() {
     document.documentElement.setAttribute('data-theme', state.settings.theme);
-    document.documentElement.style.setProperty('--accent', state.settings.settings?.accent || state.settings.accent);
+    document.documentElement.style.setProperty('--accent', state.settings.accent);
     document.documentElement.style.setProperty('--grid-columns', state.settings.columns);
     
     if (window.particleSystem) {
@@ -464,6 +541,30 @@ function applySettings() {
 }
 
 function setupEventListeners() {
+    // Крестик в поиске
+    const searchInput = document.getElementById('global-search');
+    const searchBox = searchInput.parentElement;
+    let clearBtn = searchBox.querySelector('.fa-times');
+    if (!clearBtn) {
+        clearBtn = document.createElement('i');
+        clearBtn.className = 'fa-solid fa-times';
+        searchBox.appendChild(clearBtn);
+    }
+
+    searchInput.addEventListener('input', (e) => {
+        clearBtn.style.display = e.target.value ? 'block' : 'none';
+        state.filters.search = e.target.value;
+        renderArchive();
+    });
+
+    clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        clearBtn.style.display = 'none';
+        state.filters.search = '';
+        renderArchive();
+        searchInput.focus();
+    });
+
     // Табы
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -471,15 +572,14 @@ function setupEventListeners() {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             btn.classList.add('active');
             document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
-            if (btn.dataset.tab === 'stats') updateStats();
-            if (btn.dataset.tab === 'calendar') renderCalendar();
+            if (btn.dataset.tab === 'stats' && typeof updateStats === 'function') updateStats();
+            if (btn.dataset.tab === 'calendar' && typeof renderCalendar === 'function') renderCalendar();
         });
     });
 
     // Фильтры
-    ['global-search', 'filter-tier', 'filter-type', 'filter-favorite'].forEach(id => {
-        document.getElementById(id).addEventListener('input', (e) => {
-            state.filters.search = document.getElementById('global-search').value;
+    ['filter-tier', 'filter-type', 'filter-favorite'].forEach(id => {
+        document.getElementById(id).addEventListener('change', (e) => {
             state.filters.tier = document.getElementById('filter-tier').value;
             state.filters.type = document.getElementById('filter-type').value;
             state.filters.favorite = document.getElementById('filter-favorite').checked;
@@ -501,16 +601,6 @@ function setupEventListeners() {
         }
     });
 
-    // Предотвращение закрытия по клику на фон (согласно ТЗ)
-    document.querySelectorAll('.modal-overlay').forEach(overlay => {
-        overlay.addEventListener('click', (e) => {
-            if (e.target === overlay) {
-                // Ничего не делаем, закрытие только по крестику или Esc
-                // showToast('info', 'Используйте кнопку закрытия или Esc');
-            }
-        });
-    });
-
     // Добавление части в форму
     document.getElementById('btn-add-entry').addEventListener('click', () => addEntryRow());
 
@@ -518,7 +608,6 @@ function setupEventListeners() {
     const genreSearch = document.getElementById('form-genres-search');
     const genreDropdown = document.getElementById('form-genres-dropdown');
     
-    // Заполняем datalist для поиска
     const datalist = document.getElementById('genre-datalist');
     datalist.innerHTML = GENRES_LIST.map(g => `<option value="${g}">`).join('');
     genreSearch.setAttribute('list', 'genre-datalist');
@@ -538,18 +627,18 @@ function setupEventListeners() {
         }
     });
 
-    // Скрытие дропдауна при клике вне
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.multi-select-container')) {
             genreDropdown.classList.add('hidden');
         }
     });
 
-    // Настройки
+    // Кнопка настроек (теперь работает корректно)
     document.getElementById('btn-settings').addEventListener('click', () => {
         document.querySelector('.tab-btn[data-tab="settings"]').click();
     });
 
+    // Настройки
     document.getElementById('set-theme').addEventListener('change', (e) => { state.settings.theme = e.target.value; saveSettings(); });
     document.getElementById('set-accent').addEventListener('input', (e) => { state.settings.accent = e.target.value; saveSettings(); });
     document.getElementById('set-view-mode').addEventListener('change', (e) => { state.settings.viewMode = e.target.value; saveSettings(); });
@@ -559,7 +648,6 @@ function setupEventListeners() {
         saveSettings(); 
     });
     
-    // Настройки частиц
     ['preset', 'density', 'speed', 'size'].forEach(key => {
         document.getElementById(`set-particle-${key}`).addEventListener('change', (e) => {
             state.settings.particles[key] = key === 'preset' ? e.target.value : parseInt(e.target.value);
@@ -571,11 +659,9 @@ function setupEventListeners() {
         saveSettings();
     });
 
-    // Настройки времени
     document.getElementById('set-default-ep-time').addEventListener('change', (e) => { state.settings.defaultEpTime = parseInt(e.target.value); saveSettings(); });
     document.getElementById('set-default-movie-time').addEventListener('change', (e) => { state.settings.defaultMovieTime = parseInt(e.target.value); saveSettings(); });
 
-    // Выход из режима владельца
     document.getElementById('btn-logout').addEventListener('click', () => {
         localStorage.removeItem('animeArchive_ownerMode');
         location.reload();
