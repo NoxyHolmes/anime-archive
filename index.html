@@ -13,7 +13,7 @@
 </head>
 <body class="ambient pill-glow tier-glow" data-embanim="full">
 
-<!-- фоновые слои -->
+<!-- фоновые слои: лепестки позади контента -->
 <div id="user-bg" aria-hidden="true"></div>
 <div id="user-dim" aria-hidden="true"></div>
 <div class="bg-moon" aria-hidden="true"></div>
@@ -22,7 +22,6 @@
 <div class="bg-branch br-bl" id="branch-bl" aria-hidden="true"></div>
 <canvas id="petals" aria-hidden="true"></canvas>
 
-<!-- шапка -->
 <header class="topbar">
   <a class="brand" href="#" onclick="return false">
     <span class="brand-word" aria-label="ANIME"><i>A</i><i>N</i><i>I</i><i>M</i><i>E</i></span>
@@ -38,24 +37,24 @@
   </nav>
   <div class="sync-wrap" id="sync-wrap">
     <button class="btn" id="btn-login" title="Вход">
-      <i class="fa-brands fa-github ic"></i>
+      <svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
       <span class="login-label">Вход</span>
     </button>
     <div class="sync-user hidden" id="sync-user" title="Синхронизация">
       <img id="su-avatar" alt="" class="hidden">
-      <span class="gh-mini hidden" id="su-ghmini"><i class="fa-brands fa-github"></i></span>
+      <span class="gh-mini hidden" id="su-ghmini"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg></span>
       <span class="sync-dot" id="su-dot"></span>
     </div>
     <div class="sync-menu hidden" id="sync-menu"></div>
   </div>
   <button class="btn btn-accent hidden" id="btn-add">
-    <i class="fa-solid fa-plus ic"></i>
+    <svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
     <span class="add-label">Добавить тайтл</span>
   </button>
 </header>
 
 <main>
-  <!-- ТИР-ЛИСТ -->
+  <!-- ======== ТИР-ЛИСТ ======== -->
   <section class="view" id="view-tier">
     <div class="hero" id="hero">
       <div class="hero-main">
@@ -63,10 +62,12 @@
         <p class="hero-sub">личный мир аниме — от SSS до E, сезоны, фильмы, OVA и история просмотра</p>
         <div class="hero-actions">
           <button class="btn btn-accent hidden" data-act="add">
-            <i class="fa-solid fa-plus ic"></i>Добавить тайтл
+            <svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            Добавить тайтл
           </button>
           <button class="btn" id="btn-random">
-            <i class="fa-solid fa-dice ic"></i>Случайный тайтл
+            <svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="4.5"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15.5" r="1.5" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+            Случайный тайтл
           </button>
         </div>
       </div>
@@ -86,7 +87,7 @@
     </div>
   </section>
 
-  <!-- ХРОНОЛОГИЯ -->
+  <!-- ======== ХРОНОЛОГИЯ ======== -->
   <section class="view hidden" id="view-timeline">
     <div class="page-head">
       <div>
@@ -97,7 +98,7 @@
     <div id="timeline"></div>
   </section>
 
-  <!-- КАЛЕНДАРЬ -->
+  <!-- ======== КАЛЕНДАРЬ ======== -->
   <section class="view hidden" id="view-calendar">
     <div class="page-head">
       <div>
@@ -111,10 +112,10 @@
         <button id="cal-mode-list">Список</button>
       </div>
       <div id="cal-nav-block">
-        <button class="cal-nav" id="cal-prev" aria-label="Предыдущий месяц"><i class="fa-solid fa-chevron-left"></i></button>
+        <button class="cal-nav" id="cal-prev" aria-label="Предыдущий месяц"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
         <select class="cal-sel" id="cal-sel-m" aria-label="Месяц"></select>
         <select class="cal-sel" id="cal-sel-y" aria-label="Год"></select>
-        <button class="cal-nav" id="cal-next" aria-label="Следующий месяц"><i class="fa-solid fa-chevron-right"></i></button>
+        <button class="cal-nav" id="cal-next" aria-label="Следующий месяц"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
         <button class="btn" id="cal-today" style="padding:8px 14px;font-size:13px">Сегодня</button>
       </div>
     </div>
@@ -128,7 +129,7 @@
     </div>
   </section>
 
-  <!-- СТАТИСТИКА -->
+  <!-- ======== СТАТИСТИКА ======== -->
   <section class="view hidden" id="view-stats">
     <div class="page-head">
       <div>
@@ -140,11 +141,11 @@
   </section>
 </main>
 
-<!-- ПАНЕЛЬ НАСТРОЕК -->
+<!-- ======== панель настроек ======== -->
 <aside id="drawer" aria-label="Настройки">
   <div class="drawer-head">
     <h2>Настройки</h2>
-    <button class="drawer-x" id="drawer-x" title="Закрыть панель"><i class="fa-solid fa-xmark"></i></button>
+    <button class="drawer-x" id="drawer-x" title="Закрыть панель"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   </div>
   <p class="drawer-sub">Персональные — действуют только в вашем браузере</p>
 
@@ -349,11 +350,12 @@
   <span>/ — поиск · ? — подсказка · Esc — закрыть</span>
 </footer>
 
-<!-- МОДАЛКИ -->
+<!-- ======== детали тайтла ======== -->
 <div class="overlay hidden" id="ov-title"><div class="modal modal-title" id="m-title"></div></div>
+<!-- ======== форма ======== -->
 <div class="overlay hidden" id="ov-form">
   <div class="modal modal-form">
-    <button class="modal-x" data-close><i class="fa-solid fa-xmark"></i></button>
+    <button class="modal-x" data-close><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     <h2 id="form-title">Новый тайтл</h2>
     <form id="title-form" novalidate autocomplete="off">
       <div class="form-top">
@@ -388,7 +390,7 @@
       <div class="field" style="margin-bottom:14px">
         <label>Жанры</label>
         <div class="gp-search" style="margin-bottom:10px">
-          <i class="fa-solid fa-magnifying-glass"></i>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.2-3.2"/></svg>
           <input id="f-genre-search" placeholder="Найти жанр…" autocomplete="off">
         </div>
         <div class="f-genres-selected" id="f-genres-selected"></div>
@@ -432,11 +434,14 @@
     </form>
   </div>
 </div>
+<!-- ======== день календаря ======== -->
 <div class="overlay hidden" id="ov-day"><div class="modal modal-day" id="m-day"></div></div>
+<!-- ======== подтверждение ======== -->
 <div class="overlay hidden" id="ov-confirm"><div class="modal modal-confirm" id="m-confirm"></div></div>
+<!-- ======== вход ======== -->
 <div class="overlay hidden" id="ov-login">
   <div class="modal modal-login">
-    <button class="modal-x" data-close><i class="fa-solid fa-xmark"></i></button>
+    <button class="modal-x" data-close><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     <h2>Вход</h2>
     <div class="login-tabs">
       <button data-tab="rw" class="on">Владелец · чтение и запись</button>
@@ -480,7 +485,7 @@
 </div>
 
 <div class="toasts" id="toasts"></div>
-<button id="to-top" title="Наверх"><i class="fa-solid fa-arrow-up"></i></button>
+<button id="to-top" title="Наверх"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 
 <script src="js/particles.js"></script>
 <script src="js/app.js"></script>
