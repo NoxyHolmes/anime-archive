@@ -2571,8 +2571,8 @@ const b64encode = str => { const b = new TextEncoder().encode(str); let s=''; b.
 
 /* ПРОВЕРКА ВЛАДЕЛЬЦА: только если установлен флаг anime_owner_mode через admin.html */
 function canEdit(){
-const isOwner = localStorage.getItem(LS_OWNER) === 'true';
-return !!(sync && sync.mode === 'rw' && isOwner);
+  // Достаточно того, что мы вошли по правильной ссылке-токену
+  return localStorage.getItem('anime_owner_mode') === 'true';
 }
 
 function saveSync(){ if (sync) localStorage.setItem(LS_SYNC, JSON.stringify(sync)); else localStorage.removeItem(LS_SYNC); }
@@ -2623,20 +2623,27 @@ setTimeout(() => location.reload(), 1000);
 }
 
 function updateSyncUI(){
-const connected = !!sync;
-/* Кнопка входа убрана — показываем только статус синхронизации */
-const syncUser = $('#sync-user');
-if (syncUser) syncUser.classList.toggle('hidden', !connected);
-if (connected){
-const av = $('#su-avatar'), mini = $('#su-ghmini');
-if (sync.avatar){ av.src = sync.avatar; av.classList.remove('hidden'); mini.classList.add('hidden'); }
-else { av.classList.add('hidden'); mini.classList.remove('hidden'); }
-}
-const editable = canEdit();
-const btnAdd = $('#btn-add');
-if (btnAdd) btnAdd.classList.toggle('hidden', !editable);
-$$('[data-act="add"]').forEach(b => b.classList.toggle('hidden', !editable));
-setSyncStatus(sync ? syncStatus : 'off');
+  const connected = !!sync;
+  
+  // ПОЛНОСТЬЮ скрываем кнопку "Вход", так как вход осуществляется только по ссылке
+  const loginBtn = $('#btn-login');
+  if (loginBtn) loginBtn.classList.add('hidden');
+  
+  const syncUser = $('#sync-user');
+  if (syncUser) syncUser.classList.toggle('hidden', !connected);
+  
+  if (connected){
+    const av = $('#su-avatar'), mini = $('#su-ghmini');
+    if (sync.avatar){ av.src = sync.avatar; av.classList.remove('hidden'); mini.classList.add('hidden'); }
+    else { av.classList.add('hidden'); mini.classList.remove('hidden'); }
+  }
+  
+  const editable = canEdit();
+  const btnAdd = $('#btn-add');
+  if (btnAdd) btnAdd.classList.toggle('hidden', !editable);
+  $$('[data-act="add"]').forEach(b => b.classList.toggle('hidden', !editable));
+  
+  setSyncStatus(sync ? syncStatus : 'off');
 }
 
 $('#sync-user').addEventListener('click', e => {
