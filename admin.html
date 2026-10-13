@@ -25,17 +25,16 @@ p{color:#a094b2;font-size:14px;line-height:1.6;margin-bottom:16px}
 <div class="container">
   <div id="step1">
     <h1>🔐 Первый запуск</h1>
-    <p>Сгенерируйте уникальную ссылку для входа владельца. Сохраните её в надёжном месте — она понадобится каждый раз для редактирования каталога.</p>
+    <p>Сгенерируйте уникальную ссылку для входа владельца. Сохраните её в надёжном месте.</p>
     <button class="btn" id="btn-generate">Сгенерировать ссылку</button>
   </div>
   
   <div id="step2" class="hidden">
     <h1>✅ Ссылка создана</h1>
-    <p>Скопируйте эту ссылку и сохраните в надёжном месте. По ней вы будете входить как владелец:</p>
+    <p>Скопируйте эту ссылку. По ней вы будете входить как владелец:</p>
     <div class="link-box" id="owner-link"></div>
     <button class="btn" id="btn-copy">Скопировать ссылку</button>
     <p class="success" id="copy-msg" style="margin-top:12px"></p>
-    <p style="margin-top:20px;font-size:12px;color:#6b5f7d">⚠️ Без этой ссылки редактирование невозможно. Токен GitHub вводится один раз после перехода по ссылке.</p>
   </div>
   
   <div id="step3" class="hidden">
@@ -48,10 +47,10 @@ p{color:#a094b2;font-size:14px;line-height:1.6;margin-bottom:16px}
   
   <div id="step4" class="hidden">
     <h1>🎉 Доступ подтверждён</h1>
-    <p class="success">Вы вошли как владелец. Теперь введите токен GitHub для синхронизации (один раз):</p>
+    <p class="success">Введите токен GitHub для синхронизации (один раз):</p>
     <input type="password" class="input" id="gh-token" placeholder="github_pat_... или ghp_...">
-    <input type="text" class="input" id="gh-repo" placeholder="логин/репозиторий (например: noxyholmes/anime-archive)">
-    <button class="btn" id="btn-save-gh">Сохранить и войти</button>
+    <input type="text" class="input" id="gh-repo" placeholder="логин/репозиторий (напр: noxyholmes/anime-archive)">
+    <button class="btn" id="btn-save-gh">Сохранить и войти в режим владельца</button>
     <p class="error" id="gh-error"></p>
   </div>
 </div>
@@ -59,15 +58,11 @@ p{color:#a094b2;font-size:14px;line-height:1.6;margin-bottom:16px}
 <script>
 const LS_ACCESS = 'anime_access_token';
 const LS_OWNER = 'anime_owner_mode';
-const LS_GH_TOKEN = 'anime_gh_token';
-const LS_GH_REPO = 'anime_gh_repo';
 
 function generateToken() {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let token = '';
-  for (let i = 0; i < 64; i++) {
-    token += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
+  for (let i = 0; i < 64; i++) token += chars.charAt(Math.floor(Math.random() * chars.length));
   return token;
 }
 
@@ -77,89 +72,55 @@ function showStep(n) {
   });
 }
 
-// Проверяем, есть ли токен в URL
 const urlParams = new URLSearchParams(window.location.search);
 const urlToken = urlParams.get('access');
 
 if (urlToken) {
-  // Есть токен в URL — проверяем
   const savedToken = localStorage.getItem(LS_ACCESS);
-  if (savedToken && savedToken === urlToken) {
-    // Токен правильный — показываем форму GitHub
-    showStep(4);
-  } else {
-    // Токен неправильный или первый раз
-    showStep(3);
-  }
+  if (savedToken && savedToken === urlToken) showStep(4);
+  else showStep(3);
 } else {
-  // Нет токена в URL — показываем первый шаг или форму ввода
   const savedToken = localStorage.getItem(LS_ACCESS);
-  if (savedToken) {
-    showStep(3);
-  } else {
-    showStep(1);
-  }
+  if (savedToken) showStep(3);
+  else showStep(1);
 }
 
-// Шаг 1: Генерация токена
 document.getElementById('btn-generate').onclick = () => {
   const token = generateToken();
   localStorage.setItem(LS_ACCESS, token);
-  
-  const link = `${window.location.origin}${window.location.pathname}?access=${token}`;
-  document.getElementById('owner-link').textContent = link;
+  document.getElementById('owner-link').textContent = `${window.location.origin}${window.location.pathname}?access=${token}`;
   showStep(2);
 };
 
-// Шаг 2: Копирование ссылки
 document.getElementById('btn-copy').onclick = () => {
-  const link = document.getElementById('owner-link').textContent;
-  navigator.clipboard.writeText(link).then(() => {
+  navigator.clipboard.writeText(document.getElementById('owner-link').textContent).then(() => {
     document.getElementById('copy-msg').textContent = '✓ Ссылка скопирована!';
-    setTimeout(() => {
-      document.getElementById('copy-msg').textContent = '';
-    }, 3000);
+    setTimeout(() => { document.getElementById('copy-msg').textContent = ''; }, 3000);
   });
 };
 
-// Шаг 3: Проверка токена
 document.getElementById('btn-verify').onclick = () => {
   const input = document.getElementById('access-token').value.trim();
   const saved = localStorage.getItem(LS_ACCESS);
-  
-  if (!input) {
-    document.getElementById('verify-error').textContent = 'Введите токен';
-    return;
-  }
-  
-  if (saved && saved === input) {
-    // Токен правильный — переходим к GitHub
-    showStep(4);
-  } else {
-    document.getElementById('verify-error').textContent = 'Неверный токен доступа';
-  }
+  if (!input) { document.getElementById('verify-error').textContent = 'Введите токен'; return; }
+  if (saved && saved === input) showStep(4);
+  else document.getElementById('verify-error').textContent = 'Неверный токен доступа';
 };
 
-// Шаг 4: Сохранение GitHub токена
 document.getElementById('btn-save-gh').onclick = () => {
   const ghToken = document.getElementById('gh-token').value.trim();
   const ghRepo = document.getElementById('gh-repo').value.trim();
   
-  if (!ghToken || !ghRepo) {
-    document.getElementById('gh-error').textContent = 'Заполните оба поля';
-    return;
-  }
+  if (!ghToken || !ghRepo) { document.getElementById('gh-error').textContent = 'Заполните оба поля'; return; }
+  if (!ghRepo.includes('/')) { document.getElementById('gh-error').textContent = 'Формат: логин/репозиторий'; return; }
   
-  if (!ghRepo.includes('/')) {
-    document.getElementById('gh-error').textContent = 'Формат: логин/репозиторий';
-    return;
-  }
+  localStorage.setItem('anime_gh_token', ghToken);
+  localStorage.setItem('anime_gh_repo', ghRepo);
   
-  localStorage.setItem(LS_GH_TOKEN, ghToken);
-  localStorage.setItem(LS_GH_REPO, ghRepo);
+  // САМОЕ ВАЖНОЕ: включаем режим владельца
   localStorage.setItem(LS_OWNER, 'true');
   
-  // Переход на главную
+  // Переход на главную страницу
   window.location.href = 'index.html';
 };
 </script>
