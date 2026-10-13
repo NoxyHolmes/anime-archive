@@ -97,8 +97,38 @@ function renderArchiveStats() {
     `;
 }
 
+function renderTierDistribution() {
+    const container = document.getElementById('tier-distribution');
+    if (!container) return;
+    const totalTitles = state.titles.length;
+    const tierCounts = { 'SSS': 0, 'S': 0, 'A': 0, 'B': 0, 'C': 0, 'D': 0, 'E': 0 };
+    state.titles.forEach(title => { tierCounts[title.tier] = (tierCounts[title.tier] || 0) + 1; });
+    const tierColors = {
+        'SSS': '#ffd700', 'S': '#ff6b00', 'A': '#ff2a2a',
+        'B': '#00e676', 'C': '#00bfff', 'D': '#9c27b0', 'E': '#ff0055'
+    };
+    container.innerHTML = TIERS.map(tier => {
+        const count = tierCounts[tier];
+        const percent = totalTitles > 0 ? Math.round((count / totalTitles) * 100) : 0;
+        const color = tierColors[tier];
+        return `
+            <div class="tier-dist-item" style="--tier-color: ${color}">
+                <div class="tier-dist-header">
+                    <div class="tier-dist-letter">${tier}</div>
+                    <div class="tier-dist-count">${count}</div>
+                </div>
+                <div class="tier-dist-bar">
+                    <div class="tier-dist-fill" style="width: ${percent}%"></div>
+                </div>
+                <div class="tier-dist-percent">${percent}%</div>
+            </div>
+        `;
+    }).join('');
+}
+
 function renderArchive() {
     renderArchiveStats();
+    renderTierDistribution();
     const container = document.getElementById('tiers-container');
     container.innerHTML = '';
     TIERS.forEach(tier => {
@@ -383,7 +413,6 @@ function applySettings() {
 }
 
 function setupEventListeners() {
-    // Крестик в поиске
     const searchInput = document.getElementById('global-search');
     const searchBox = searchInput.parentElement;
     let clearBtn = searchBox.querySelector('.fa-times');
@@ -402,7 +431,6 @@ function setupEventListeners() {
         state.filters.search = ''; renderArchive(); searchInput.focus();
     });
 
-    // Табы
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -414,7 +442,6 @@ function setupEventListeners() {
         });
     });
 
-    // Фильтры
     ['filter-tier', 'filter-type', 'filter-favorite'].forEach(id => {
         document.getElementById(id).addEventListener('change', () => {
             state.filters.tier = document.getElementById('filter-tier').value;
@@ -424,7 +451,6 @@ function setupEventListeners() {
         });
     });
 
-    // Закрытие модалок
     document.querySelectorAll('.modal-close, .modal-close-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const modal = e.target.closest('.modal-overlay');
@@ -435,10 +461,8 @@ function setupEventListeners() {
         if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.active').forEach(m => closeModal(m.id));
     });
 
-    // Форма
     document.getElementById('btn-add-entry').addEventListener('click', () => addEntryRow());
 
-    // Жанры
     const genreSearch = document.getElementById('form-genres-search');
     const genreDropdown = document.getElementById('form-genres-dropdown');
     const datalist = document.getElementById('genre-datalist');
@@ -461,12 +485,10 @@ function setupEventListeners() {
         if (!e.target.closest('.multi-select-container')) genreDropdown.classList.add('hidden');
     });
 
-    // Кнопка настроек
     document.getElementById('btn-settings').addEventListener('click', () => {
         document.querySelector('.tab-btn[data-tab="settings"]').click();
     });
 
-    // Настройки
     document.getElementById('set-theme').addEventListener('change', (e) => { state.settings.theme = e.target.value; saveSettings(); });
     document.getElementById('set-accent').addEventListener('input', (e) => { state.settings.accent = e.target.value; saveSettings(); });
     document.getElementById('set-view-mode').addEventListener('change', (e) => { state.settings.viewMode = e.target.value; saveSettings(); });
