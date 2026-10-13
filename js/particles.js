@@ -1,8 +1,3 @@
-/**
- * Движок фоновых частиц для Аниме-Архива
- * Поддерживает 20 пресетов, настройку плотности, скорости и размера.
- */
-
 class ParticleSystem {
     constructor() {
         this.canvas = document.getElementById('particles-canvas');
@@ -10,27 +5,13 @@ class ParticleSystem {
         this.particles = [];
         this.animationId = null;
         this.isEnabled = true;
-        
-        // Настройки по умолчанию
-        this.config = {
-            preset: 'sakura',
-            density: 50,
-            speed: 3,
-            size: 8,
-            theme: 'dark'
-        };
-
+        this.config = { preset: 'sakura', density: 50, speed: 3, size: 8, theme: 'dark' };
         this.resize();
         window.addEventListener('resize', () => this.resize());
         this.loadConfig();
         this.init();
     }
-
-    resize() {
-        this.canvas.width = window.innerWidth;
-        this.canvas.height = window.innerHeight;
-    }
-
+    resize() { this.canvas.width = window.innerWidth; this.canvas.height = window.innerHeight; }
     loadConfig() {
         const saved = localStorage.getItem('animeArchive_settings');
         if (saved) {
@@ -39,12 +20,7 @@ class ParticleSystem {
             this.isEnabled = settings.particles?.enabled !== false;
         }
     }
-
-    updateConfig(newConfig) {
-        this.config = { ...this.config, ...newConfig };
-        this.init(); // Пересоздаём частицы при изменении настроек
-    }
-
+    updateConfig(newConfig) { this.config = { ...this.config, ...newConfig }; this.init(); }
     getPresetColors(preset) {
         const colors = {
             'sakura': ['#ffb7c5', '#ffc0cb', '#ff9eb5'],
@@ -70,12 +46,10 @@ class ParticleSystem {
         };
         return colors[preset] || colors['sakura'];
     }
-
     createParticle() {
         const colors = this.getPresetColors(this.config.preset);
         const isRain = this.config.preset === 'rain' || this.config.preset === 'drizzle';
         const isStar = this.config.preset === 'shooting-stars';
-        
         return {
             x: Math.random() * this.canvas.width,
             y: Math.random() * this.canvas.height - this.canvas.height,
@@ -90,7 +64,6 @@ class ParticleSystem {
             trail: isStar ? [] : null
         };
     }
-
     init() {
         this.particles = [];
         if (!this.isEnabled) {
@@ -98,88 +71,57 @@ class ParticleSystem {
             if (this.animationId) cancelAnimationFrame(this.animationId);
             return;
         }
-
         const count = this.config.density;
-        for (let i = 0; i < count; i++) {
-            this.particles.push(this.createParticle());
-        }
-
-        if (!this.animationId) {
-            this.animate();
-        }
+        for (let i = 0; i < count; i++) this.particles.push(this.createParticle());
+        if (!this.animationId) this.animate();
     }
-
     animate() {
         if (!this.isEnabled) return;
-
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
         this.particles.forEach(p => {
             this.ctx.save();
             this.ctx.globalAlpha = p.opacity;
             this.ctx.fillStyle = p.color;
             this.ctx.strokeStyle = p.color;
-
             if (p.isStar) {
-                // Падающие звёзды с хвостом
                 p.trail.push({ x: p.x, y: p.y });
                 if (p.trail.length > 10) p.trail.shift();
-                
                 this.ctx.beginPath();
                 this.ctx.moveTo(p.trail[0].x, p.trail[0].y);
-                for (let i = 1; i < p.trail.length; i++) {
-                    this.ctx.lineTo(p.trail[i].x, p.trail[i].y);
-                }
+                for (let i = 1; i < p.trail.length; i++) this.ctx.lineTo(p.trail[i].x, p.trail[i].y);
                 this.ctx.lineWidth = p.size * 0.5;
                 this.ctx.stroke();
-
-                p.x += p.speedX * 3;
-                p.y += p.speedY * 3;
+                p.x += p.speedX * 3; p.y += p.speedY * 3;
             } else if (this.config.preset === 'rain' || this.config.preset === 'drizzle') {
-                // Дождь
                 this.ctx.beginPath();
                 this.ctx.moveTo(p.x, p.y);
                 this.ctx.lineTo(p.x + p.speedX, p.y + p.size * 2);
                 this.ctx.lineWidth = p.size * 0.3;
                 this.ctx.stroke();
-                
-                p.x += p.speedX;
-                p.y += p.speedY;
+                p.x += p.speedX; p.y += p.speedY;
             } else {
-                // Обычные частицы (лепестки, снег и т.д.)
                 this.ctx.translate(p.x, p.y);
                 this.ctx.rotate((p.rotation * Math.PI) / 180);
-                
-                if (this.config.preset === 'hearts') {
-                    this.drawHeart(0, 0, p.size);
-                } else if (this.config.preset === 'bubbles') {
-                    this.ctx.beginPath();
-                    this.ctx.arc(0, 0, p.size, 0, Math.PI * 2);
-                    this.ctx.fill();
+                if (this.config.preset === 'hearts') { this.drawHeart(0, 0, p.size); }
+                else if (this.config.preset === 'bubbles') {
+                    this.ctx.beginPath(); this.ctx.arc(0, 0, p.size, 0, Math.PI * 2); this.ctx.fill();
                 } else {
-                    // Эллипс для лепестков/листьев
                     this.ctx.beginPath();
                     this.ctx.ellipse(0, 0, p.size, p.size * 0.6, 0, 0, Math.PI * 2);
                     this.ctx.fill();
                 }
-
-                p.x += p.speedX + Math.sin(p.y * 0.01) * 0.5; // Лёгкое покачивание
+                p.x += p.speedX + Math.sin(p.y * 0.01) * 0.5;
                 p.y += p.speedY;
                 p.rotation += p.rotationSpeed;
             }
-
             this.ctx.restore();
-
-            // Сброс частицы при выходе за границы
             if (p.y > this.canvas.height + 20 || p.x > this.canvas.width + 20 || p.x < -20) {
                 Object.assign(p, this.createParticle());
-                p.y = -20; // Начинаем сверху
+                p.y = -20;
             }
         });
-
         this.animationId = requestAnimationFrame(() => this.animate());
     }
-
     drawHeart(x, y, size) {
         this.ctx.beginPath();
         const topCurveHeight = size * 0.3;
@@ -190,20 +132,13 @@ class ParticleSystem {
         this.ctx.bezierCurveTo(x + size / 2, y, x, y, x, y + topCurveHeight);
         this.ctx.fill();
     }
-
     toggle(enabled) {
         this.isEnabled = enabled;
-        if (enabled) {
-            this.init();
-        } else {
+        if (enabled) this.init();
+        else {
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            if (this.animationId) {
-                cancelAnimationFrame(this.animationId);
-                this.animationId = null;
-            }
+            if (this.animationId) { cancelAnimationFrame(this.animationId); this.animationId = null; }
         }
     }
 }
-
-// Экспортируем глобально для использования в app.js
 window.particleSystem = new ParticleSystem();
