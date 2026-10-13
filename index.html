@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ANIME · личный каталог просмотра</title>
+<title>ANIME — личный каталог просмотра</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2 C 15.5 6.5, 20 8.5, 20 13.5 C 20 18, 15.5 21, 12 22 C 8.5 21, 4 18, 4 13.5 C 4 8.5, 8.5 6.5, 12 2 Z' fill='%23ff7aa2'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -79,7 +79,7 @@
     <div id="empty-state" class="empty-state" style="display:none">
       <div class="empty-word">ANIME</div>
       <h2>Каталог пока пуст</h2>
-      <p>Войдите по токену — и наполняйте коллекцию.</p>
+      <p>Войдите по токену доступа — и наполняйте коллекцию.</p>
       <div class="row">
         <button class="btn btn-accent hidden" data-act="add">Добавить тайтл</button>
       </div>
@@ -111,10 +111,10 @@
         <button id="cal-mode-list">Список</button>
       </div>
       <div id="cal-nav-block">
-        <button class="cal-nav" id="cal-prev"><i class="fa-solid fa-chevron-left"></i></button>
-        <select class="cal-sel" id="cal-sel-m"></select>
-        <select class="cal-sel" id="cal-sel-y"></select>
-        <button class="cal-nav" id="cal-next"><i class="fa-solid fa-chevron-right"></i></button>
+        <button class="cal-nav" id="cal-prev" aria-label="Предыдущий месяц"><i class="fa-solid fa-chevron-left"></i></button>
+        <select class="cal-sel" id="cal-sel-m" aria-label="Месяц"></select>
+        <select class="cal-sel" id="cal-sel-y" aria-label="Год"></select>
+        <button class="cal-nav" id="cal-next" aria-label="Следующий месяц"><i class="fa-solid fa-chevron-right"></i></button>
         <button class="btn" id="cal-today" style="padding:8px 14px;font-size:13px">Сегодня</button>
       </div>
     </div>
@@ -144,7 +144,7 @@
 <aside id="drawer" aria-label="Настройки">
   <div class="drawer-head">
     <h2>Настройки</h2>
-    <button class="drawer-x" id="drawer-x"><i class="fa-solid fa-xmark"></i></button>
+    <button class="drawer-x" id="drawer-x" title="Закрыть панель"><i class="fa-solid fa-xmark"></i></button>
   </div>
   <p class="drawer-sub">Персональные — действуют только в вашем браузере</p>
 
