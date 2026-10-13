@@ -3,290 +3,486 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ANIME ARCHIVE</title>
+<title>ANIME · личный каталог просмотра</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2 C 15.5 6.5, 20 8.5, 20 13.5 C 20 18, 15.5 21, 12 22 C 8.5 21, 4 18, 4 13.5 C 4 8.5, 8.5 6.5, 12 2 Z' fill='%23ff7aa2'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="css/styles.css">
 </head>
-<body>
-<canvas id="bg-canvas"></canvas>
-<div class="noise"></div>
+<body class="ambient pill-glow tier-glow" data-embanim="full">
 
+<!-- фоновые слои -->
+<div id="user-bg" aria-hidden="true"></div>
+<div id="user-dim" aria-hidden="true"></div>
+<div class="bg-moon" aria-hidden="true"></div>
+<div class="bg-ambient" aria-hidden="true"><div class="amb a1"></div><div class="amb a2"></div></div>
+<div class="bg-branch br-tr" id="branch-tr" aria-hidden="true"></div>
+<div class="bg-branch br-bl" id="branch-bl" aria-hidden="true"></div>
+<canvas id="petals" aria-hidden="true"></canvas>
+
+<!-- шапка -->
 <header class="topbar">
-  <div class="logo">
-    <div class="logo-mark">⌬</div>
-    <div class="logo-text">
-      <div class="logo-title">ANIME<span class="accent">.</span>ARCHIVE</div>
-      <div class="logo-sub">personal collection · v3.0</div>
+  <a class="brand" href="#" onclick="return false">
+    <span class="brand-word" aria-label="ANIME"><i>A</i><i>N</i><i>I</i><i>M</i><i>E</i></span>
+    <span class="brand-sub">КАТАЛОГ ПРОСМОТРА</span>
+  </a>
+  <nav class="nav" id="nav">
+    <span class="nav-pill" id="nav-pill"></span>
+    <button class="nav-btn active" data-view="tier">Тир-лист</button>
+    <button class="nav-btn" data-view="timeline">Хронология</button>
+    <button class="nav-btn" data-view="calendar">Календарь</button>
+    <button class="nav-btn" data-view="stats">Статистика</button>
+    <button class="nav-btn" data-view="settings">Настройки</button>
+  </nav>
+  <div class="sync-wrap" id="sync-wrap">
+    <button class="btn" id="btn-login" title="Вход">
+      <i class="fa-brands fa-github ic"></i>
+      <span class="login-label">Вход</span>
+    </button>
+    <div class="sync-user hidden" id="sync-user" title="Синхронизация">
+      <img id="su-avatar" alt="" class="hidden">
+      <span class="gh-mini hidden" id="su-ghmini"><i class="fa-brands fa-github"></i></span>
+      <span class="sync-dot" id="su-dot"></span>
     </div>
-    <span id="owner-badge" class="hidden"><i class="fa-solid fa-bolt"></i> OWNER</span>
+    <div class="sync-menu hidden" id="sync-menu"></div>
   </div>
-
-  <div class="topbar-center">
-    <div class="search-wrap">
-      <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" id="global-search" placeholder="поиск тайтла или жанра...">
-      <button id="search-clear" class="hidden"><i class="fa-solid fa-xmark"></i></button>
-    </div>
-    <div class="filters">
-      <select id="filter-tier">
-        <option value="all">все тиры</option>
-        <option value="SSS">SSS</option>
-        <option value="S">S</option>
-        <option value="A">A</option>
-        <option value="B">B</option>
-        <option value="C">C</option>
-        <option value="D">D</option>
-        <option value="E">E</option>
-      </select>
-      <select id="filter-type">
-        <option value="all">все типы</option>
-        <option value="TV-сериал">TV</option>
-        <option value="Фильм">Фильм</option>
-        <option value="OVA">OVA</option>
-        <option value="ONA">ONA</option>
-      </select>
-      <button id="filter-fav" class="filter-btn" title="только избранные">
-        <i class="fa-solid fa-heart"></i>
-      </button>
-    </div>
-  </div>
-
-  <div class="topbar-actions">
-    <button id="btn-settings" class="icon-btn" title="настройки"><i class="fa-solid fa-sliders"></i></button>
-    <button id="btn-github" class="icon-btn hidden" title="GitHub"><i class="fa-brands fa-github"></i></button>
-    <button id="btn-add" class="btn-primary hidden"><i class="fa-solid fa-plus"></i><span>добавить</span></button>
-    <button id="btn-logout" class="icon-btn hidden" title="выйти"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
-  </div>
+  <button class="btn btn-accent hidden" id="btn-add">
+    <i class="fa-solid fa-plus ic"></i>
+    <span class="add-label">Добавить тайтл</span>
+  </button>
 </header>
 
-<nav class="nav-tabs">
-  <button class="nav-tab active" data-tab="archive">
-    <span class="tab-num">01</span>
-    <span class="tab-label">архив</span>
-  </button>
-  <button class="nav-tab" data-tab="stats">
-    <span class="tab-num">02</span>
-    <span class="tab-label">статистика</span>
-  </button>
-  <button class="nav-tab" data-tab="calendar">
-    <span class="tab-num">03</span>
-    <span class="tab-label">календарь</span>
-  </button>
-  <button class="nav-tab" data-tab="history">
-    <span class="tab-num">04</span>
-    <span class="tab-label">история</span>
-  </button>
-</nav>
-
-<main class="main">
-  <section id="tab-archive" class="tab active">
-    <div id="archive-stats" class="stats-row"></div>
-
-    <div class="tier-strip" id="tier-strip"></div>
-
-    <div class="section-head">
-      <h2 class="section-title">
-        <span class="section-num">01</span>
-        <span>последние добавленные</span>
-      </h2>
-      <div class="section-line"></div>
-    </div>
-    <div class="recent-scroll" id="recent-list"></div>
-
-    <div id="tiers-container"></div>
-  </section>
-
-  <section id="tab-stats" class="tab">
-    <div class="section-head">
-      <h2 class="section-title">
-        <span class="section-num">02</span>
-        <span>аналитика коллекции</span>
-      </h2>
-      <div class="section-line"></div>
-    </div>
-    <div class="stats-big" id="stats-big"></div>
-    <div class="charts-grid">
-      <div class="chart-card"><h3>топ жанров</h3><canvas id="chart-genres"></canvas></div>
-      <div class="chart-card"><h3>распределение тиров</h3><canvas id="chart-tiers"></canvas></div>
-      <div class="chart-card full"><h3>динамика по месяцам</h3><canvas id="chart-monthly"></canvas></div>
-    </div>
-  </section>
-
-  <section id="tab-calendar" class="tab">
-    <div class="section-head">
-      <h2 class="section-title">
-        <span class="section-num">03</span>
-        <span>календарь просмотров</span>
-      </h2>
-      <div class="section-line"></div>
-    </div>
-    <div class="cal-wrap">
-      <div class="cal-head">
-        <button id="cal-prev"><i class="fa-solid fa-chevron-left"></i></button>
-        <h3 id="cal-month-year"></h3>
-        <button id="cal-next"><i class="fa-solid fa-chevron-right"></i></button>
-        <div class="cal-toggle">
-          <button class="active" data-view="grid">сетка</button>
-          <button data-view="list">список</button>
+<main>
+  <!-- ТИР-ЛИСТ -->
+  <section class="view" id="view-tier">
+    <div class="hero" id="hero">
+      <div class="hero-main">
+        <h1 class="hero-title">Коллекция</h1>
+        <p class="hero-sub">личный мир аниме — от SSS до E, сезоны, фильмы, OVA и история просмотра</p>
+        <div class="hero-actions">
+          <button class="btn btn-accent hidden" data-act="add">
+            <i class="fa-solid fa-plus ic"></i>Добавить тайтл
+          </button>
+          <button class="btn" id="btn-random">
+            <i class="fa-solid fa-dice ic"></i>Случайный тайтл
+          </button>
         </div>
       </div>
-      <div id="calendar-grid" class="cal-grid"></div>
-      <div id="calendar-list" class="cal-list hidden"></div>
+      <div class="hero-stats" id="hero-stats"></div>
+    </div>
+    <div class="tier-total" id="tier-total"></div>
+    <div id="recent-wrap"></div>
+    <div id="filters-wrap"></div>
+    <div id="tierlist"></div>
+    <div id="empty-state" class="empty-state" style="display:none">
+      <div class="empty-word">ANIME</div>
+      <h2>Каталог пока пуст</h2>
+      <p>Войдите по токену — и наполняйте коллекцию.</p>
+      <div class="row">
+        <button class="btn btn-accent hidden" data-act="add">Добавить тайтл</button>
+      </div>
     </div>
   </section>
 
-  <section id="tab-history" class="tab">
-    <div class="section-head">
-      <h2 class="section-title">
-        <span class="section-num">04</span>
-        <span>история просмотров</span>
-      </h2>
-      <div class="section-line"></div>
+  <!-- ХРОНОЛОГИЯ -->
+  <section class="view hidden" id="view-timeline">
+    <div class="page-head">
+      <div>
+        <h1 class="page-title">Хронология</h1>
+        <p class="page-sub">Общий список просмотра — от свежего к старому</p>
+      </div>
     </div>
-    <div class="history-head">
-      <input type="text" id="history-search" placeholder="поиск...">
-      <select id="history-year"><option value="all">все годы</option></select>
+    <div id="timeline"></div>
+  </section>
+
+  <!-- КАЛЕНДАРЬ -->
+  <section class="view hidden" id="view-calendar">
+    <div class="page-head">
+      <div>
+        <h1 class="page-title">Календарь просмотра</h1>
+        <p class="page-sub">Дни, в которые вы закончили сезоны, фильмы, OVA и спешлы</p>
+      </div>
     </div>
-    <div id="history-list"></div>
+    <div class="cal-head">
+      <div class="cal-mode">
+        <button id="cal-mode-grid" class="on">Сетка</button>
+        <button id="cal-mode-list">Список</button>
+      </div>
+      <div id="cal-nav-block">
+        <button class="cal-nav" id="cal-prev"><i class="fa-solid fa-chevron-left"></i></button>
+        <select class="cal-sel" id="cal-sel-m"></select>
+        <select class="cal-sel" id="cal-sel-y"></select>
+        <button class="cal-nav" id="cal-next"><i class="fa-solid fa-chevron-right"></i></button>
+        <button class="btn" id="cal-today" style="padding:8px 14px;font-size:13px">Сегодня</button>
+      </div>
+    </div>
+    <div id="cal-grid-wrap">
+      <div class="cal-grid" id="cal-grid"></div>
+      <p class="cal-note">Записи с неполной датой видны в режиме «Список» и во «Хронологии».</p>
+    </div>
+    <div id="cal-list-wrap" class="hidden">
+      <div class="cal-years" id="cal-years"></div>
+      <div id="cal-list"></div>
+    </div>
+  </section>
+
+  <!-- СТАТИСТИКА -->
+  <section class="view hidden" id="view-stats">
+    <div class="page-head">
+      <div>
+        <h1 class="page-title">Статистика и аналитика</h1>
+        <p class="page-sub">Серии, часы, активность, рекорды, тиры, жанры и годы</p>
+      </div>
+    </div>
+    <div id="stats"></div>
   </section>
 </main>
 
-<!-- МОДАЛКА: настройки -->
-<div class="modal" id="modal-settings">
-  <div class="modal-inner">
-    <button class="modal-close" data-close><i class="fa-solid fa-xmark"></i></button>
-    <h2 class="modal-title"><i class="fa-solid fa-sliders"></i> настройки</h2>
-    <div class="modal-tabs">
-      <button class="modal-tab active" data-mtab="appearance">внешний вид</button>
-      <button class="modal-tab" data-mtab="particles">анимация</button>
-      <button class="modal-tab" data-mtab="data">данные</button>
-    </div>
-    <div class="modal-body" id="mtab-appearance">
-      <div class="setting-row"><label>тема</label><select id="set-theme"><option value="dark">тёмная</option><option value="light">светлая</option></select></div>
-      <div class="setting-row"><label>акцент</label><input type="color" id="set-accent" value="#ff2d78"></div>
-      <div class="setting-row"><label>колонок</label><input type="range" id="set-columns" min="4" max="12" value="8"><span id="set-columns-val">8</span></div>
-      <div class="setting-row"><label>длит. серии (мин)</label><input type="number" id="set-ep-time" value="24"></div>
-      <div class="setting-row"><label>длит. фильма (мин)</label><input type="number" id="set-movie-time" value="110"></div>
-    </div>
-    <div class="modal-body hidden" id="mtab-particles">
-      <div class="setting-row"><label>пресет</label><select id="set-preset">
-        <option value="sakura">сакура</option><option value="snow">снег</option><option value="rain">дождь</option>
-        <option value="autumn">осень</option><option value="stars">звёзды</option><option value="fireflies">светлячки</option>
-        <option value="hearts">сердца</option><option value="bubbles">пузыри</option><option value="confetti">конфетти</option>
-        <option value="petals">лепестки</option>
-      </select></div>
-      <div class="setting-row"><label>плотность</label><input type="range" id="set-density" min="10" max="200" value="60"></div>
-      <div class="setting-row"><label>скорость</label><input type="range" id="set-speed" min="1" max="10" value="4"></div>
-      <div class="setting-row"><label>размер</label><input type="range" id="set-size" min="2" max="20" value="8"></div>
-      <div class="setting-row"><label class="switch"><input type="checkbox" id="set-anim-on" checked><span>анимации вкл</span></label></div>
-    </div>
-    <div class="modal-body hidden" id="mtab-data">
-      <div class="setting-row">
-        <button id="btn-export" class="btn-ghost"><i class="fa-solid fa-download"></i> экспорт JSON</button>
-        <button id="btn-import" class="btn-ghost"><i class="fa-solid fa-upload"></i> импорт JSON</button>
-        <input type="file" id="file-import" accept=".json" class="hidden">
-      </div>
-      <div class="setting-row" id="save-status"><span class="status-dot"></span><span>данные загружены</span></div>
+<!-- ПАНЕЛЬ НАСТРОЕК -->
+<aside id="drawer" aria-label="Настройки">
+  <div class="drawer-head">
+    <h2>Настройки</h2>
+    <button class="drawer-x" id="drawer-x"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <p class="drawer-sub">Персональные — действуют только в вашем браузере</p>
+
+  <div class="set-sec">
+    <h3>Каталог</h3>
+    <div class="sw-row">
+      <div><div class="sw-name">Вид каталога</div><div class="sw-desc">Постеры, чипы или список</div></div>
+      <select class="sel-set" id="sel-catview">
+        <option value="posters">Постеры</option>
+        <option value="chips">Чипы</option>
+        <option value="list">Список</option>
+      </select>
     </div>
   </div>
-</div>
 
-<!-- МОДАЛКА: детали тайтла -->
-<div class="modal" id="modal-detail">
-  <div class="modal-inner large">
-    <button class="modal-close" data-close><i class="fa-solid fa-xmark"></i></button>
-    <div class="detail-grid">
-      <img id="detail-cover" class="detail-cover" src="" alt="">
-      <div class="detail-info">
-        <div class="detail-tier" id="detail-tier"></div>
-        <h2 id="detail-title"></h2>
-        <h3 id="detail-original"></h3>
-        <div class="detail-meta">
-          <span id="detail-type" class="tag"></span>
-          <span id="detail-fav" class="tag hidden"><i class="fa-solid fa-heart"></i> любимое</span>
-        </div>
-        <div id="detail-genres" class="genres"></div>
-        <div class="detail-actions owner-only hidden">
-          <button id="btn-edit" class="btn-primary"><i class="fa-solid fa-pen"></i> редактировать</button>
-          <button id="btn-delete" class="btn-danger"><i class="fa-solid fa-trash"></i> удалить</button>
-        </div>
-      </div>
+  <div class="set-sec">
+    <h3>Эмблемы тиров</h3>
+    <div class="sw-row">
+      <div><div class="sw-name">Анимация эмблем</div><div class="sw-desc">У каждого тира своя: звезда, лотос, алмаз…</div></div>
+      <select class="sel-set" id="sel-embanim">
+        <option value="full">Полная</option>
+        <option value="float">Только парение</option>
+        <option value="off">Выключена</option>
+      </select>
     </div>
-    <div class="detail-entries">
-      <h4>история просмотра</h4>
-      <table class="entries-table">
-        <thead><tr><th>часть</th><th>серий</th><th>длит.</th><th>дата</th><th>время</th></tr></thead>
-        <tbody id="detail-entries"></tbody>
-        <tfoot><tr><td colspan="4" class="right">итого:</td><td><strong id="detail-total">0</strong></td></tr></tfoot>
-      </table>
+    <div class="sw-row">
+      <div><div class="sw-name">Скорость анимации</div></div>
+      <div class="range-in"><input type="range" id="s-embanimspd" min="2" max="14" step="1"><span class="rng-val" id="v-embanimspd"></span></div>
+    </div>
+    <div class="sw-row">
+      <div><div class="sw-name">Свечение тира</div></div>
+      <label class="switch"><input type="checkbox" id="s-tierglow"><i></i></label>
     </div>
   </div>
-</div>
 
-<!-- МОДАЛКА: форма -->
-<div class="modal" id="modal-form">
-  <div class="modal-inner large scroll">
-    <button class="modal-close" data-close><i class="fa-solid fa-xmark"></i></button>
-    <h2 class="modal-title" id="form-title">новый тайтл</h2>
-    <form id="title-form">
-      <input type="hidden" id="form-id">
-      <div class="form-grid">
-        <div class="field"><label>название *</label><input type="text" id="f-name" required></div>
-        <div class="field"><label>оригинальное</label><input type="text" id="f-original"></div>
-        <div class="field"><label>тип *</label><select id="f-type">
-          <option>TV-сериал</option><option>Фильм</option><option>OVA</option><option>ONA</option><option>Спешл</option>
-        </select></div>
-        <div class="field"><label>тир *</label><select id="f-tier">
-          <option>SSS</option><option>S</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option>
-        </select></div>
-        <div class="field full"><label>URL обложки</label><input type="url" id="f-cover" placeholder="https://..."></div>
-        <div class="field full">
-          <label>жанры</label>
-          <div class="multi-select">
-            <input type="text" id="f-genre-search" placeholder="поиск жанра...">
-            <div id="f-genre-drop" class="multi-drop hidden"></div>
-            <div id="f-genre-selected" class="selected-tags"></div>
+  <div class="set-sec">
+    <h3>Частицы и погода</h3>
+    <div class="sw-row">
+      <div><div class="sw-name">Частицы</div></div>
+      <label class="switch"><input type="checkbox" id="s-particles"><i></i></label>
+    </div>
+    <div class="sw-row">
+      <div><div class="sw-name">Стиль частиц</div></div>
+      <select class="sel-set" id="sel-pstyle"></select>
+    </div>
+    <div class="sw-row">
+      <div><div class="sw-name">Поверх контента</div></div>
+      <label class="switch"><input type="checkbox" id="s-petsfront"><i></i></label>
+    </div>
+    <div class="sw-row">
+      <div><div class="sw-name">Плотность</div></div>
+      <div class="range-in"><input type="range" id="s-density" min="5" max="100" step="5"><span class="rng-val" id="v-density"></span></div>
+    </div>
+    <div class="sw-row">
+      <div><div class="sw-name">Скорость падения</div></div>
+      <div class="range-in"><input type="range" id="s-fall" min="20" max="250" step="10"><span class="rng-val" id="v-fall"></span></div>
+    </div>
+    <div class="sw-row">
+      <div><div class="sw-name">Размер частиц</div></div>
+      <div class="range-in"><input type="range" id="s-psize" min="50" max="200" step="10"><span class="rng-val" id="v-psize"></span></div>
+    </div>
+    <div class="sw-row">
+      <div><div class="sw-name">Прозрачность</div></div>
+      <div class="range-in"><input type="range" id="s-palpha" min="20" max="100" step="5"><span class="rng-val" id="v-palpha"></span></div>
+    </div>
+    <div class="sw-row">
+      <div><div class="sw-name">Вращение в полёте</div></div>
+      <label class="switch"><input type="checkbox" id="s-pspin"><i></i></label>
+    </div>
+    <div class="sw-row">
+      <div><div class="sw-name">Мерцание</div></div>
+      <label class="switch"><input type="checkbox" id="s-twinkle"><i></i></label>
+    </div>
+    <div class="sw-row">
+      <div><div class="sw-name">Сила ветра</div></div>
+      <div class="range-in"><input type="range" id="s-wind" min="0" max="200" step="10"><span class="rng-val" id="v-wind"></span></div>
+    </div>
+  </div>
+
+  <div class="set-sec">
+    <h3>Деревья на фоне</h3>
+    <div class="sw-row">
+      <div><div class="sw-name">Деревья</div></div>
+      <label class="switch"><input type="checkbox" id="s-branches"><i></i></label>
+    </div>
+    <div class="sw-row">
+      <div><div class="sw-name">Порода дерева</div></div>
+      <select class="sel-set" id="sel-bstyle"></select>
+    </div>
+    <div class="sw-row">
+      <div><div class="sw-name">Покачивание</div></div>
+      <label class="switch"><input type="checkbox" id="s-sway"><i></i></label>
+    </div>
+    <div class="sw-row">
+      <div><div class="sw-name">Параллакс от курсора</div></div>
+      <div class="range-in"><input type="range" id="s-parallax" min="0" max="100" step="10"><span class="rng-val" id="v-parallax"></span></div>
+    </div>
+    <div class="sw-row">
+      <div><div class="sw-name">Прозрачность деревьев</div></div>
+      <div class="range-in"><input type="range" id="s-balpha" min="20" max="100" step="5"><span class="rng-val" id="v-balpha"></span></div>
+    </div>
+  </div>
+
+  <div class="set-sec">
+    <h3>Фон и глубина</h3>
+    <div class="sw-row">
+      <div><div class="sw-name">Фоновое свечение</div></div>
+      <label class="switch"><input type="checkbox" id="s-ambient"><i></i></label>
+    </div>
+    <div class="sw-row">
+      <div><div class="sw-name">Луна</div></div>
+      <label class="switch"><input type="checkbox" id="s-moon"><i></i></label>
+    </div>
+    <div class="sw-row">
+      <div><div class="sw-name">Своя картина</div></div>
+      <div class="bg-actions">
+        <label for="bg-file">Загрузить…</label>
+        <input type="file" id="bg-file" accept="image/*" hidden>
+        <button id="bg-remove">Убрать</button>
+      </div>
+    </div>
+    <div class="sw-row">
+      <div><div class="sw-name">Затемнение картины</div></div>
+      <div class="range-in"><input type="range" id="s-bgdim" min="0" max="90" step="5"><span class="rng-val" id="v-bgdim"></span></div>
+    </div>
+  </div>
+
+  <div class="set-sec">
+    <h3>Анимации интерфейса</h3>
+    <div class="sw-row">
+      <div><div class="sw-name">Анимации интерфейса</div></div>
+      <label class="switch"><input type="checkbox" id="s-anim"><i></i></label>
+    </div>
+    <div class="sw-row">
+      <div><div class="sw-name">Темп анимаций</div></div>
+      <select class="sel-set" id="sel-tempo">
+        <option value="calm">Спокойный</option>
+        <option value="normal">Обычный</option>
+        <option value="lively">Живой</option>
+        <option value="instant">Мгновенный</option>
+      </select>
+    </div>
+    <div class="sw-row"><div><div class="sw-name">Каскад строк тир-листа</div></div><label class="switch"><input type="checkbox" id="s-rowanim"><i></i></label></div>
+    <div class="sw-row"><div><div class="sw-name">Каскад карточек</div></div><label class="switch"><input type="checkbox" id="s-cascade"><i></i></label></div>
+    <div class="sw-row"><div><div class="sw-name">Подсветка строк тиров</div></div><label class="switch"><input type="checkbox" id="s-tierbg"><i></i></label></div>
+    <div class="sw-row"><div><div class="sw-name">Появление модалок</div></div><label class="switch"><input type="checkbox" id="s-modalpop"><i></i></label></div>
+    <div class="sw-row"><div><div class="sw-name">Анимация тостов</div></div><label class="switch"><input type="checkbox" id="s-toastanim"><i></i></label></div>
+    <div class="sw-row"><div><div class="sw-name">Свечение активной вкладки</div></div><label class="switch"><input type="checkbox" id="s-pillglow"><i></i></label></div>
+  </div>
+
+  <div class="set-sec">
+    <h3>Карточки</h3>
+    <div class="sw-row"><div><div class="sw-name">Объёмный наклон</div></div><label class="switch"><input type="checkbox" id="s-tilt"><i></i></label></div>
+    <div class="sw-row"><div><div class="sw-name">Сила наклона</div></div><div class="range-in"><input type="range" id="s-tiltpow" min="2" max="20" step="1"><span class="rng-val" id="v-tiltpow"></span></div></div>
+    <div class="sw-row"><div><div class="sw-name">Подъём при наведении</div></div><label class="switch"><input type="checkbox" id="s-lift"><i></i></label></div>
+    <div class="sw-row"><div><div class="sw-name">Подсветка цветом тира</div></div><label class="switch"><input type="checkbox" id="s-glow"><i></i></label></div>
+    <div class="sw-row"><div><div class="sw-name">Блеск на обложках</div></div><label class="switch"><input type="checkbox" id="s-shine"><i></i></label></div>
+  </div>
+
+  <div class="set-sec">
+    <h3>Счётчики и списки</h3>
+    <div class="sw-row"><div><div class="sw-name">Анимация счётчиков</div></div><label class="switch"><input type="checkbox" id="s-counters"><i></i></label></div>
+    <div class="sw-row"><div><div class="sw-name">Скорость счётчиков</div></div><div class="range-in"><input type="range" id="s-cntspd" min="200" max="2000" step="100"><span class="rng-val" id="v-cntspd"></span></div></div>
+    <div class="sw-row"><div><div class="sw-name">Лента недавних</div></div><label class="switch"><input type="checkbox" id="s-recent"><i></i></label></div>
+  </div>
+
+  <div class="set-sec">
+    <h3>Тема</h3>
+    <div class="sw-row"><div><div class="sw-name">Светлая тема</div></div><label class="switch"><input type="checkbox" id="s-light"><i></i></label></div>
+    <div class="sw-row">
+      <div><div class="sw-name">Акцентный цвет</div></div>
+      <div class="acc-pick" id="acc-pick">
+        <button data-acc="sakura" style="--c:#ff7aa2"></button>
+        <button data-acc="flame" style="--c:#ff6b4a"></button>
+        <button data-acc="violet" style="--c:#b18cff"></button>
+        <button data-acc="mint" style="--c:#6fd6b1"></button>
+      </div>
+    </div>
+    <div class="sw-row"><div><div class="sw-name">Прозрачность панелей</div></div><div class="range-in"><input type="range" id="s-panelop" min="50" max="100" step="2"><span class="rng-val" id="v-panelop"></span></div></div>
+    <div class="sw-row"><div><div class="sw-name">Скругление карточек</div></div><div class="range-in"><input type="range" id="s-radius" min="0" max="20" step="1"><span class="rng-val" id="v-radius"></span></div></div>
+  </div>
+
+  <div class="set-sec">
+    <h3>Расчёт времени</h3>
+    <div class="num-row"><div><div class="sw-name">Длительность серии</div></div><div class="num-in"><input type="number" id="s-epmin" min="1" max="600"><span>мин</span></div></div>
+    <div class="num-row"><div><div class="sw-name">Длительность фильма</div></div><div class="num-in"><input type="number" id="s-filmmin" min="1" max="600"><span>мин</span></div></div>
+  </div>
+
+  <div class="set-sec">
+    <h3>Данные</h3>
+    <div class="set-actions">
+      <button class="btn" id="btn-export"><i class="fa-solid fa-download ic"></i>Экспорт JSON</button>
+      <button class="btn" id="btn-import"><i class="fa-solid fa-upload ic"></i>Импорт JSON</button>
+      <input type="file" id="file-import" accept=".json,application/json" hidden>
+      <button class="btn btn-accent" id="btn-reset-set"><i class="fa-solid fa-rotate-left ic"></i>Сбросить настройки</button>
+    </div>
+  </div>
+</aside>
+
+<footer>
+  <span>ANIME · личный каталог просмотра</span>
+  <span>/ — поиск · ? — подсказка · Esc — закрыть</span>
+</footer>
+
+<!-- МОДАЛКИ -->
+<div class="overlay hidden" id="ov-title"><div class="modal modal-title" id="m-title"></div></div>
+<div class="overlay hidden" id="ov-form">
+  <div class="modal modal-form">
+    <button class="modal-x" data-close><i class="fa-solid fa-xmark"></i></button>
+    <h2 id="form-title">Новый тайтл</h2>
+    <form id="title-form" novalidate autocomplete="off">
+      <div class="form-top">
+        <div class="f-cover">
+          <img id="f-preview" alt="Обложка">
+          <div class="cover-actions">
+            <label for="f-cover-file">Загрузить файл…</label>
+            <input type="file" id="f-cover-file" accept="image/*" hidden>
+            <button type="button" id="f-cover-clear">Сбросить обложку</button>
           </div>
         </div>
-        <div class="field full"><label class="switch"><input type="checkbox" id="f-fav"><span>любимый тайтл</span></label></div>
+        <div class="f-main">
+          <div class="field" id="w-name">
+            <label>Название</label>
+            <input id="f-name" placeholder="Полное название тайтла" autocomplete="off">
+            <div class="err-t">Название обязательно</div>
+          </div>
+          <div class="field">
+            <label>Ссылка на обложку</label>
+            <input id="f-cover-url" placeholder="https://… (можно оставить пустым)" autocomplete="off">
+          </div>
+          <div class="field">
+            <label>Тир</label>
+            <div class="seg" id="f-tier"></div>
+          </div>
+          <div class="field">
+            <label>Тип</label>
+            <div class="seg seg-types" id="f-type"></div>
+          </div>
+        </div>
       </div>
-      <div class="form-section">
-        <h4>составные части</h4>
-        <div id="form-entries"></div>
-        <button type="button" id="btn-add-entry" class="btn-ghost small"><i class="fa-solid fa-plus"></i> добавить часть</button>
+      <div class="field" style="margin-bottom:14px">
+        <label>Жанры</label>
+        <div class="gp-search" style="margin-bottom:10px">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input id="f-genre-search" placeholder="Найти жанр…" autocomplete="off">
+        </div>
+        <div class="f-genres-selected" id="f-genres-selected"></div>
+        <div class="gchips" id="f-genres"></div>
+        <div class="genre-add">
+          <input id="f-genre-new" placeholder="Свой жанр…" autocomplete="off">
+          <button type="button" id="f-genre-add">Добавить</button>
+        </div>
       </div>
-      <div class="form-actions">
-        <button type="button" class="btn-ghost" data-close>отмена</button>
-        <button type="submit" class="btn-primary">сохранить</button>
+      <div class="field" id="units-block" style="margin-bottom:14px">
+        <label id="units-label">Структура просмотра</label>
+        <div class="units-box" id="units-box">
+          <div class="units-head"><span class="units-sum" id="units-sum"></span></div>
+          <div class="units-add" id="units-add"></div>
+          <div class="units-list" id="units-list"></div>
+          <div class="units-err">Проверьте даты — формат ДД.ММ.ГГГГ, ММ.ГГГГ или ГГГГ</div>
+          <div class="units-foot">Название — свободный текст · у фильмов в поле количества — длительность в минутах</div>
+        </div>
+      </div>
+      <div class="field hidden" id="w-episodes">
+        <label id="l-episodes">Эпизоды</label>
+        <input type="number" id="f-episodes" min="0" max="5000" placeholder="0">
+      </div>
+      <div class="field" id="w-minutes2">
+        <label id="l-minutes">Длительность эпизода</label>
+        <input type="number" id="f-minutes" min="1" max="600" placeholder="по умолчанию">
+      </div>
+      <div class="f-estimate" id="f-estimate"></div>
+      <div class="field hidden" id="w-date">
+        <label>Дата просмотра</label>
+        <input id="f-date" placeholder="12.08.2023 · 08.2023 · 2023" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Заметка</label>
+        <textarea id="f-notes" placeholder="Впечатления, цитаты…" autocomplete="off"></textarea>
+      </div>
+      <div class="form-foot">
+        <button type="button" class="btn" data-close>Отмена</button>
+        <button type="submit" class="btn btn-accent" id="f-submit">Сохранить</button>
       </div>
     </form>
   </div>
 </div>
-
-<!-- МОДАЛКА: GitHub -->
-<div class="modal" id="modal-github">
-  <div class="modal-inner">
-    <button class="modal-close" data-close><i class="fa-solid fa-xmark"></i></button>
-    <h2 class="modal-title">GitHub синхронизация</h2>
-    <p class="modal-hint">Personal Access Token с правом <code>repo</code></p>
-    <div class="field"><label>токен</label><input type="password" id="gh-token" placeholder="ghp_..."></div>
-    <div class="field"><label>репозиторий</label><input type="text" id="gh-repo" placeholder="логин/repo"></div>
-    <div class="form-actions">
-      <button class="btn-ghost" data-close>отмена</button>
-      <button id="btn-gh-save" class="btn-primary">сохранить</button>
+<div class="overlay hidden" id="ov-day"><div class="modal modal-day" id="m-day"></div></div>
+<div class="overlay hidden" id="ov-confirm"><div class="modal modal-confirm" id="m-confirm"></div></div>
+<div class="overlay hidden" id="ov-login">
+  <div class="modal modal-login">
+    <button class="modal-x" data-close><i class="fa-solid fa-xmark"></i></button>
+    <h2>Вход</h2>
+    <div class="login-tabs">
+      <button data-tab="rw" class="on">Владелец · чтение и запись</button>
+      <button data-tab="ro">Чтение</button>
+    </div>
+    <div id="lk-rw">
+      <div class="field">
+        <label>Токен доступа</label>
+        <input type="password" id="lk-token" placeholder="github_pat_… или ghp_…" autocomplete="new-password">
+      </div>
+      <button type="button" class="btn" id="lk-check">Проверить токен</button>
+      <div class="lk-user hidden" id="lk-user"></div>
+      <div class="field hidden" id="lk-repo-w">
+        <label>Репозиторий</label>
+        <select id="lk-repo"></select>
+      </div>
+      <div class="field hidden" id="lk-branch-w">
+        <label>Ветка</label>
+        <select id="lk-branch"></select>
+      </div>
+      <div class="lk-status" id="lk-status"></div>
+      <div class="login-foot">
+        <button type="button" class="btn" data-close>Отмена</button>
+        <button type="button" class="btn btn-accent" id="lk-connect" disabled>Подключить</button>
+      </div>
+    </div>
+    <div id="lk-ro" class="hidden">
+      <div class="lk-hint">Режим чтения: укажите публичный репозиторий владельца — каталог подтянется без токена.</div>
+      <div class="lk-row">
+        <div class="field"><label>Владелец</label><input id="ro-owner" placeholder="github-логин"></div>
+        <div class="field"><label>Репозиторий</label><input id="ro-repo" placeholder="имя репозитория"></div>
+      </div>
+      <div class="field"><label>Ветка</label><input id="ro-branch" value="main"></div>
+      <div class="lk-status" id="ro-status"></div>
+      <div class="login-foot">
+        <button type="button" class="btn" data-close>Отмена</button>
+        <button type="button" class="btn btn-accent" id="ro-connect">Подключиться</button>
+      </div>
     </div>
   </div>
 </div>
 
-<div id="toasts"></div>
-<datalist id="genre-list"></datalist>
+<div class="toasts" id="toasts"></div>
+<button id="to-top" title="Наверх"><i class="fa-solid fa-arrow-up"></i></button>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 <script src="js/particles.js"></script>
-<script src="js/stats.js"></script>
 <script src="js/app.js"></script>
 <script src="js/admin.js"></script>
 </body>
