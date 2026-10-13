@@ -75,7 +75,7 @@ document.getElementById('file-import').addEventListener('change', (e) => {
             const importedData = JSON.parse(event.target.result);
             if (Array.isArray(importedData)) {
                 state.titles = importedData;
-                saveData(); renderArchive(); renderRecent();
+                saveData(); renderArchive(); renderRecent(); renderHistory();
                 if (typeof updateStats === 'function') updateStats();
                 showToast('success', 'Данные успешно импортированы');
             } else throw new Error('Неверный формат JSON');
