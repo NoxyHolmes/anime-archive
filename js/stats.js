@@ -5,7 +5,6 @@ function updateStats() {
     const genreCounts = {};
     const tierCounts = { 'SSS': 0, 'S': 0, 'A': 0, 'B': 0, 'C': 0, 'D': 0, 'E': 0 };
     const monthlyCounts = {};
-
     state.titles.forEach(title => {
         tierCounts[title.tier] = (tierCounts[title.tier] || 0) + 1;
         title.genres.forEach(g => { genreCounts[g] = (genreCounts[g] || 0) + 1; });
@@ -30,7 +29,6 @@ function updateStats() {
             }
         });
     });
-
     document.getElementById('stat-total-titles').textContent = totalTitles;
     document.getElementById('stat-total-episodes').textContent = totalEpisodes;
     document.getElementById('stat-total-time').textContent = formatTime(totalTimeMinutes);
@@ -56,7 +54,6 @@ function renderCharts(genres, tiers, monthly) {
             y: { ticks: { color: textColor, font: { size: 10 } }, grid: { color: gridColor } }
         }
     };
-
     const sortedGenres = Object.entries(genres).sort((a, b) => b[1] - a[1]).slice(0, 8);
     const ctxGenres = document.getElementById('chart-genres').getContext('2d');
     if (chartGenres) chartGenres.destroy();
@@ -68,7 +65,6 @@ function renderCharts(genres, tiers, monthly) {
         },
         options: { ...commonOptions, indexAxis: 'y', plugins: { legend: { display: false } } }
     });
-
     const ctxTiers = document.getElementById('chart-tiers').getContext('2d');
     if (chartTiers) chartTiers.destroy();
     chartTiers = new Chart(ctxTiers, {
@@ -82,7 +78,6 @@ function renderCharts(genres, tiers, monthly) {
             plugins: { legend: { position: 'right', labels: { color: textColor, font: { size: 10 }, padding: 8 } } }
         }
     });
-
     const sortedMonths = Object.keys(monthly).sort().slice(-12);
     const ctxMonthly = document.getElementById('chart-monthly').getContext('2d');
     if (chartMonthly) chartMonthly.destroy();
@@ -99,7 +94,6 @@ function renderCharts(genres, tiers, monthly) {
     });
 }
 
-// КАЛЕНДАРЬ
 let currentCalDate = new Date();
 document.getElementById('cal-prev').addEventListener('click', () => { currentCalDate.setMonth(currentCalDate.getMonth() - 1); renderCalendar(); });
 document.getElementById('cal-next').addEventListener('click', () => { currentCalDate.setMonth(currentCalDate.getMonth() + 1); renderCalendar(); });
