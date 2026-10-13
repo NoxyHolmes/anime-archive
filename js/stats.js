@@ -29,10 +29,6 @@ function updateStats() {
             }
         });
     });
-    document.getElementById('stat-total-titles').textContent = totalTitles;
-    document.getElementById('stat-total-episodes').textContent = totalEpisodes;
-    document.getElementById('stat-total-time').textContent = formatTime(totalTimeMinutes);
-    document.getElementById('stat-movies-time').textContent = formatTime(movieTimeMinutes);
     renderCharts(genreCounts, tierCounts, monthlyCounts);
 }
 
@@ -55,9 +51,10 @@ function renderCharts(genres, tiers, monthly) {
         }
     };
     const sortedGenres = Object.entries(genres).sort((a, b) => b[1] - a[1]).slice(0, 8);
-    const ctxGenres = document.getElementById('chart-genres').getContext('2d');
+    const ctxGenres = document.getElementById('chart-genres');
+    if (!ctxGenres) return;
     if (chartGenres) chartGenres.destroy();
-    chartGenres = new Chart(ctxGenres, {
+    chartGenres = new Chart(ctxGenres.getContext('2d'), {
         type: 'bar',
         data: {
             labels: sortedGenres.map(g => g[0].length > 15 ? g[0].substring(0, 15) + '...' : g[0]),
@@ -65,9 +62,10 @@ function renderCharts(genres, tiers, monthly) {
         },
         options: { ...commonOptions, indexAxis: 'y', plugins: { legend: { display: false } } }
     });
-    const ctxTiers = document.getElementById('chart-tiers').getContext('2d');
+    const ctxTiers = document.getElementById('chart-tiers');
+    if (!ctxTiers) return;
     if (chartTiers) chartTiers.destroy();
-    chartTiers = new Chart(ctxTiers, {
+    chartTiers = new Chart(ctxTiers.getContext('2d'), {
         type: 'doughnut',
         data: {
             labels: Object.keys(tiers),
@@ -79,9 +77,10 @@ function renderCharts(genres, tiers, monthly) {
         }
     });
     const sortedMonths = Object.keys(monthly).sort().slice(-12);
-    const ctxMonthly = document.getElementById('chart-monthly').getContext('2d');
+    const ctxMonthly = document.getElementById('chart-monthly');
+    if (!ctxMonthly) return;
     if (chartMonthly) chartMonthly.destroy();
-    chartMonthly = new Chart(ctxMonthly, {
+    chartMonthly = new Chart(ctxMonthly.getContext('2d'), {
         type: 'line',
         data: {
             labels: sortedMonths,
@@ -94,34 +93,45 @@ function renderCharts(genres, tiers, monthly) {
     });
 }
 
+// КАЛЕНДАРЬ (в модалке)
 let currentCalDate = new Date();
-document.getElementById('cal-prev').addEventListener('click', () => { currentCalDate.setMonth(currentCalDate.getMonth() - 1); renderCalendar(); });
-document.getElementById('cal-next').addEventListener('click', () => { currentCalDate.setMonth(currentCalDate.getMonth() + 1); renderCalendar(); });
-document.querySelectorAll('.view-toggle button').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.querySelectorAll('.view-toggle button').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active'); renderCalendar();
+
+document.addEventListener('DOMContentLoaded', () => {
+    const calPrev = document.getElementById('cal-prev');
+    const calNext = document.getElementById('cal-next');
+    if (calPrev) calPrev.addEventListener('click', () => { currentCalDate.setMonth(currentCalDate.getMonth() - 1); renderCalendar(); });
+    if (calNext) calNext.addEventListener('click', () => { currentCalDate.setMonth(currentCalDate.getMonth() + 1); renderCalendar(); });
+    document.querySelectorAll('.view-toggle button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.view-toggle button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active'); renderCalendar();
+        });
     });
 });
 
 function renderCalendar() {
-    const view = document.querySelector('.view-toggle button.active').dataset.view;
+    const viewBtn = document.querySelector('.view-toggle button.active');
+    const view = viewBtn ? viewBtn.dataset.view : 'grid';
     const year = currentCalDate.getFullYear(), month = currentCalDate.getMonth();
     const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
-    document.getElementById('cal-month-year').textContent = `${monthNames[month]} ${year}`;
+    const monthYearEl = document.getElementById('cal-month-year');
+    if (monthYearEl) monthYearEl.textContent = `${monthNames[month]} ${year}`;
+    const gridEl = document.getElementById('calendar-grid');
+    const listEl = document.getElementById('calendar-list');
     if (view === 'grid') {
-        document.getElementById('calendar-grid').classList.remove('hidden');
-        document.getElementById('calendar-list').classList.add('hidden');
+        if (gridEl) gridEl.classList.remove('hidden');
+        if (listEl) listEl.classList.add('hidden');
         renderCalendarGrid(year, month);
     } else {
-        document.getElementById('calendar-grid').classList.add('hidden');
-        document.getElementById('calendar-list').classList.remove('hidden');
+        if (gridEl) gridEl.classList.add('hidden');
+        if (listEl) listEl.classList.remove('hidden');
         renderCalendarList(year, month);
     }
 }
 
 function renderCalendarGrid(year, month) {
     const grid = document.getElementById('calendar-grid');
+    if (!grid) return;
     grid.innerHTML = '';
     ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].forEach(d => {
         const div = document.createElement('div');
@@ -165,6 +175,7 @@ function renderCalendarGrid(year, month) {
 
 function renderCalendarList(year, month) {
     const list = document.getElementById('calendar-list');
+    if (!list) return;
     list.innerHTML = '';
     const monthViews = [];
     state.titles.forEach(title => {
@@ -191,7 +202,7 @@ function renderCalendarList(year, month) {
                 <div style="font-weight:600">${item.title.title}</div>
                 <div style="font-size:0.8rem; color:var(--text-secondary)">${item.entry.kind} • ${dateStr}</div>
             </div>`;
-        div.onclick = () => openDetailModal(item.title.id);
+        div.onclick = () => { closeModal('modal-calendar'); openDetailModal(item.title.id); };
         list.appendChild(div);
     });
 }
