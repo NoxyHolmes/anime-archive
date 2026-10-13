@@ -2836,6 +2836,52 @@ window.addEventListener('blur', () => { if (tiltEl){ tiltEl.style.transform = ''
 window.addEventListener('resize', movePill);
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(movePill);
 
+  // === СТРАХОВОЧНЫЙ ДВИЖОК ЧАСТИЦ (на случай обрезки файла) ===
+if (typeof Particles === 'undefined') {
+    const Particles = (() => {
+        const cv = document.getElementById('petals');
+        if (!cv) return { init:()=>{}, refresh:()=>{}, restyle:()=>{}, burst:()=>{} };
+        const ctx = cv.getContext('2d');
+        let W=0, H=0, parts=[], running=false;
+        
+        const resize = () => { W = innerWidth; H = innerHeight; cv.width = W; cv.height = H; };
+        const spawn = () => ({ 
+            x: Math.random()*W, 
+            y: -20, 
+            s: Math.random()*4+2, 
+            vy: Math.random()*1.5+0.5, 
+            phase: Math.random()*6.28, 
+            color: ['#ffdce8','#ffc6d9','#ffffff'][Math.floor(Math.random()*3)] 
+        });
+        
+        const step = () => {
+            if (!running) return;
+            ctx.clearRect(0,0,W,H);
+            if (parts.length < 60) parts.push(spawn());
+            for (let i = parts.length - 1; i >= 0; i--) {
+                const p = parts[i];
+                p.y += p.vy;
+                p.x += Math.sin(p.phase) * 0.5;
+                p.phase += 0.02;
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = 0.7;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.s, 0, 6.28);
+                ctx.fill();
+                if (p.y > H + 20) parts.splice(i, 1);
+            }
+            requestAnimationFrame(step);
+        };
+        
+        return {
+            init() { resize(); for(let i=0;i<60;i++) parts.push(spawn()); running = true; step(); },
+            refresh() { if(!running) { running = true; step(); } },
+            restyle() { parts = []; },
+            burst() {}
+        };
+    })();
+}
+// === КОНЕЦ СТРАХОВОЧНОГО КОДА ===
 /* ================= старт ================= */
 document.addEventListener('DOMContentLoaded', () => {
 Particles.init();
