@@ -6,11 +6,12 @@
     <title>Аниме-Архив</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@400;600;700;800;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+    <div class="mesh-bg"></div>
     <canvas id="particles-canvas"></canvas>
 
     <header class="glass-header">
@@ -18,7 +19,7 @@
             <div class="logo-icon">🐉</div>
             <div>
                 <div class="logo-title">Аниме-Архив</div>
-                <div class="logo-subtitle">Sakura Edition</div>
+                <div class="logo-subtitle">Sakura Edition v2.0</div>
             </div>
             <span id="owner-badge" class="hidden"><i class="fa-solid fa-crown"></i> Владелец</span>
         </div>
@@ -52,7 +53,6 @@
         </div>
 
         <div class="header-actions">
-            <button id="btn-calendar-modal" class="icon-btn" title="Календарь"><i class="fa-solid fa-calendar-days"></i></button>
             <button id="btn-settings" class="icon-btn" title="Настройки"><i class="fa-solid fa-gear"></i></button>
             <button id="btn-github-auth" class="icon-btn hidden" title="GitHub"><i class="fa-brands fa-github"></i></button>
             <button id="btn-add-title" class="btn-primary hidden"><i class="fa-solid fa-plus"></i> Добавить</button>
@@ -61,17 +61,15 @@
     </header>
 
     <main class="content-area">
-        <!-- СТАТИСТИКА СВЕРХУ (только здесь) -->
         <div id="archive-stats-container" class="archive-stats"></div>
 
-        <!-- ТАБЫ НАВИГАЦИИ -->
         <nav class="tabs-nav">
             <button class="tab-btn active" data-tab="archive"><i class="fa-solid fa-layer-group"></i> Сетка тиров</button>
             <button class="tab-btn" data-tab="stats"><i class="fa-solid fa-chart-pie"></i> Аналитика</button>
+            <button class="tab-btn" data-tab="calendar"><i class="fa-solid fa-calendar-days"></i> Календарь</button>
             <button class="tab-btn" data-tab="history"><i class="fa-solid fa-clock-rotate-left"></i> История</button>
         </nav>
 
-        <!-- АРХИВ -->
         <section id="tab-archive" class="tab-content active">
             <div class="tier-stats-bar glass-panel">
                 <h3><i class="fa-solid fa-chart-simple"></i> Распределение по тиру</h3>
@@ -84,7 +82,6 @@
             <div id="tiers-container"></div>
         </section>
 
-        <!-- АНАЛИТИКА (только графики, без статистики) -->
         <section id="tab-stats" class="tab-content">
             <div class="charts-grid">
                 <div class="chart-container glass-panel">
@@ -102,7 +99,22 @@
             </div>
         </section>
 
-        <!-- ИСТОРИЯ ПРОСМОТРОВ (весь список по месяцам) -->
+        <section id="tab-calendar" class="tab-content">
+            <div class="calendar-section glass-panel">
+                <div class="calendar-controls">
+                    <button id="cal-prev"><i class="fa-solid fa-chevron-left"></i></button>
+                    <h3 id="cal-month-year">Октябрь 2026</h3>
+                    <button id="cal-next"><i class="fa-solid fa-chevron-right"></i></button>
+                    <div class="view-toggle">
+                        <button class="active" data-view="grid">Сетка</button>
+                        <button data-view="list">Список</button>
+                    </div>
+                </div>
+                <div id="calendar-grid" class="calendar-grid"></div>
+                <div id="calendar-list" class="calendar-list hidden"></div>
+            </div>
+        </section>
+
         <section id="tab-history" class="tab-content">
             <div class="history-container glass-panel">
                 <div class="history-header">
@@ -117,125 +129,104 @@
                 <div id="history-list" class="history-list"></div>
             </div>
         </section>
-
-        <!-- НАСТРОЙКИ (модальное окно) -->
-        <div id="modal-settings" class="modal-overlay hidden">
-            <div class="modal-content glass-panel settings-modal">
-                <button class="modal-close"><i class="fa-solid fa-xmark"></i></button>
-                <h2><i class="fa-solid fa-gear"></i> Настройки</h2>
-                
-                <div class="settings-tabs">
-                    <button class="settings-tab active" data-settings="appearance">Внешний вид</button>
-                    <button class="settings-tab" data-settings="particles">Анимация</button>
-                    <button class="settings-tab" data-settings="data">Данные</button>
-                </div>
-
-                <div class="settings-content" id="settings-appearance">
-                    <div class="setting-row">
-                        <label>Тема</label>
-                        <select id="set-theme">
-                            <option value="dark">Тёмная</option>
-                            <option value="light">Светлая</option>
-                        </select>
-                    </div>
-                    <div class="setting-row">
-                        <label>Акцентный цвет</label>
-                        <input type="color" id="set-accent" value="#a855f7">
-                    </div>
-                    <div class="setting-row">
-                        <label>Колонок на десктопе</label>
-                        <input type="range" id="set-columns" min="4" max="12" value="8">
-                        <span id="set-columns-val">8</span>
-                    </div>
-                    <div class="setting-row">
-                        <label>Средняя длительность серии (мин)</label>
-                        <input type="number" id="set-default-ep-time" value="24">
-                    </div>
-                    <div class="setting-row">
-                        <label>Средняя длительность фильма (мин)</label>
-                        <input type="number" id="set-default-movie-time" value="110">
-                    </div>
-                </div>
-
-                <div class="settings-content hidden" id="settings-particles">
-                    <div class="setting-row">
-                        <label>Пресет</label>
-                        <select id="set-particle-preset">
-                            <option value="sakura">Сакура</option>
-                            <option value="white-sakura">Белая сакура</option>
-                            <option value="red-roses">Красные розы</option>
-                            <option value="white-petals">Белые лепестки</option>
-                            <option value="yellow-petals">Жёлтые лепестки</option>
-                            <option value="snow">Снег</option>
-                            <option value="rain">Ливень</option>
-                            <option value="drizzle">Морось</option>
-                            <option value="autumn">Осенние листья</option>
-                            <option value="fireflies">Светлячки</option>
-                            <option value="shooting-stars">Падающие звёзды</option>
-                            <option value="stardust">Звёздная пыль</option>
-                            <option value="bubbles">Пузырьки</option>
-                            <option value="confetti">Конфетти</option>
-                            <option value="feathers">Пёрышки</option>
-                            <option value="hearts">Сердечки</option>
-                            <option value="butterflies">Бабочки</option>
-                            <option value="clover">Зелёный клевер</option>
-                            <option value="sparks">Искры фейерверка</option>
-                            <option value="night-petals">Ночные синие лепестки</option>
-                        </select>
-                    </div>
-                    <div class="setting-row">
-                        <label>Плотность</label>
-                        <input type="range" id="set-particle-density" min="10" max="200" value="50">
-                    </div>
-                    <div class="setting-row">
-                        <label>Скорость</label>
-                        <input type="range" id="set-particle-speed" min="1" max="10" value="3">
-                    </div>
-                    <div class="setting-row">
-                        <label>Размер частиц</label>
-                        <input type="range" id="set-particle-size" min="2" max="20" value="8">
-                    </div>
-                    <div class="setting-row">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="set-anim-enabled" checked> Включить анимации
-                        </label>
-                    </div>
-                </div>
-
-                <div class="settings-content hidden" id="settings-data">
-                    <div class="setting-row">
-                        <button id="btn-export-json" class="btn-secondary"><i class="fa-solid fa-download"></i> Экспорт JSON</button>
-                        <button id="btn-import-json" class="btn-secondary"><i class="fa-solid fa-upload"></i> Импорт JSON</button>
-                        <input type="file" id="file-import" accept=".json" class="hidden">
-                    </div>
-                    <div class="setting-row" id="save-status">
-                        <span class="status-indicator">Статус: Данные загружены</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- МОДАЛКА КАЛЕНДАРЯ -->
-        <div id="modal-calendar" class="modal-overlay hidden">
-            <div class="modal-content glass-panel calendar-modal">
-                <button class="modal-close"><i class="fa-solid fa-xmark"></i></button>
-                <h2><i class="fa-solid fa-calendar-days"></i> Календарь просмотров</h2>
-                <div class="calendar-controls">
-                    <button id="cal-prev"><i class="fa-solid fa-chevron-left"></i></button>
-                    <h3 id="cal-month-year">Октябрь 2026</h3>
-                    <button id="cal-next"><i class="fa-solid fa-chevron-right"></i></button>
-                    <div class="view-toggle">
-                        <button class="active" data-view="grid">Календарь</button>
-                        <button data-view="list">Список</button>
-                    </div>
-                </div>
-                <div id="calendar-grid" class="calendar-grid"></div>
-                <div id="calendar-list" class="calendar-list hidden"></div>
-            </div>
-        </div>
     </main>
 
-    <!-- МОДАЛКА ДЕТАЛЕЙ ТАЙТЛА -->
+    <div id="modal-settings" class="modal-overlay hidden">
+        <div class="modal-content glass-panel settings-modal">
+            <button class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+            <h2><i class="fa-solid fa-gear"></i> Настройки</h2>
+            
+            <div class="settings-tabs">
+                <button class="settings-tab active" data-settings="appearance">Внешний вид</button>
+                <button class="settings-tab" data-settings="particles">Анимация</button>
+                <button class="settings-tab" data-settings="data">Данные</button>
+            </div>
+
+            <div class="settings-content" id="settings-appearance">
+                <div class="setting-row">
+                    <label>Тема</label>
+                    <select id="set-theme">
+                        <option value="dark">Тёмная</option>
+                        <option value="light">Светлая</option>
+                    </select>
+                </div>
+                <div class="setting-row">
+                    <label>Акцентный цвет</label>
+                    <input type="color" id="set-accent" value="#a855f7">
+                </div>
+                <div class="setting-row">
+                    <label>Колонок на десктопе</label>
+                    <input type="range" id="set-columns" min="4" max="12" value="8">
+                    <span id="set-columns-val">8</span>
+                </div>
+                <div class="setting-row">
+                    <label>Средняя длительность серии (мин)</label>
+                    <input type="number" id="set-default-ep-time" value="24">
+                </div>
+                <div class="setting-row">
+                    <label>Средняя длительность фильма (мин)</label>
+                    <input type="number" id="set-default-movie-time" value="110">
+                </div>
+            </div>
+
+            <div class="settings-content hidden" id="settings-particles">
+                <div class="setting-row">
+                    <label>Пресет</label>
+                    <select id="set-particle-preset">
+                        <option value="sakura">Сакура</option>
+                        <option value="white-sakura">Белая сакура</option>
+                        <option value="red-roses">Красные розы</option>
+                        <option value="white-petals">Белые лепестки</option>
+                        <option value="yellow-petals">Жёлтые лепестки</option>
+                        <option value="snow">Снег</option>
+                        <option value="rain">Ливень</option>
+                        <option value="drizzle">Морось</option>
+                        <option value="autumn">Осенние листья</option>
+                        <option value="fireflies">Светлячки</option>
+                        <option value="shooting-stars">Падающие звёзды</option>
+                        <option value="stardust">Звёздная пыль</option>
+                        <option value="bubbles">Пузырьки</option>
+                        <option value="confetti">Конфетти</option>
+                        <option value="feathers">Пёрышки</option>
+                        <option value="hearts">Сердечки</option>
+                        <option value="butterflies">Бабочки</option>
+                        <option value="clover">Зелёный клевер</option>
+                        <option value="sparks">Искры фейерверка</option>
+                        <option value="night-petals">Ночные синие лепестки</option>
+                    </select>
+                </div>
+                <div class="setting-row">
+                    <label>Плотность</label>
+                    <input type="range" id="set-particle-density" min="10" max="200" value="50">
+                </div>
+                <div class="setting-row">
+                    <label>Скорость</label>
+                    <input type="range" id="set-particle-speed" min="1" max="10" value="3">
+                </div>
+                <div class="setting-row">
+                    <label>Размер частиц</label>
+                    <input type="range" id="set-particle-size" min="2" max="20" value="8">
+                </div>
+                <div class="setting-row">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="set-anim-enabled" checked> Включить анимации
+                    </label>
+                </div>
+            </div>
+
+            <div class="settings-content hidden" id="settings-data">
+                <div class="setting-row">
+                    <button id="btn-export-json" class="btn-secondary"><i class="fa-solid fa-download"></i> Экспорт JSON</button>
+                    <button id="btn-import-json" class="btn-secondary"><i class="fa-solid fa-upload"></i> Импорт JSON</button>
+                    <input type="file" id="file-import" accept=".json" class="hidden">
+                </div>
+                <div class="setting-row" id="save-status">
+                    <span class="status-indicator">Статус: Данные загружены</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="modal-title-detail" class="modal-overlay hidden">
         <div class="modal-content glass-panel large">
             <button class="modal-close"><i class="fa-solid fa-xmark"></i></button>
@@ -280,7 +271,6 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА ФОРМЫ -->
     <div id="modal-title-form" class="modal-overlay hidden">
         <div class="modal-content glass-panel large scrollable">
             <button class="modal-close"><i class="fa-solid fa-xmark"></i></button>
@@ -351,7 +341,6 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА GITHUB -->
     <div id="modal-github-auth" class="modal-overlay hidden">
         <div class="modal-content glass-panel">
             <button class="modal-close"><i class="fa-solid fa-xmark"></i></button>
