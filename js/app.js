@@ -1,7 +1,7 @@
 const state = {
     titles: [],
     settings: {
-        theme: 'dark', accent: '#a855f7', viewMode: 'grid', columns: 8,
+        theme: 'dark', accent: '#a855f7', columns: 8,
         particles: { preset: 'sakura', density: 50, speed: 3, size: 8, enabled: true },
         defaultEpTime: 24, defaultMovieTime: 110
     },
@@ -23,6 +23,11 @@ const GENRES_LIST = [
     "Выживание", "Природа/Экология", "Животные", "ИИ и роботы", "Виртуальная реальность", "Сёнэн",
     "Сёдзё", "Сэйнэн", "Дзёсэй", "Сёнэн-ай", "Сёдзё-ай", "Авангард", "Детское", "Семейное"
 ].sort();
+
+const TIER_COLORS = {
+    'SSS': '#ffd700', 'S': '#ff6b00', 'A': '#ff2a2a',
+    'B': '#00e676', 'C': '#00bfff', 'D': '#9c27b0', 'E': '#ff0055'
+};
 
 document.addEventListener('DOMContentLoaded', () => {
     loadSettings();
@@ -62,6 +67,7 @@ async function loadData() {
     renderArchive();
     renderRecent();
     if (typeof updateStats === 'function') updateStats();
+    renderHistory();
     showToast('success', 'Данные загружены');
 }
 
@@ -103,14 +109,10 @@ function renderTierDistribution() {
     const totalTitles = state.titles.length;
     const tierCounts = { 'SSS': 0, 'S': 0, 'A': 0, 'B': 0, 'C': 0, 'D': 0, 'E': 0 };
     state.titles.forEach(title => { tierCounts[title.tier] = (tierCounts[title.tier] || 0) + 1; });
-    const tierColors = {
-        'SSS': '#ffd700', 'S': '#ff6b00', 'A': '#ff2a2a',
-        'B': '#00e676', 'C': '#00bfff', 'D': '#9c27b0', 'E': '#ff0055'
-    };
     container.innerHTML = TIERS.map(tier => {
         const count = tierCounts[tier];
         const percent = totalTitles > 0 ? Math.round((count / totalTitles) * 100) : 0;
-        const color = tierColors[tier];
+        const color = TIER_COLORS[tier];
         return `
             <div class="tier-dist-item" style="--tier-color: ${color}">
                 <div class="tier-dist-header">
@@ -277,7 +279,7 @@ function openDetailModal(id) {
         if (confirm(`Удалить "${title.title}"?`)) {
             state.titles = state.titles.filter(t => t.id !== id);
             saveData(); closeModal('modal-title-detail');
-            renderArchive(); renderRecent();
+            renderArchive(); renderRecent(); renderHistory();
             if (typeof updateStats === 'function') updateStats();
             showToast('success', 'Тайтл удалён');
         }
@@ -359,7 +361,7 @@ document.getElementById('title-form').addEventListener('submit', (e) => {
     if (isNew) state.titles.push(titleData);
     else { const index = state.titles.findIndex(t => t.id === id); state.titles[index] = titleData; }
     saveData(); closeModal('modal-title-form');
-    renderArchive(); renderRecent();
+    renderArchive(); renderRecent(); renderHistory();
     if (typeof updateStats === 'function') updateStats();
     showToast('success', 'Тайтл сохранён');
 });
@@ -413,6 +415,7 @@ function applySettings() {
 }
 
 function setupEventListeners() {
+    // Крестик в поиске
     const searchInput = document.getElementById('global-search');
     const searchBox = searchInput.parentElement;
     let clearBtn = searchBox.querySelector('.fa-times');
@@ -431,6 +434,7 @@ function setupEventListeners() {
         state.filters.search = ''; renderArchive(); searchInput.focus();
     });
 
+    // Табы
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -438,10 +442,11 @@ function setupEventListeners() {
             btn.classList.add('active');
             document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
             if (btn.dataset.tab === 'stats' && typeof updateStats === 'function') updateStats();
-            if (btn.dataset.tab === 'calendar' && typeof renderCalendar === 'function') renderCalendar();
+            if (btn.dataset.tab === 'history') renderHistory();
         });
     });
 
+    // Фильтры
     ['filter-tier', 'filter-type', 'filter-favorite'].forEach(id => {
         document.getElementById(id).addEventListener('change', () => {
             state.filters.tier = document.getElementById('filter-tier').value;
@@ -451,6 +456,18 @@ function setupEventListeners() {
         });
     });
 
+    // Кнопка настроек (ТЕПЕРЬ РАБОТАЕТ!)
+    document.getElementById('btn-settings').addEventListener('click', () => {
+        openModal('modal-settings');
+    });
+
+    // Кнопка календаря
+    document.getElementById('btn-calendar-modal').addEventListener('click', () => {
+        openModal('modal-calendar');
+        if (typeof renderCalendar === 'function') renderCalendar();
+    });
+
+    // Закрытие модалок
     document.querySelectorAll('.modal-close, .modal-close-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const modal = e.target.closest('.modal-overlay');
@@ -461,8 +478,20 @@ function setupEventListeners() {
         if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.active').forEach(m => closeModal(m.id));
     });
 
+    // Табы настроек
+    document.querySelectorAll('.settings-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.settings-content').forEach(c => c.classList.add('hidden'));
+            tab.classList.add('active');
+            document.getElementById(`settings-${tab.dataset.settings}`).classList.remove('hidden');
+        });
+    });
+
+    // Форма
     document.getElementById('btn-add-entry').addEventListener('click', () => addEntryRow());
 
+    // Жанры
     const genreSearch = document.getElementById('form-genres-search');
     const genreDropdown = document.getElementById('form-genres-dropdown');
     const datalist = document.getElementById('genre-datalist');
@@ -485,13 +514,9 @@ function setupEventListeners() {
         if (!e.target.closest('.multi-select-container')) genreDropdown.classList.add('hidden');
     });
 
-    document.getElementById('btn-settings').addEventListener('click', () => {
-        document.querySelector('.tab-btn[data-tab="settings"]').click();
-    });
-
+    // Настройки
     document.getElementById('set-theme').addEventListener('change', (e) => { state.settings.theme = e.target.value; saveSettings(); });
     document.getElementById('set-accent').addEventListener('input', (e) => { state.settings.accent = e.target.value; saveSettings(); });
-    document.getElementById('set-view-mode').addEventListener('change', (e) => { state.settings.viewMode = e.target.value; saveSettings(); });
     document.getElementById('set-columns').addEventListener('input', (e) => {
         state.settings.columns = e.target.value;
         document.getElementById('set-columns-val').textContent = e.target.value;
@@ -523,3 +548,114 @@ function saveSettings() {
     localStorage.setItem('animeArchive_settings', JSON.stringify(state.settings));
     applySettings();
 }
+
+// ИСТОРИЯ ПРОСМОТРОВ (весь список по месяцам)
+function renderHistory() {
+    const container = document.getElementById('history-list');
+    if (!container) return;
+    
+    const searchQuery = document.getElementById('history-search')?.value.toLowerCase() || '';
+    const yearFilter = document.getElementById('history-year-filter')?.value || 'all';
+    
+    // Собираем все просмотры
+    const allViews = [];
+    state.titles.forEach(title => {
+        title.entries.forEach(entry => {
+            if (!entry.watchDate) return;
+            const dates = entry.watchDate.split('–').map(d => d.trim());
+            const startDate = dates[0];
+            if (!startDate.match(/^\d{4}-\d{2}/)) return;
+            
+            const date = new Date(startDate);
+            const year = date.getFullYear();
+            const month = date.getMonth();
+            
+            if (yearFilter !== 'all' && year !== parseInt(yearFilter)) return;
+            
+            if (searchQuery) {
+                if (!title.title.toLowerCase().includes(searchQuery) && 
+                    !entry.kind.toLowerCase().includes(searchQuery)) return;
+            }
+            
+            allViews.push({
+                date: date,
+                dateStr: startDate,
+                title: title,
+                entry: entry,
+                year: year,
+                month: month
+            });
+        });
+    });
+    
+    // Сортировка по дате (новые сверху)
+    allViews.sort((a, b) => b.date - a.date);
+    
+    // Группировка по месяцам
+    const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+    const grouped = {};
+    allViews.forEach(view => {
+        const key = `${view.year}-${view.month}`;
+        if (!grouped[key]) grouped[key] = { year: view.year, month: view.month, items: [] };
+        grouped[key].items.push(view);
+    });
+    
+    // Заполняем фильтр годов
+    const yearSelect = document.getElementById('history-year-filter');
+    if (yearSelect) {
+        const years = [...new Set(allViews.map(v => v.year))].sort((a, b) => b - a);
+        const currentVal = yearSelect.value;
+        yearSelect.innerHTML = '<option value="all">Все годы</option>' + 
+            years.map(y => `<option value="${y}">${y}</option>`).join('');
+        yearSelect.value = currentVal || 'all';
+    }
+    
+    // Рендер
+    container.innerHTML = '';
+    const sortedKeys = Object.keys(grouped).sort().reverse();
+    
+    if (sortedKeys.length === 0) {
+        container.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--text-secondary)">Ничего не найдено</div>';
+        return;
+    }
+    
+    sortedKeys.forEach(key => {
+        const group = grouped[key];
+        const monthDiv = document.createElement('div');
+        monthDiv.className = 'history-month-group';
+        
+        const title = document.createElement('div');
+        title.className = 'history-month-title';
+        title.textContent = `${monthNames[group.month]} ${group.year} г.`;
+        monthDiv.appendChild(title);
+        
+        group.items.forEach(item => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'history-item';
+            itemDiv.onclick = () => openDetailModal(item.title.id);
+            
+            const color = TIER_COLORS[item.title.tier] || '#888';
+            const dateFormatted = item.date.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            
+            itemDiv.innerHTML = `
+                <div class="history-item-date">${dateFormatted}</div>
+                <div class="history-item-info">
+                    <div class="history-item-title">${item.title.title}</div>
+                    <div class="history-item-kind">${item.entry.kind}</div>
+                </div>
+                <div class="history-item-tier" style="background: ${color}">${item.title.tier}</div>
+            `;
+            monthDiv.appendChild(itemDiv);
+        });
+        
+        container.appendChild(monthDiv);
+    });
+}
+
+// Обработчики для истории
+document.addEventListener('DOMContentLoaded', () => {
+    const historySearch = document.getElementById('history-search');
+    const historyYear = document.getElementById('history-year-filter');
+    if (historySearch) historySearch.addEventListener('input', renderHistory);
+    if (historyYear) historyYear.addEventListener('change', renderHistory);
+});
