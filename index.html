@@ -64,14 +64,15 @@
 
     <main class="content-area">
         <section id="tab-archive" class="tab-content active">
-            <!-- Статистика сверху архива -->
             <div id="archive-stats-container" class="archive-stats"></div>
-
+            <div class="tier-stats-bar glass-panel">
+                <h3><i class="fa-solid fa-chart-simple"></i> Распределение по тиру</h3>
+                <div id="tier-distribution" class="tier-distribution"></div>
+            </div>
             <div class="recent-ribbon glass-panel">
                 <h3><i class="fa-solid fa-clock-rotate-left"></i> Последние добавленные</h3>
                 <div class="recent-scroll" id="recent-list"></div>
             </div>
-
             <div id="tiers-container"></div>
         </section>
 
@@ -94,7 +95,6 @@
                     <div class="stat-label">Время фильмов</div>
                 </div>
             </div>
-            
             <div class="charts-grid">
                 <div class="chart-container glass-panel">
                     <h3>Топ жанров</h3>
