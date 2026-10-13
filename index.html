@@ -4,23 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Аниме-Архив</title>
-    
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Font Awesome для иконок -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Стили -->
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <!-- Фоновая анимация частиц -->
     <canvas id="particles-canvas"></canvas>
 
-    <!-- Шапка -->
     <header class="glass-header">
         <div class="logo">
             <i class="fa-solid fa-dragon"></i>
@@ -31,7 +23,7 @@
         <div class="search-filters">
             <div class="search-box">
                 <i class="fa-solid fa-search"></i>
-                <input type="text" id="global-search" placeholder="Поиск по названию...">
+                <input type="text" id="global-search" placeholder="Поиск по названию или жанру...">
             </div>
             <select id="filter-tier">
                 <option value="all">Все тиры</option>
@@ -64,42 +56,25 @@
         </div>
     </header>
 
-    <!-- Навигация (Табы) -->
     <nav class="tabs-nav glass-panel">
         <button class="tab-btn active" data-tab="archive"><i class="fa-solid fa-layer-group"></i> Архив</button>
         <button class="tab-btn" data-tab="stats"><i class="fa-solid fa-chart-pie"></i> Статистика</button>
         <button class="tab-btn" data-tab="calendar"><i class="fa-solid fa-calendar-days"></i> Календарь</button>
     </nav>
 
-    <!-- Основной контент -->
     <main class="content-area">
-        
-        <!-- Вкладка: Архив -->
         <section id="tab-archive" class="tab-content active">
-               <div id="archive-stats-container" class="archive-stats"></div>
-            <!-- Лента последних добавленных -->
+            <!-- Статистика сверху архива -->
+            <div id="archive-stats-container" class="archive-stats"></div>
+
             <div class="recent-ribbon glass-panel">
                 <h3><i class="fa-solid fa-clock-rotate-left"></i> Последние добавленные</h3>
-                <div class="recent-scroll" id="recent-list">
-                    <!-- Заполняется через JS -->
-                </div>
+                <div class="recent-scroll" id="recent-list"></div>
             </div>
 
-            <!-- Контейнер для тиров (генерируется JS) -->
-            <div id="tiers-container">
-                <!-- Пример структуры, которую создаст JS:
-                <div class="tier-section" data-tier="SSS">
-                    <div class="tier-header">
-                        <div class="tier-3d-letter letter-sss">SSS</div>
-                        <div class="tier-stats">12 тайтлов (15%)</div>
-                    </div>
-                    <div class="tier-grid" id="grid-SSS"></div>
-                </div>
-                -->
-            </div>
+            <div id="tiers-container"></div>
         </section>
 
-        <!-- Вкладка: Статистика -->
         <section id="tab-stats" class="tab-content">
             <div class="stats-summary glass-panel">
                 <div class="stat-card">
@@ -122,21 +97,20 @@
             
             <div class="charts-grid">
                 <div class="chart-container glass-panel">
-                    <h3>Жанры</h3>
+                    <h3>Топ жанров</h3>
                     <canvas id="chart-genres"></canvas>
                 </div>
                 <div class="chart-container glass-panel">
                     <h3>Распределение по тирам</h3>
                     <canvas id="chart-tiers"></canvas>
                 </div>
-                <div class="chart-container glass-panel full-width">
+                <div class="chart-container full-width glass-panel">
                     <h3>Динамика просмотра по месяцам</h3>
                     <canvas id="chart-monthly"></canvas>
                 </div>
             </div>
         </section>
 
-        <!-- Вкладка: Календарь -->
         <section id="tab-calendar" class="tab-content">
             <div class="calendar-controls glass-panel">
                 <button id="cal-prev"><i class="fa-solid fa-chevron-left"></i></button>
@@ -151,7 +125,6 @@
             <div id="calendar-list" class="calendar-list glass-panel hidden"></div>
         </section>
 
-        <!-- Вкладка: Настройки -->
         <section id="tab-settings" class="tab-content">
             <div class="settings-grid">
                 <div class="settings-panel glass-panel">
@@ -187,7 +160,7 @@
                     <div class="setting-row">
                         <label>Пресет</label>
                         <select id="set-particle-preset">
-                            <option value="sakura">Сакура (розовая)</option>
+                            <option value="sakura">Сакура</option>
                             <option value="white-sakura">Белая сакура</option>
                             <option value="red-roses">Красные розы</option>
                             <option value="white-petals">Белые лепестки</option>
@@ -255,7 +228,6 @@
         </section>
     </main>
 
-    <!-- Модальное окно: Просмотр тайтла -->
     <div id="modal-title-detail" class="modal-overlay hidden">
         <div class="modal-content glass-panel large">
             <button class="modal-close"><i class="fa-solid fa-xmark"></i></button>
@@ -300,14 +272,12 @@
         </div>
     </div>
 
-    <!-- Модальное окно: Добавление/Редактирование тайтла -->
     <div id="modal-title-form" class="modal-overlay hidden">
         <div class="modal-content glass-panel large scrollable">
             <button class="modal-close"><i class="fa-solid fa-xmark"></i></button>
             <h2 id="form-modal-title">Добавить тайтл</h2>
             <form id="title-form">
                 <input type="hidden" id="form-id">
-                
                 <div class="form-grid">
                     <div class="form-group">
                         <label>Название (рус.) *</label>
@@ -359,13 +329,11 @@
                         </label>
                     </div>
                 </div>
-
                 <div class="form-section">
                     <h4>Составные части (Сезоны, Фильмы, Спешлы)</h4>
                     <div id="form-entries-container"></div>
                     <button type="button" id="btn-add-entry" class="btn-secondary small"><i class="fa-solid fa-plus"></i> Добавить часть</button>
                 </div>
-
                 <div class="form-actions">
                     <button type="button" class="btn-secondary modal-close-btn">Отмена</button>
                     <button type="submit" class="btn-primary">Сохранить</button>
@@ -374,7 +342,6 @@
         </div>
     </div>
 
-    <!-- Модальное окно: GitHub Token -->
     <div id="modal-github-auth" class="modal-overlay hidden">
         <div class="modal-content glass-panel">
             <button class="modal-close"><i class="fa-solid fa-xmark"></i></button>
@@ -396,13 +363,9 @@
         </div>
     </div>
 
-    <!-- Контейнер для тостов (уведомлений) -->
     <div id="toast-container"></div>
-
-    <!-- Datalist для жанров (заполняется JS) -->
     <datalist id="genre-datalist"></datalist>
 
-    <!-- Скрипты -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script src="js/particles.js"></script>
