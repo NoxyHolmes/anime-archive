@@ -5,21 +5,163 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Вход владельца</title>
 <style>
-body{display:flex;justify-content:center;align-items:center;height:100vh;margin:0;background:#100c15;color:#f3eef6;font-family:'Onest',system-ui,sans-serif}
-.loader{text-align:center}
-.spinner{width:44px;height:44px;border:3px solid #2b2138;border-top-color:#ff7aa2;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}
-@keyframes spin{to{transform:rotate(360deg)}}
-p{font-family:'JetBrains Mono';font-size:12px;letter-spacing:2px;color:#a094b2;text-transform:uppercase}
+*{box-sizing:border-box;margin:0;padding:0}
+body{display:flex;justify-content:center;align-items:center;min-height:100vh;background:#100c15;color:#f3eef6;font-family:'Onest',system-ui,sans-serif;padding:20px}
+.container{max-width:500px;width:100%;background:#181224;border:1px solid #2b2138;border-radius:16px;padding:32px}
+h1{font-size:20px;margin-bottom:16px;color:#ff7aa2}
+p{color:#a094b2;font-size:14px;line-height:1.6;margin-bottom:16px}
+.input{width:100%;padding:12px;background:#161020;border:1px solid #2b2138;border-radius:10px;color:#f3eef6;font-size:14px;margin-bottom:12px;font-family:'JetBrains Mono',monospace}
+.input:focus{outline:none;border-color:#ff7aa2}
+.btn{width:100%;padding:12px;background:#ff7aa2;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:.2s}
+.btn:hover{background:#ff5a8a}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.link-box{background:#161020;border:1px solid #2b2138;border-radius:10px;padding:12px;margin:16px 0;word-break:break-all;font-family:'JetBrains Mono',monospace;font-size:12px;color:#ff7aa2;max-height:200px;overflow-y:auto}
+.hidden{display:none}
+.error{color:#ff6b6b;font-size:13px;margin-top:8px}
+.success{color:#8fd6a4;font-size:13px;margin-top:8px}
 </style>
 </head>
 <body>
-  <div class="loader">
-    <div class="spinner"></div>
-    <p>проверка прав...</p>
+<div class="container">
+  <div id="step1">
+    <h1>🔐 Первый запуск</h1>
+    <p>Сгенерируйте уникальную ссылку для входа владельца. Сохраните её в надёжном месте — она понадобится каждый раз для редактирования каталога.</p>
+    <button class="btn" id="btn-generate">Сгенерировать ссылку</button>
   </div>
-  <script>
-    localStorage.setItem('animeOwner','true');
-    window.location.href='index.html';
-  </script>
+  
+  <div id="step2" class="hidden">
+    <h1>✅ Ссылка создана</h1>
+    <p>Скопируйте эту ссылку и сохраните в надёжном месте. По ней вы будете входить как владелец:</p>
+    <div class="link-box" id="owner-link"></div>
+    <button class="btn" id="btn-copy">Скопировать ссылку</button>
+    <p class="success" id="copy-msg" style="margin-top:12px"></p>
+    <p style="margin-top:20px;font-size:12px;color:#6b5f7d">⚠️ Без этой ссылки редактирование невозможно. Токен GitHub вводится один раз после перехода по ссылке.</p>
+  </div>
+  
+  <div id="step3" class="hidden">
+    <h1>🔑 Проверка доступа</h1>
+    <p>Введите токен доступа из ссылки:</p>
+    <input type="password" class="input" id="access-token" placeholder="Вставьте токен...">
+    <button class="btn" id="btn-verify">Проверить</button>
+    <p class="error" id="verify-error"></p>
+  </div>
+  
+  <div id="step4" class="hidden">
+    <h1>🎉 Доступ подтверждён</h1>
+    <p class="success">Вы вошли как владелец. Теперь введите токен GitHub для синхронизации (один раз):</p>
+    <input type="password" class="input" id="gh-token" placeholder="github_pat_... или ghp_...">
+    <input type="text" class="input" id="gh-repo" placeholder="логин/репозиторий (например: noxyholmes/anime-archive)">
+    <button class="btn" id="btn-save-gh">Сохранить и войти</button>
+    <p class="error" id="gh-error"></p>
+  </div>
+</div>
+
+<script>
+const LS_ACCESS = 'anime_access_token';
+const LS_OWNER = 'anime_owner_mode';
+const LS_GH_TOKEN = 'anime_gh_token';
+const LS_GH_REPO = 'anime_gh_repo';
+
+function generateToken() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let token = '';
+  for (let i = 0; i < 64; i++) {
+    token += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return token;
+}
+
+function showStep(n) {
+  ['step1','step2','step3','step4'].forEach((id, i) => {
+    document.getElementById(id).classList.toggle('hidden', i + 1 !== n);
+  });
+}
+
+// Проверяем, есть ли токен в URL
+const urlParams = new URLSearchParams(window.location.search);
+const urlToken = urlParams.get('access');
+
+if (urlToken) {
+  // Есть токен в URL — проверяем
+  const savedToken = localStorage.getItem(LS_ACCESS);
+  if (savedToken && savedToken === urlToken) {
+    // Токен правильный — показываем форму GitHub
+    showStep(4);
+  } else {
+    // Токен неправильный или первый раз
+    showStep(3);
+  }
+} else {
+  // Нет токена в URL — показываем первый шаг или форму ввода
+  const savedToken = localStorage.getItem(LS_ACCESS);
+  if (savedToken) {
+    showStep(3);
+  } else {
+    showStep(1);
+  }
+}
+
+// Шаг 1: Генерация токена
+document.getElementById('btn-generate').onclick = () => {
+  const token = generateToken();
+  localStorage.setItem(LS_ACCESS, token);
+  
+  const link = `${window.location.origin}${window.location.pathname}?access=${token}`;
+  document.getElementById('owner-link').textContent = link;
+  showStep(2);
+};
+
+// Шаг 2: Копирование ссылки
+document.getElementById('btn-copy').onclick = () => {
+  const link = document.getElementById('owner-link').textContent;
+  navigator.clipboard.writeText(link).then(() => {
+    document.getElementById('copy-msg').textContent = '✓ Ссылка скопирована!';
+    setTimeout(() => {
+      document.getElementById('copy-msg').textContent = '';
+    }, 3000);
+  });
+};
+
+// Шаг 3: Проверка токена
+document.getElementById('btn-verify').onclick = () => {
+  const input = document.getElementById('access-token').value.trim();
+  const saved = localStorage.getItem(LS_ACCESS);
+  
+  if (!input) {
+    document.getElementById('verify-error').textContent = 'Введите токен';
+    return;
+  }
+  
+  if (saved && saved === input) {
+    // Токен правильный — переходим к GitHub
+    showStep(4);
+  } else {
+    document.getElementById('verify-error').textContent = 'Неверный токен доступа';
+  }
+};
+
+// Шаг 4: Сохранение GitHub токена
+document.getElementById('btn-save-gh').onclick = () => {
+  const ghToken = document.getElementById('gh-token').value.trim();
+  const ghRepo = document.getElementById('gh-repo').value.trim();
+  
+  if (!ghToken || !ghRepo) {
+    document.getElementById('gh-error').textContent = 'Заполните оба поля';
+    return;
+  }
+  
+  if (!ghRepo.includes('/')) {
+    document.getElementById('gh-error').textContent = 'Формат: логин/репозиторий';
+    return;
+  }
+  
+  localStorage.setItem(LS_GH_TOKEN, ghToken);
+  localStorage.setItem(LS_GH_REPO, ghRepo);
+  localStorage.setItem(LS_OWNER, 'true');
+  
+  // Переход на главную
+  window.location.href = 'index.html';
+};
+</script>
 </body>
 </html>
