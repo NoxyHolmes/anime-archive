@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Вход владельца</title>
 <style>
-  body{display:flex;justify-content:center;align-items:center;height:100vh;margin:0;background:#07070d;color:#f0f0f5;font-family:'Space Grotesk',sans-serif}
-  .loader{text-align:center}
-  .spinner{width:44px;height:44px;border:3px solid #1a1a2a;border-top-color:#ff2d78;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  p{font-family:'JetBrains Mono';font-size:12px;letter-spacing:2px;color:#8a8aa0;text-transform:uppercase}
+body{display:flex;justify-content:center;align-items:center;height:100vh;margin:0;background:#100c15;color:#f3eef6;font-family:'Onest',system-ui,sans-serif}
+.loader{text-align:center}
+.spinner{width:44px;height:44px;border:3px solid #2b2138;border-top-color:#ff7aa2;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+p{font-family:'JetBrains Mono';font-size:12px;letter-spacing:2px;color:#a094b2;text-transform:uppercase}
 </style>
 </head>
 <body>
@@ -18,7 +18,7 @@
     <p>проверка прав...</p>
   </div>
   <script>
-    localStorage.setItem('animeArchive_owner','true');
+    localStorage.setItem('animeOwner','true');
     window.location.href='index.html';
   </script>
 </body>
