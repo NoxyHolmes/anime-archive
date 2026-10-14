@@ -1,0 +1,287 @@
+{
+  "meta": {
+    "title": "myTierAnime · Канон 2026",
+    "owner": "geraltschwarzenegger-svg",
+    "repo": "myTierAnime",
+    "branch": "main",
+    "updatedAt": "2026-10-14T21:51:12.046Z",
+    "activeMode": "emblems-realism"
+  },
+  "tiers": [
+    {
+      "id": "S",
+      "rank": 1,
+      "name": "Абсолютный Канон",
+      "subtitle": "Астролябия Короны · Шедевры на все времена",
+      "hue": 45,
+      "items": [
+        {
+          "uid": "anime-cotn-2022",
+          "kind": "TV Сериал",
+          "title": "Песнь ночных сов",
+          "origTitle": "Yofukashi no Uta (Call of the Night)",
+          "year": 2022,
+          "studio": "Liden Films",
+          "score": 10,
+          "reaction": "👑 Корона ночи",
+          "genres": [
+            "Сверхъестественное",
+            "Романтика",
+            "Вампиры",
+            "Ночной вайб"
+          ],
+          "poster": "https://shikimori.one/system/animes/original/48926.jpg",
+          "comment": "Неоновая эстетика ночного города, потрясающий саундтрек Creepy Nuts и харизма Надзуны Нанакусы. Идеальная атмосфера свободы и ночных прогулок.",
+          "seasons": [
+            {
+              "title": "Сезон 1",
+              "type": "TV Сериал",
+              "episodes": 13,
+              "epMinutes": 23,
+              "date": "12.08.2024",
+              "note": "Первый просмотр"
+            },
+            {
+              "title": "Сезон 1 (Rewatch)",
+              "type": "TV Сериал",
+              "episodes": 13,
+              "epMinutes": 23,
+              "date": "18.06.2026",
+              "note": "Пересмотр в FHD"
+            }
+          ]
+        },
+        {
+          "uid": "anime-frieren-2023",
+          "kind": "TV Сериал",
+          "title": "Провожающая в последний путь Фрирен",
+          "origTitle": "Sousou no Frieren",
+          "year": 2023,
+          "studio": "Madhouse",
+          "score": 9.9,
+          "reaction": "💎 Вечность",
+          "genres": [
+            "Фэнтези",
+            "Приключения",
+            "Драма",
+            "Философия"
+          ],
+          "poster": "https://shikimori.one/system/animes/original/52991.jpg",
+          "comment": "Глубокая, меланхоличная и невероятно красивая история о течении времени, памяти о товарищах и ценности каждого мгновения.",
+          "seasons": [
+            {
+              "title": "Сезон 1",
+              "type": "TV Сериал",
+              "episodes": 28,
+              "epMinutes": 24,
+              "date": "24.04.2026",
+              "note": "Полный просмотр"
+            },
+            {
+              "title": "Мини-аниме Магия",
+              "type": "ONA",
+              "episodes": 11,
+              "epMinutes": 2,
+              "date": "28.04.2026",
+              "note": "Короткие спешлы"
+            }
+          ]
+        },
+        {
+          "uid": "anime-oshinoko-2023",
+          "kind": "TV Сериал",
+          "title": "Звёздное дитя",
+          "origTitle": "Oshi no Ko",
+          "year": 2023,
+          "studio": "Doga Kobo",
+          "score": 9.8,
+          "reaction": "✨ Идол",
+          "genres": [
+            "Драма",
+            "Музыка",
+            "Триллер",
+            "Шоу-бизнес"
+          ],
+          "poster": "https://shikimori.one/system/animes/original/52034.jpg",
+          "comment": "Феноменальная режиссура, пронзительный пролог, хореография B-Komachi и легендарный трек Idol от YOASOBI.",
+          "seasons": [
+            {
+              "title": "Пролог (Эпизод 1)",
+              "type": "Спешл",
+              "episodes": 1,
+              "epMinutes": 82,
+              "date": "10.05.2025",
+              "note": "Расширенная премьера"
+            },
+            {
+              "title": "Сезон 1 (эп. 2–11)",
+              "type": "TV Сериал",
+              "episodes": 10,
+              "epMinutes": 24,
+              "date": "15.05.2025",
+              "note": "Основной сезон"
+            },
+            {
+              "title": "Сезон 2",
+              "type": "TV Сериал",
+              "episodes": 13,
+              "epMinutes": 24,
+              "date": "05.10.2026",
+              "note": "Второй сезон"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "A",
+      "rank": 2,
+      "name": "Кристалл Спектра",
+      "subtitle": "Тессеракт Дисперсии · Выдающиеся тайтлы",
+      "hue": 185,
+      "items": [
+        {
+          "uid": "anime-apothecary-2023",
+          "kind": "TV Сериал",
+          "title": "Монолог фармацевта",
+          "origTitle": "Kusuriya no Hitorigoto",
+          "year": 2023,
+          "studio": "OLM / TOHO animation",
+          "score": 9.3,
+          "reaction": "🧪 Интрига",
+          "genres": [
+            "Детектив",
+            "Исторический",
+            "Драма"
+          ],
+          "poster": "https://shikimori.one/system/animes/original/54492.jpg",
+          "comment": "Блестящий детективный сюжет в декорациях императорского двора и великолепная Маомао.",
+          "seasons": [
+            {
+              "title": "Сезон 1",
+              "type": "TV Сериал",
+              "episodes": 24,
+              "epMinutes": 24,
+              "date": "14.03.2026",
+              "note": "1 сезон"
+            }
+          ]
+        },
+        {
+          "uid": "anime-yourname-2016",
+          "kind": "Фильм",
+          "title": "Твоё имя",
+          "origTitle": "Kimi no Na wa.",
+          "year": 2016,
+          "studio": "CoMix Wave Films",
+          "score": 9.4,
+          "reaction": "☄️ Комета",
+          "genres": [
+            "Романтика",
+            "Драма",
+            "Сверхъестественное"
+          ],
+          "poster": "https://shikimori.one/system/animes/original/32281.jpg",
+          "comment": "Визуальный шедевр Макото Синкая с музыкой RADWIMPS.",
+          "seasons": [
+            {
+              "title": "Полнометражный фильм",
+              "type": "Фильм",
+              "episodes": 1,
+              "epMinutes": 106,
+              "date": "19.01.2026",
+              "note": "Просмотр в 4K"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "rank": 3,
+      "name": "Аметистовый Резонанс",
+      "subtitle": "Магнитный Тор · Достойные и атмосферные работы",
+      "hue": 275,
+      "items": [
+        {
+          "uid": "anime-sololeveling-2024",
+          "kind": "TV Сериал",
+          "title": "Поднятие уровня в одиночку",
+          "origTitle": "Ore dake Level Up na Ken",
+          "year": 2024,
+          "studio": "A-1 Pictures",
+          "score": 8.5,
+          "reaction": "🔥 Экшен",
+          "genres": [
+            "Экшен",
+            "Фэнтези",
+            "Приключения"
+          ],
+          "poster": "https://shikimori.one/system/animes/original/52299.jpg",
+          "comment": "Отличная динамика боёв и музыка Хироюки Савано.",
+          "seasons": [
+            {
+              "title": "Сезон 1",
+              "type": "TV Сериал",
+              "episodes": 12,
+              "epMinutes": 24,
+              "date": "02.02.2026",
+              "note": "Просмотр"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "rank": 4,
+      "name": "Изумрудная Роса",
+      "subtitle": "Био-Сфера Росы · Расслабляющие и нишевые тайтлы",
+      "hue": 148,
+      "items": [
+        {
+          "uid": "anime-bartender-2024",
+          "kind": "TV Сериал",
+          "title": "Бармен: Бокал бога",
+          "origTitle": "Bartender: Kami no Glass",
+          "year": 2024,
+          "studio": "Liber",
+          "score": 7.9,
+          "reaction": "🍸 Уют",
+          "genres": [
+            "Повседневность",
+            "Драма"
+          ],
+          "poster": "https://shikimori.one/system/animes/original/53407.jpg",
+          "comment": "Спокойный вечерний сериал с приятной атмосферой камерного бара.",
+          "seasons": [
+            {
+              "title": "Сезон 1",
+              "type": "TV Сериал",
+              "episodes": 12,
+              "epMinutes": 24,
+              "date": "11.05.2026",
+              "note": "Для вечернего отдыха"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "D",
+      "rank": 5,
+      "name": "Янтарный Маятник",
+      "subtitle": "Хронометр · Спорные или проходные работы",
+      "hue": 28,
+      "items": []
+    },
+    {
+      "id": "E",
+      "rank": 6,
+      "name": "Монолит Забвения",
+      "subtitle": "Обелиск Пепла · Разочарования и брошенные тайтлы",
+      "hue": 215,
+      "items": []
+    }
+  ]
+}
