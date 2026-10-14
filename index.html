@@ -674,7 +674,6 @@ body.no-anim .tl-row{opacity:1}
 <button class="nav-btn" data-view="settings">Настройки</button>
 </nav>
 <div class="sync-wrap" id="sync-wrap">
-<!-- Кнопка "Вход" УБРАНА — вход только через admin.html?access=ТОКЕН -->
 <div class="sync-user hidden" id="sync-user" title="Синхронизация">
 <img id="su-avatar" alt="" class="hidden">
 <span class="gh-mini hidden" id="su-ghmini"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg></span>
@@ -1264,7 +1263,7 @@ const light = state.titles.map(t => (t.cover && t.cover.startsWith('data:')) ? {
 localStorage.setItem(LS_KEY, JSON.stringify({v:3, updatedAt: 0, titles: light}));
 if (!quotaWarned){
 quotaWarned = true;
-toast('Локальный кэш переполнен — обложки временно выгружены из кэша. Полная версия хранится в GitHub и подтянется автоматически', 'warn');
+toast('Локальный кэш переполнен — обложки временно выгружены из кэша', 'warn');
 }
 }catch(e2){}
 }
@@ -1278,7 +1277,7 @@ function save(push = true){
 state.updatedAt = Date.now();
 persist();
 broadcastLocal();
-if (push) schedulePush();
+if (push && typeof schedulePush === 'function') schedulePush();
 }
 
 let bc = null;
@@ -1386,6 +1385,234 @@ const t = findTitle(img.dataset.fb);
 if (t) img.src = coverSrc(t);
 }
 }, true);
+
+/* ================================================================
+ДВИЖОК ЧАСТИЦ (встроен, чтобы избежать "Particles is not defined")
+================================================================ */
+const Particles = (() => {
+const cv = document.getElementById('petals');
+if (!cv) return { init:()=>{}, refresh:()=>{}, restyle:()=>{}, burst:()=>{} };
+const ctx = cv.getContext('2d');
+let W=0, H=0, parts=[], bursts=[], running=false, frame=0, last=performance.now();
+const mouse = {x:-9e3, y:-9e3, vx:0, vy:0};
+let gust=0, gustTarget=0, gustUntil=0, nextGust=140;
+
+const PRESETS = {
+sakura:     {label:'Сакура · лепестки',        shape:'petal', colors:['#ffdce8','#ffc6d9','#ffb0cb','#ff9dc4','#fff0f5'], size:[4.5,11], vy:[.5,1.5],  sway:[.6,2.0], alpha:[.55,.95]},
+snow:       {label:'Зима · снег',              shape:'flake', colors:['#ffffff','#f2f7ff','#e8f1ff'], size:[2.5,6.5], vy:[.4,1.1], sway:[.4,1.2], alpha:[.6,1]},
+rain:       {label:'Дождь',                    shape:'drop', colors:['#9fd0ff','#7ab8ff','#c4e2ff'], size:[2,3.5], vy:[3,5], sway:[.05,.2], alpha:[.35,.7]},
+autumn:     {label:'Осень · листья',           shape:'leaf', colors:['#ffb347','#ff8c42','#e2574c','#d96c3f','#c9452f'], size:[5,10], vy:[.6,1.4], sway:[1,2.6], alpha:[.6,.95]},
+stars:      {label:'Ночь · звёздочки',         shape:'star', colors:['#ffffff','#ffd76e','#cfe8ff','#ffe9b0'], size:[1.5,3.5], vy:[.05,.25], sway:[.2,.8], alpha:[.3,.9], twinkle:true},
+fireflies:  {label:'Лето · светлячки',         shape:'glow', colors:['#ffe28a','#c3ff8a','#9affc3','#ffd76e'], size:[2,4.5], vy:[-.15,.35], sway:[.5,1.5], alpha:[.35,.9], twinkle:true, glow:true},
+hearts:     {label:'Сердечки',                 shape:'petal', colors:['#ff1493','#ff69b4','#ffb6c1'], size:[4,9], vy:[.4,1.2], sway:[.6,1.8], alpha:[.5,.9]},
+bubbles:    {label:'Пузыри',                   shape:'glow', colors:['rgba(255,255,255,.5)','rgba(255,255,255,.3)'], size:[2,6], vy:[-.3,.3], sway:[.5,1.5], alpha:[.3,.7], twinkle:true, glow:true},
+confetti:   {label:'Конфетти',                 shape:['petal','star'], colors:['#ff0000','#00ff00','#0000ff','#ffff00','#ff00ff','#00ffff'], size:[3,7], vy:[.5,1.5], sway:[.5,2], alpha:[.6,1]},
+petals:     {label:'Разноцветные лепестки',    shape:'petal', colors:['#ffd76e','#ff7aa2','#b18cff','#6fd6b1'], size:[4.5,10], vy:[.5,1.3], sway:[.6,1.9], alpha:[.55,.95]}
+};
+
+const preset = () => PRESETS[settings.particleStyle] || PRESETS.sakura;
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const rnd = (a,b) => a + Math.random()*(b-a);
+
+function resize(){
+const dpr = Math.min(devicePixelRatio||1, 2);
+W = innerWidth; H = innerHeight;
+cv.width = W*dpr; cv.height = H*dpr;
+ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+
+function spawn(anywhere){
+const p = preset();
+const shape = Array.isArray(p.shape) ? pick(p.shape) : p.shape;
+const sm = settings.particleSize/100, fm = settings.fallSpeed/100, am = settings.particleOpacity/100;
+return { shape, color: pick(p.colors),
+x: Math.random()*(W+160)-80,
+y: anywhere ? Math.random()*H : -20 - Math.random()*H*0.25,
+s: rnd(p.size[0], p.size[1]) * sm,
+vy: rnd(p.vy[0], p.vy[1]) * fm,
+phase: Math.random()*Math.PI*2, swaySpeed: 0.015 + Math.random()*0.03, swayAmp: rnd(p.sway[0], p.sway[1]),
+rot: Math.random()*Math.PI*2, rotV: (Math.random()-.5)*0.05,
+flip: Math.random()*Math.PI*2, flipV: 0.02 + Math.random()*0.05,
+alpha: rnd(p.alpha[0], p.alpha[1]) * am,
+wf: 0.5 + Math.random()*0.9, twk: p.twinkle ? Math.random()*Math.PI*2 : 0, glow: !!p.glow };
+}
+
+function target(){ if (!settings.particles || REDUCED) return 0; return Math.round(W*H/16000 * (0.25 + (settings.petalDensity/100)*1.25)); }
+
+function wind(){ const s = settings.wind/100, t = frame;
+return (Math.sin(t*0.004)*0.6 + Math.sin(t*0.0017+2)*0.4 + Math.sin(t*0.0009+5)*0.3) * s * 1.5 + gust; }
+
+function petalPath(c, s){
+c.beginPath(); c.moveTo(0, s);
+c.bezierCurveTo(s*0.85, s*0.45, s*0.95, -s*0.35, s*0.28, -s*0.82);
+c.quadraticCurveTo(s*0.1, -s*0.97, 0, -s*0.78);
+c.quadraticCurveTo(-s*0.1, -s*0.97, -s*0.28, -s*0.82);
+c.bezierCurveTo(-s*0.95, -s*0.35, -s*0.85, s*0.45, 0, s);
+c.closePath();
+}
+
+function drawFlake(c, s, color, alpha){
+c.strokeStyle = color; c.fillStyle = color; c.globalAlpha = alpha;
+if (s < 2.2){ c.beginPath(); c.arc(0,0,s,0,6.283); c.fill(); return; }
+c.lineWidth = Math.max(.8, s*.22); c.lineCap = 'round'; c.beginPath();
+for (let i = 0; i < 6; i++){
+const a = i*Math.PI/3;
+c.moveTo(0,0); c.lineTo(Math.cos(a)*s, Math.sin(a)*s);
+const mx = Math.cos(a)*s*.55, my = Math.sin(a)*s*.55;
+c.moveTo(mx, my); c.lineTo(mx + Math.cos(a+2.1)*s*.3, my + Math.sin(a+2.1)*s*.3);
+c.moveTo(mx, my); c.lineTo(mx + Math.cos(a-2.1)*s*.3, my + Math.sin(a-2.1)*s*.3);
+}
+c.stroke();
+}
+
+function drawLeaf(c, s, color, alpha){
+c.fillStyle = color; c.globalAlpha = alpha;
+c.beginPath(); c.moveTo(0, s);
+c.quadraticCurveTo(s*1.05, s*.1, 0, -s);
+c.quadraticCurveTo(-s*1.05, s*.1, 0, s);
+c.closePath(); c.fill();
+c.globalAlpha = alpha*.45; c.strokeStyle = color; c.lineWidth = Math.max(.6, s*.09);
+c.beginPath(); c.moveTo(0, s*.75); c.lineTo(0, -s*.75); c.stroke();
+}
+
+function drawGlow(c, s, color, alpha){
+c.globalAlpha = alpha; c.fillStyle = color; c.shadowColor = color; c.shadowBlur = s*2.6;
+c.beginPath(); c.arc(0, 0, s*.55, 0, 6.283); c.fill(); c.fill(); c.shadowBlur = 0;
+}
+
+function drawStar(c, s, color, alpha){
+c.strokeStyle = color; c.globalAlpha = alpha; c.lineWidth = Math.max(.7, s*.3); c.lineCap = 'round';
+c.beginPath();
+c.moveTo(-s,0); c.lineTo(s,0); c.moveTo(0,-s); c.lineTo(0,s);
+c.moveTo(-s*.45,-s*.45); c.lineTo(s*.45,s*.45); c.moveTo(s*.45,-s*.45); c.lineTo(-s*.45,s*.45);
+c.stroke();
+}
+
+function drawDrop(c, s, color, alpha){
+c.strokeStyle = color; c.globalAlpha = alpha; c.lineWidth = s*.5; c.lineCap = 'round';
+c.beginPath(); c.moveTo(0, -s*1.6); c.lineTo(0, s*1.2); c.stroke();
+}
+
+function draw(p, alphaMul){
+ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+if (p.shape === 'petal' || p.shape === 'leaf') ctx.scale(0.35 + 0.65*Math.abs(Math.cos(p.flip)), 1);
+const a = Math.max(0, Math.min(1, p.alpha * alphaMul * (p.twk ? .45 + .55*Math.abs(Math.sin(p.twk)) : 1)));
+if (p.shape === 'petal'){ ctx.globalAlpha = a; ctx.fillStyle = p.color; petalPath(ctx, p.s); ctx.fill(); }
+else if (p.shape === 'flake') drawFlake(ctx, p.s, p.color, a);
+else if (p.shape === 'leaf') drawLeaf(ctx, p.s, p.color, a);
+else if (p.shape === 'glow') drawGlow(ctx, p.s, p.color, a);
+else if (p.shape === 'star') drawStar(ctx, p.s, p.color, a);
+else if (p.shape === 'drop') drawDrop(ctx, p.s, p.color, a);
+ctx.restore();
+}
+
+function step(now){
+const dt = Math.min(48, now - last); last = now; const k = dt/16.7; frame++;
+if (frame > nextGust){ gustTarget = (Math.random()<.5?-1:1)*(0.8+Math.random()*1.6)*(settings.wind/100); gustUntil = frame + 50 + Math.random()*80; nextGust = frame + 260 + Math.random()*420; }
+if (frame > gustUntil) gustTarget = 0;
+gust += (gustTarget - gust)*0.015*k;
+const wv = wind();
+mouse.vx *= Math.pow(0.88, k); mouse.vy *= Math.pow(0.88, k);
+ctx.clearRect(0,0,W,H);
+const tg = target();
+if (parts.length < tg && frame % 3 === 0) parts.push(spawn(false));
+if (parts.length > tg) parts.length = Math.max(tg, parts.length - 2);
+const spinOn = settings.particleSpin;
+for (const p of parts){
+p.phase += p.swaySpeed*k;
+if (p.twk) p.twk += 0.05*k;
+p.flip += p.flipV*k;
+if (spinOn){ p.rot += p.rotV*k + wv*0.002*k; }
+p.x += (Math.sin(p.phase)*p.swayAmp*0.35 + wv*p.wf)*k;
+p.y += p.vy*k*(0.75 + 0.35*Math.abs(Math.cos(p.phase)));
+const dx = p.x-mouse.x, dy = p.y-mouse.y, d2 = dx*dx+dy*dy;
+if (d2 < 22500){ const f = 1 - Math.sqrt(d2)/150; p.x += mouse.vx*f*0.2*k; p.y += mouse.vy*f*0.12*k; }
+if (p.y > H+24 || p.y < -60 || p.x < -120 || p.x > W+120) Object.assign(p, spawn(false));
+draw(p, 1);
+}
+for (let i = bursts.length-1; i >= 0; i--){
+const b = bursts[i];
+b.vy += 0.1*k; b.vx *= Math.pow(0.985, k);
+b.x += b.vx*k; b.y += b.vy*k;
+if (spinOn){ b.rot += b.rv*k; }
+b.flip += 0.12*k; b.life -= k;
+if (b.life <= 0 || b.y > H+30){ bursts.splice(i,1); continue; }
+draw(b, Math.max(0, Math.min(1, b.life/b.max*1.3)));
+}
+if (parts.length || bursts.length || target() > 0) requestAnimationFrame(step);
+else { running = false; ctx.clearRect(0,0,W,H); }
+}
+
+function start(){ if (running) return; running = true; last = performance.now(); requestAnimationFrame(step); }
+
+window.addEventListener('resize', resize);
+window.addEventListener('pointermove', e => {
+mouse.vx = Math.max(-40, Math.min(40, e.clientX - mouse.x));
+mouse.vy = Math.max(-40, Math.min(40, e.clientY - mouse.y));
+mouse.x = e.clientX; mouse.y = e.clientY;
+}, {passive:true});
+
+return {
+init(){ resize(); for (let i=0;i<target();i++) parts.push(spawn(true)); start(); },
+refresh(){ if (target() > 0 || bursts.length) start(); },
+restyle(){ parts = []; start(); },
+burst(x, y, n=18){
+if (REDUCED) return;
+const pr = preset();
+for (let i=0;i<n;i++){
+const a = Math.random()*Math.PI*2, sp = 1.5 + Math.random()*4.2;
+bursts.push({shape: Array.isArray(pr.shape)?pr.shape[i%pr.shape.length]:pr.shape,
+x, y, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp - 1.6,
+s: rnd(pr.size[0], pr.size[1])*(settings.particleSize/100),
+rot:Math.random()*6.28, rv:(Math.random()-.5)*.22,
+flip:Math.random()*6.28, life:55+Math.random()*45, max:100,
+color: pr.colors[i%pr.colors.length],
+alpha: rnd(pr.alpha[0], pr.alpha[1])*(settings.particleOpacity/100),
+glow: !!pr.glow, twk: 0, wf: .7});
+}
+start();
+}
+};
+})();
+
+/* ================= генеративные деревья (упрощённо) ================= */
+function renderTrees(){
+const tr = $('#branch-tr'), bl = $('#branch-bl');
+if (!tr || !bl) return;
+const style = settings.branchStyle || 'sakura';
+const colors = {
+sakura:['#ff7aa2','#ffb0cb','#ffdce8'],
+maple:['#ff6b4a','#ffb347','#e2574c'],
+oak:['#4e8f4a','#9ed67f','#2c5d31'],
+pine:['#173a2a','#2b5e40','#4f8f63'],
+willow:['#4a6b2f','#7fae4e','#c8e39a'],
+birch:['#5f8f3e','#94c162','#e3f0a8'],
+bonsai:['#2f5d3a','#4f8f55','#9fd98a'],
+night:['#ff7aa2','#b18cff','#7ad0ff'],
+magnolia:['#fff6ea','#fdeedc','#f7e3c8'],
+orange:['#ff9a3d','#ffb54d','#2f5d33'],
+winter:['#5d4a5e','#3a2d3f','#8b93a0'],
+apple:['#fff5f8','#ffd6e3','#6fa855'],
+firsnow:['#274156','#3f6d84','#9fc8d8']
+};
+const c = colors[style] || colors.sakura;
+const svg = (mirror) => `<svg viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<radialGradient id="g1"><stop offset="0" stop-color="${c[0]}" stop-opacity=".6"/><stop offset="1" stop-color="${c[0]}" stop-opacity="0"/></radialGradient>
+</defs>
+<g class="sway" style="transform-origin:${mirror?'60':'340'}px 600px">
+<path d="M${mirror?'60':'340'},600 Q${mirror?'80':'320'},400 ${mirror?'120':'280'},200" stroke="#3a2531" stroke-width="12" fill="none" stroke-linecap="round"/>
+<path d="M${mirror?'80':'320'},450 Q${mirror?'140':'260'},350 ${mirror?'180':'220'},280" stroke="#3a2531" stroke-width="6" fill="none" stroke-linecap="round"/>
+<circle cx="${mirror?'120':'280'}" cy="200" r="80" fill="url(#g1)"/>
+<circle cx="${mirror?'180':'220'}" cy="280" r="60" fill="url(#g1)"/>
+<circle cx="${mirror?'100':'300'}" cy="250" r="50" fill="${c[1]}" opacity=".4"/>
+<circle cx="${mirror?'160':'240'}" cy="300" r="40" fill="${c[2]}" opacity=".3"/>
+</g>
+</svg>`;
+tr.innerHTML = svg(false);
+bl.innerHTML = svg(true);
+}
+renderTrees();
 
 /* ================= тосты / модалки ================= */
 const PETAL_ICO = '<svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 C 15.5 6.5, 20 8.5, 20 13.5 C 20 18, 15.5 21, 12 22 C 8.5 21, 4 18, 4 13.5 C 4 8.5, 8.5 6.5, 12 2 Z"/></svg>';
@@ -1682,6 +1909,66 @@ box.innerHTML = html || '<p class="tier-empty" style="padding:50px 0">Ничег
 if (animate) $$('#tierlist .tc-n').forEach(el => animNum(el, +el.dataset.n, Math.round((settings.counterSpeed||800)*.7)));
 const info = $('#filter-info');
 if (info) info.textContent = filtering ? `найдено: ${found} · скрыто: ${state.titles.length - found}` : '';
+}
+
+function emblemShape(tier){
+const c = TIER_COLOR[tier];
+const lt = lighten(c, .55);
+const dk = shadeColor(c, .42);
+const id = 'es' + tier;
+const defs = `<defs>
+<linearGradient id="${id}" x1="0" y1="0" x2=".25" y2="1">
+<stop offset="0" stop-color="${lt}"/><stop offset=".5" stop-color="${c}"/><stop offset="1" stop-color="${dk}"/>
+</linearGradient>
+<radialGradient id="${id}g" cx=".34" cy=".26" r=".95">
+<stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/>
+</radialGradient>
+</defs>`;
+const petal = a => `<ellipse rx="10" ry="24" cy="-24" transform="rotate(${a})" fill="url(#${id})" stroke="${lt}" stroke-width="1.2" opacity=".95"/>`;
+const shapes = {
+SSS: `<polygon points="50,3 61.8,36.5 96,37.5 68.5,58.5 78.5,92.5 50,72 21.5,92.5 31.5,58.5 4,37.5 38.2,36.5" fill="url(#${id})" stroke="${lt}" stroke-width="1.6" stroke-linejoin="round"/>
+<path d="M50 50 L50 3 M50 50 L96 37.5 M50 50 L78.5 92.5 M50 50 L21.5 92.5 M50 50 L4 37.5" stroke="rgba(60,40,0,.4)" stroke-width=".8"/>
+<polygon points="50,3 61.8,36.5 38.2,36.5" fill="url(#${id}g)" opacity=".85"/>`,
+S: `<g transform="translate(50,52)">${[0,60,120,180,240,300].map(petal).join('')}</g>
+<circle cx="50" cy="52" r="16" fill="url(#${id})" stroke="${lt}" stroke-width="1.4"/>
+<path d="M41 46 Q50 38 59 46" stroke="rgba(255,255,255,.55)" stroke-width="1.6" fill="none" stroke-linecap="round"/>`,
+A: `<polygon points="50,4 83,40 50,96 17,40" fill="url(#${id})" stroke="${lt}" stroke-width="1.6" stroke-linejoin="round"/>
+<path d="M17 40 H83 M50 4 L36 40 L50 96 M50 4 L64 40 L50 96" stroke="rgba(30,10,60,.38)" stroke-width=".9" fill="none"/>
+<polygon points="50,4 64,40 50,40" fill="url(#${id}g)" opacity=".8"/>`,
+B: `<polygon points="50,3 77,25 77,75 50,97 23,75 23,25" fill="url(#${id})" stroke="${lt}" stroke-width="1.6" stroke-linejoin="round"/>
+<path d="M50 3 V97 M23 25 L50 44 L77 25 M23 75 L50 56 L77 75" stroke="rgba(10,30,60,.35)" stroke-width=".9" fill="none"/>
+<polygon points="50,3 77,25 50,44" fill="url(#${id}g)" opacity=".75"/>`,
+C: `<circle cx="50" cy="50" r="34" fill="none" stroke="url(#${id})" stroke-width="11"/>
+<circle cx="50" cy="50" r="34" fill="none" stroke="${lt}" stroke-width="1" opacity=".7"/>
+<circle cx="50" cy="50" r="19" fill="url(#${id})" stroke="${lt}" stroke-width="1.3"/>
+<circle cx="50" cy="16" r="6" fill="${lt}" stroke="${dk}" stroke-width="1.4"/>`,
+D: `<path d="M50 4 L85 17 V52 C85 74 69 88 50 96 C31 88 15 74 15 52 V17 Z" fill="url(#${id})" stroke="${lt}" stroke-width="1.6" stroke-linejoin="round"/>
+<path d="M50 4 L85 17 V52 H15 V17 Z" fill="url(#${id}g)" opacity=".4"/>
+<path d="M50 22 L67 33 V54 C67 66 58 74 50 78 C42 74 33 66 33 54 V33 Z" fill="none" stroke="rgba(40,20,0,.35)" stroke-width="1.1"/>`,
+E: `<rect x="16" y="16" width="68" height="68" rx="14" fill="url(#${id})" stroke="${lt}" stroke-width="1.5"/>
+<rect x="27" y="27" width="46" height="46" rx="9" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1.3"/>
+<path d="M23 33 Q50 21 77 33" stroke="rgba(255,255,255,.4)" stroke-width="1.7" fill="none" stroke-linecap="round"/>`
+};
+return `<svg viewBox="0 0 100 100">${defs}${shapes[tier]}</svg>`;
+}
+
+function emblemHTML(tier, i){
+const layers = [
+{z:-12, o:.22, b:.45},
+{z:-6,  o:.55, b:.68},
+{z:0,   o:1,   b:1},
+{z:7,   o:.4,  b:1.3}
+].map(L => `<div class="emb-layer" style="--z:${L.z}px;--lo:${L.o};--lb:${L.b}">${emblemShape(tier)}</div>`).join('');
+return `
+<div class="emb" data-tier="${tier}" style="--tc:${TIER_COLOR[tier]};--i:${i}">
+<span class="emb-aura"></span>
+<span class="emb-ring"></span>
+<div class="emb-rot">${layers}
+<span class="emb-letter">${tier}</span>
+</div>
+<span class="emb-shadow"></span>
+${tier === 'SSS' ? `<span class="emb-crown">${CROWN}</span>` : ''}
+</div>`;
 }
 
 function renderTimeline(){
@@ -2413,10 +2700,11 @@ if (bl) bl.style.transform = `translate(${(mx*k*.7).toFixed(1)}px,${(my*k*.5).to
 
 function bindSettings(){
 $('#sel-pstyle').innerHTML = Object.entries(PRESETS).map(([k,p]) => `<option value="${k}">${esc(p.label)}</option>`).join('');
-$('#sel-bstyle').innerHTML = Object.entries(TREE_STYLES).map(([k,b]) => `<option value="${k}">${esc(b.label)}</option>`).join('');
+const treeStyles = {sakura:'Сакура',maple:'Клён',oak:'Дуб',pine:'Ель',willow:'Ива',birch:'Берёза',bonsai:'Бонсай',night:'Ночная сакура',magnolia:'Магнолия',orange:'Апельсиновое дерево',winter:'Зимнее дерево',apple:'Яблоня в цвету',firsnow:'Заснеженная ель'};
+$('#sel-bstyle').innerHTML = Object.entries(treeStyles).map(([k,l]) => `<option value="${k}">${l}</option>`).join('');
 $('#sel-tempo').value = settings.tempo;
 $('#sel-pstyle').value = PRESETS[settings.particleStyle] ? settings.particleStyle : 'sakura';
-$('#sel-bstyle').value = TREE_STYLES[settings.branchStyle] ? settings.branchStyle : 'sakura';
+$('#sel-bstyle').value = treeStyles[settings.branchStyle] ? settings.branchStyle : 'sakura';
 $('#sel-catview').value = ['posters','chips','list'].includes(settings.catalogView) ? settings.catalogView : 'posters';
 $('#sel-embanim').value = ['full','float','off'].includes(settings.emblemAnim) ? settings.emblemAnim : 'full';
 $('#sel-pstyle').addEventListener('change', e => { settings.particleStyle = e.target.value; persistSettings(); Particles.restyle(); });
@@ -2478,43 +2766,11 @@ persistSettings(); renderAll();
 numHandler('s-epmin','epMin'); numHandler('s-filmmin','filmMin');
 }
 
-function bindSettingsValues(){
-const map = {anim:'s-anim', rowAnim:'s-rowanim', cascade:'s-cascade', modalPop:'s-modalpop', toastAnim:'s-toastanim',
-pillGlow:'s-pillglow', tierGlow:'s-tierglow', tierBg:'s-tierbg',
-tilt:'s-tilt', cardLift:'s-lift', glow:'s-glow', shine:'s-shine',
-counters:'s-counters', recent:'s-recent', light:'s-light',
-particles:'s-particles', particleSpin:'s-pspin', twinkle:'s-twinkle', petsFront:'s-petsfront',
-branches:'s-branches', sway:'s-sway', ambient:'s-ambient', moon:'s-moon'};
-for (const [k, id] of Object.entries(map)) $('#'+id).checked = !!settings[k];
-const rv = (rid, vid, key, fmt) => { $('#'+rid).value = settings[key]; $('#'+vid).textContent = fmt(settings[key]); };
-rv('s-density','v-density','petalDensity', v => v + '%');
-rv('s-fall','v-fall','fallSpeed', v => v + '%');
-rv('s-psize','v-psize','particleSize', v => v + '%');
-rv('s-palpha','v-palpha','particleOpacity', v => v + '%');
-rv('s-wind','v-wind','wind', v => (v/100).toFixed(1) + '×');
-rv('s-parallax','v-parallax','parallax', v => v + '%');
-rv('s-balpha','v-balpha','branchAlpha', v => v + '%');
-rv('s-bgdim','v-bgdim','bgDim', v => v + '%');
-rv('s-embanimspd','v-embanimspd','embAnimSpeed', v => v + ' с');
-rv('s-tiltpow','v-tiltpow','tiltPower', v => '±' + v + '°');
-rv('s-cntspd','v-cntspd','counterSpeed', v => v + ' мс');
-rv('s-panelop','v-panelop','panelOp', v => v + '%');
-rv('s-radius','v-radius','radius', v => v + ' px');
-$('#sel-tempo').value = settings.tempo;
-$('#sel-pstyle').value = PRESETS[settings.particleStyle] ? settings.particleStyle : 'sakura';
-$('#sel-bstyle').value = TREE_STYLES[settings.branchStyle] ? settings.branchStyle : 'sakura';
-$('#sel-catview').value = ['posters','chips','list'].includes(settings.catalogView) ? settings.catalogView : 'posters';
-$('#sel-embanim').value = ['full','float','off'].includes(settings.emblemAnim) ? settings.emblemAnim : 'full';
-$$('#acc-pick button').forEach(b => b.classList.toggle('on', settings.accent === b.dataset.acc));
-$('#s-epmin').value = settings.epMin;
-$('#s-filmmin').value = settings.filmMin;
-}
-
 $('#btn-reset-set').onclick = () => openConfirm({
 title:'Вернуть стандартные настройки?',
 text:'Оформление, эффекты и атмосфера сбросятся к исходным — только в вашем браузере. Каталог и вход не затрагиваются.',
 okLabel:'Сбросить',
-onOk(){ settings = {...DEFAULT_SETTINGS}; persistSettings(); applySettings(); bindSettingsValues(); renderTrees(); Particles.restyle(); renderAll(); toast('Настройки возвращены к стандартным'); }
+onOk(){ settings = {...DEFAULT_SETTINGS}; persistSettings(); applySettings(); renderTrees(); Particles.restyle(); renderAll(); toast('Настройки возвращены к стандартным'); }
 });
 
 $('#btn-export').onclick = () => {
@@ -2558,7 +2814,7 @@ e.target.value = '';
 });
 
 /* ================================================================
-СИНХРОНИЗАЦИЯ С GITHUB + ВХОД ВЛАДЕЛЬЦА ЧЕРЕЗ УНИКАЛЬНУЮ ССЫЛКУ
+СИНХРОНИЗАЦИЯ С GITHUB
 ================================================================ */
 let sync = null;
 try{ sync = JSON.parse(localStorage.getItem(LS_SYNC)) || null; }catch(e){}
@@ -2569,10 +2825,9 @@ const POLL_MS = 5000, API_MS = 70000;
 
 const b64encode = str => { const b = new TextEncoder().encode(str); let s=''; b.forEach(x => s += String.fromCharCode(x)); return btoa(s); };
 
-/* ПРОВЕРКА ВЛАДЕЛЬЦА: только если установлен флаг anime_owner_mode через admin.html */
+/* ПРОВЕРКА ВЛАДЕЛЬЦА: только флаг anime_owner_mode из localStorage */
 function canEdit(){
-  // Достаточно того, что мы вошли по правильной ссылке-токену
-  return localStorage.getItem('anime_owner_mode') === 'true';
+return localStorage.getItem(LS_OWNER) === 'true';
 }
 
 function saveSync(){ if (sync) localStorage.setItem(LS_SYNC, JSON.stringify(sync)); else localStorage.removeItem(LS_SYNC); }
@@ -2623,27 +2878,19 @@ setTimeout(() => location.reload(), 1000);
 }
 
 function updateSyncUI(){
-  const connected = !!sync;
-  
-  // ПОЛНОСТЬЮ скрываем кнопку "Вход", так как вход осуществляется только по ссылке
-  const loginBtn = $('#btn-login');
-  if (loginBtn) loginBtn.classList.add('hidden');
-  
-  const syncUser = $('#sync-user');
-  if (syncUser) syncUser.classList.toggle('hidden', !connected);
-  
-  if (connected){
-    const av = $('#su-avatar'), mini = $('#su-ghmini');
-    if (sync.avatar){ av.src = sync.avatar; av.classList.remove('hidden'); mini.classList.add('hidden'); }
-    else { av.classList.add('hidden'); mini.classList.remove('hidden'); }
-  }
-  
-  const editable = canEdit();
-  const btnAdd = $('#btn-add');
-  if (btnAdd) btnAdd.classList.toggle('hidden', !editable);
-  $$('[data-act="add"]').forEach(b => b.classList.toggle('hidden', !editable));
-  
-  setSyncStatus(sync ? syncStatus : 'off');
+const connected = !!sync;
+const syncUser = $('#sync-user');
+if (syncUser) syncUser.classList.toggle('hidden', !connected);
+if (connected){
+const av = $('#su-avatar'), mini = $('#su-ghmini');
+if (sync.avatar){ av.src = sync.avatar; av.classList.remove('hidden'); mini.classList.add('hidden'); }
+else { av.classList.add('hidden'); mini.classList.remove('hidden'); }
+}
+const editable = canEdit();
+const btnAdd = $('#btn-add');
+if (btnAdd) btnAdd.classList.toggle('hidden', !editable);
+$$('[data-act="add"]').forEach(b => b.classList.toggle('hidden', !editable));
+setSyncStatus(sync ? syncStatus : 'off');
 }
 
 $('#sync-user').addEventListener('click', e => {
@@ -2836,58 +3083,11 @@ window.addEventListener('blur', () => { if (tiltEl){ tiltEl.style.transform = ''
 window.addEventListener('resize', movePill);
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(movePill);
 
-  // === СТРАХОВОЧНЫЙ ДВИЖОК ЧАСТИЦ (на случай обрезки файла) ===
-if (typeof Particles === 'undefined') {
-    const Particles = (() => {
-        const cv = document.getElementById('petals');
-        if (!cv) return { init:()=>{}, refresh:()=>{}, restyle:()=>{}, burst:()=>{} };
-        const ctx = cv.getContext('2d');
-        let W=0, H=0, parts=[], running=false;
-        
-        const resize = () => { W = innerWidth; H = innerHeight; cv.width = W; cv.height = H; };
-        const spawn = () => ({ 
-            x: Math.random()*W, 
-            y: -20, 
-            s: Math.random()*4+2, 
-            vy: Math.random()*1.5+0.5, 
-            phase: Math.random()*6.28, 
-            color: ['#ffdce8','#ffc6d9','#ffffff'][Math.floor(Math.random()*3)] 
-        });
-        
-        const step = () => {
-            if (!running) return;
-            ctx.clearRect(0,0,W,H);
-            if (parts.length < 60) parts.push(spawn());
-            for (let i = parts.length - 1; i >= 0; i--) {
-                const p = parts[i];
-                p.y += p.vy;
-                p.x += Math.sin(p.phase) * 0.5;
-                p.phase += 0.02;
-                ctx.fillStyle = p.color;
-                ctx.globalAlpha = 0.7;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.s, 0, 6.28);
-                ctx.fill();
-                if (p.y > H + 20) parts.splice(i, 1);
-            }
-            requestAnimationFrame(step);
-        };
-        
-        return {
-            init() { resize(); for(let i=0;i<60;i++) parts.push(spawn()); running = true; step(); },
-            refresh() { if(!running) { running = true; step(); } },
-            restyle() { parts = []; },
-            burst() {}
-        };
-    })();
-}
-// === КОНЕЦ СТРАХОВОЧНОГО КОДА ===
 /* ================= старт ================= */
 document.addEventListener('DOMContentLoaded', () => {
 Particles.init();
 applySettings();
 bindSettings();
-bindSettingsValues();
 renderAll();
 movePill();
 updateSyncUI();
