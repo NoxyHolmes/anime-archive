@@ -265,13 +265,9 @@ filter:drop-shadow(0 2px 4px rgba(0,0,0,.5));pointer-events:none}
 @keyframes embOrbitZ{from{transform:rotate(0deg) rotateY(22deg)}to{transform:rotate(360deg) rotateY(22deg)}}
 @keyframes embSwing{from{transform:rotate(13deg)}to{transform:rotate(-13deg)}}
 @keyframes embGentle{0%,100%{transform:translateY(0) rotateY(-7deg)}50%{transform:translateY(-6px) rotateY(7deg)}}
-body[data-embanim="off"] .emb-rot,
-body[data-embanim="off"] .emb-aura,
-body[data-embanim="off"] .emb-ring,
-body[data-embanim="off"] .emb-shadow{animation:none!important}
+body[data-embanim="off"] .emb-rot,body[data-embanim="off"] .emb-aura,body[data-embanim="off"] .emb-ring,body[data-embanim="off"] .emb-shadow{animation:none!important}
 body[data-embanim="float"] .emb-rot{animation:embGentle 6s ease-in-out infinite!important}
-body[data-embanim="float"] .emb-aura,
-body[data-embanim="float"] .emb-ring{animation:none!important}
+body[data-embanim="float"] .emb-aura,body[data-embanim="float"] .emb-ring{animation:none!important}
 .tier-epithet{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .tier-count{font-family:'JetBrains Mono';font-size:11px;color:var(--muted);white-space:nowrap}
 .tier-count b{color:var(--text);font-weight:600}
@@ -651,7 +647,6 @@ body.no-anim .tl-row{opacity:1}
 </style>
 </head>
 <body class="ambient pill-glow tier-glow" data-embanim="full">
-
 <div id="user-bg" aria-hidden="true"></div>
 <div id="user-dim" aria-hidden="true"></div>
 <div class="bg-moon" aria-hidden="true"></div>
@@ -659,7 +654,6 @@ body.no-anim .tl-row{opacity:1}
 <div class="bg-branch br-tr" id="branch-tr" aria-hidden="true"></div>
 <div class="bg-branch br-bl" id="branch-bl" aria-hidden="true"></div>
 <canvas id="petals" aria-hidden="true"></canvas>
-
 <header class="topbar">
 <a class="brand" href="#" onclick="return false">
 <span class="brand-word" aria-label="ANIME"><i>A</i><i>N</i><i>I</i><i>M</i><i>E</i></span>
@@ -686,7 +680,6 @@ body.no-anim .tl-row{opacity:1}
 <span class="add-label">Добавить тайтл</span>
 </button>
 </header>
-
 <main>
 <section class="view" id="view-tier">
 <div class="hero" id="hero">
@@ -719,24 +712,18 @@ body.no-anim .tl-row{opacity:1}
 </div>
 </div>
 </section>
-
 <section class="view hidden" id="view-timeline">
-<div class="page-head">
-<div>
+<div class="page-head"><div>
 <h1 class="page-title">Хронология</h1>
 <p class="page-sub">Общий список просмотра — от свежего к старому</p>
-</div>
-</div>
+</div></div>
 <div id="timeline"></div>
 </section>
-
 <section class="view hidden" id="view-calendar">
-<div class="page-head">
-<div>
+<div class="page-head"><div>
 <h1 class="page-title">Календарь просмотра</h1>
 <p class="page-sub">Дни, в которые вы закончили сезоны, фильмы, OVA и спешлы</p>
-</div>
-</div>
+</div></div>
 <div class="cal-head">
 <div class="cal-mode">
 <button id="cal-mode-grid" class="on">Сетка</button>
@@ -759,25 +746,20 @@ body.no-anim .tl-row{opacity:1}
 <div id="cal-list"></div>
 </div>
 </section>
-
 <section class="view hidden" id="view-stats">
-<div class="page-head">
-<div>
+<div class="page-head"><div>
 <h1 class="page-title">Статистика и аналитика</h1>
 <p class="page-sub">Серии, часы, активность, рекорды, тиры, жанры и годы</p>
-</div>
-</div>
+</div></div>
 <div id="stats"></div>
 </section>
 </main>
-
 <aside id="drawer" aria-label="Настройки">
 <div class="drawer-head">
 <h2>Настройки</h2>
 <button class="drawer-x" id="drawer-x" title="Закрыть панель"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
 </div>
 <p class="drawer-sub">Персональные — действуют только в вашем браузере</p>
-
 <div class="set-sec">
 <h3>Каталог</h3>
 <div class="sw-row">
@@ -789,11 +771,10 @@ body.no-anim .tl-row{opacity:1}
 </select>
 </div>
 </div>
-
 <div class="set-sec">
 <h3>Эмблемы тиров</h3>
 <div class="sw-row">
-<div><div class="sw-name">Анимация эмблем</div><div class="sw-desc">У каждого тира своя: звезда, лотос, алмаз…</div></div>
+<div><div class="sw-name">Анимация эмблем</div><div class="sw-desc">У каждого тира своя</div></div>
 <select class="sel-set" id="sel-embanim">
 <option value="full">Полная</option>
 <option value="float">Только парение</option>
@@ -809,7 +790,6 @@ body.no-anim .tl-row{opacity:1}
 <label class="switch"><input type="checkbox" id="s-tierglow"><i></i></label>
 </div>
 </div>
-
 <div class="set-sec">
 <h3>Частицы и погода</h3>
 <div class="sw-row">
@@ -853,7 +833,6 @@ body.no-anim .tl-row{opacity:1}
 <div class="range-in"><input type="range" id="s-wind" min="0" max="200" step="10"><span class="rng-val" id="v-wind"></span></div>
 </div>
 </div>
-
 <div class="set-sec">
 <h3>Деревья на фоне</h3>
 <div class="sw-row">
@@ -877,7 +856,6 @@ body.no-anim .tl-row{opacity:1}
 <div class="range-in"><input type="range" id="s-balpha" min="20" max="100" step="5"><span class="rng-val" id="v-balpha"></span></div>
 </div>
 </div>
-
 <div class="set-sec">
 <h3>Фон и глубина</h3>
 <div class="sw-row">
@@ -901,7 +879,6 @@ body.no-anim .tl-row{opacity:1}
 <div class="range-in"><input type="range" id="s-bgdim" min="0" max="90" step="5"><span class="rng-val" id="v-bgdim"></span></div>
 </div>
 </div>
-
 <div class="set-sec">
 <h3>Анимации интерфейса</h3>
 <div class="sw-row">
@@ -924,7 +901,6 @@ body.no-anim .tl-row{opacity:1}
 <div class="sw-row"><div><div class="sw-name">Анимация тостов</div></div><label class="switch"><input type="checkbox" id="s-toastanim"><i></i></label></div>
 <div class="sw-row"><div><div class="sw-name">Свечение активной вкладки</div></div><label class="switch"><input type="checkbox" id="s-pillglow"><i></i></label></div>
 </div>
-
 <div class="set-sec">
 <h3>Карточки</h3>
 <div class="sw-row"><div><div class="sw-name">Объёмный наклон</div></div><label class="switch"><input type="checkbox" id="s-tilt"><i></i></label></div>
@@ -933,14 +909,12 @@ body.no-anim .tl-row{opacity:1}
 <div class="sw-row"><div><div class="sw-name">Подсветка цветом тира</div></div><label class="switch"><input type="checkbox" id="s-glow"><i></i></label></div>
 <div class="sw-row"><div><div class="sw-name">Блеск на обложках</div></div><label class="switch"><input type="checkbox" id="s-shine"><i></i></label></div>
 </div>
-
 <div class="set-sec">
 <h3>Счётчики и списки</h3>
 <div class="sw-row"><div><div class="sw-name">Анимация счётчиков</div></div><label class="switch"><input type="checkbox" id="s-counters"><i></i></label></div>
 <div class="sw-row"><div><div class="sw-name">Скорость счётчиков</div></div><div class="range-in"><input type="range" id="s-cntspd" min="200" max="2000" step="100"><span class="rng-val" id="v-cntspd"></span></div></div>
 <div class="sw-row"><div><div class="sw-name">Лента недавних</div></div><label class="switch"><input type="checkbox" id="s-recent"><i></i></label></div>
 </div>
-
 <div class="set-sec">
 <h3>Тема</h3>
 <div class="sw-row"><div><div class="sw-name">Светлая тема</div></div><label class="switch"><input type="checkbox" id="s-light"><i></i></label></div>
@@ -956,13 +930,11 @@ body.no-anim .tl-row{opacity:1}
 <div class="sw-row"><div><div class="sw-name">Прозрачность панелей</div></div><div class="range-in"><input type="range" id="s-panelop" min="50" max="100" step="2"><span class="rng-val" id="v-panelop"></span></div></div>
 <div class="sw-row"><div><div class="sw-name">Скругление карточек</div></div><div class="range-in"><input type="range" id="s-radius" min="0" max="20" step="1"><span class="rng-val" id="v-radius"></span></div></div>
 </div>
-
 <div class="set-sec">
 <h3>Расчёт времени</h3>
 <div class="num-row"><div><div class="sw-name">Длительность серии</div></div><div class="num-in"><input type="number" id="s-epmin" min="1" max="600"><span>мин</span></div></div>
 <div class="num-row"><div><div class="sw-name">Длительность фильма</div></div><div class="num-in"><input type="number" id="s-filmmin" min="1" max="600"><span>мин</span></div></div>
 </div>
-
 <div class="set-sec">
 <h3>Данные</h3>
 <div class="set-actions">
@@ -973,12 +945,10 @@ body.no-anim .tl-row{opacity:1}
 </div>
 </div>
 </aside>
-
 <footer>
 <span>ANIME · личный каталог просмотра</span>
 <span>/ — поиск · ? — подсказка · Esc — закрыть</span>
 </footer>
-
 <div class="overlay hidden" id="ov-title"><div class="modal modal-title" id="m-title"></div></div>
 <div class="overlay hidden" id="ov-form">
 <div class="modal modal-form">
@@ -1063,10 +1033,8 @@ body.no-anim .tl-row{opacity:1}
 </div>
 <div class="overlay hidden" id="ov-day"><div class="modal modal-day" id="m-day"></div></div>
 <div class="overlay hidden" id="ov-confirm"><div class="modal modal-confirm" id="m-confirm"></div></div>
-
 <div class="toasts" id="toasts"></div>
 <button id="to-top" title="Наверх"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
-
 <script>
 'use strict';
 /* ================= константы ================= */
@@ -1093,7 +1061,46 @@ const DATA_PATH = 'anime-data.json';
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const CROWN = `<svg viewBox="0 0 24 14" width="100%"><path d="M2 12 L3 4 L7 8 L12 2 L17 8 L21 4 L22 12 Z" fill="#ffd76e" stroke="#c9932a" stroke-width="1" stroke-linejoin="round"/><circle cx="12" cy="2" r="1.4" fill="#fff3c4"/><circle cx="3" cy="4" r="1" fill="#fff3c4"/><circle cx="21" cy="4" r="1" fill="#fff3c4"/></svg>`;
 const CROWN_MINI = `<svg viewBox="0 0 24 14" width="13" height="9"><path d="M2 12 L3 4 L7 8 L12 2 L17 8 L21 4 L22 12 Z" fill="#ffd76e" stroke="#c9932a" stroke-width="1"/></svg>`;
-
+const PRESETS = {
+sakura:     {label:'Сакура · лепестки',        shape:'petal', colors:['#ffdce8','#ffc6d9','#ffb0cb','#ff9dc4','#fff0f5'], size:[4.5,11], vy:[.5,1.5],  sway:[.6,2.0], alpha:[.55,.95]},
+snow:       {label:'Зима · снег',              shape:'flake', colors:['#ffffff','#f2f7ff','#e8f1ff'], size:[2.5,6.5], vy:[.4,1.1], sway:[.4,1.2], alpha:[.6,1]},
+rain:       {label:'Дождь',                    shape:'drop', colors:['#9fd0ff','#7ab8ff','#c4e2ff'], size:[2,3.5], vy:[3,5], sway:[.05,.2], alpha:[.35,.7]},
+autumn:     {label:'Осень · листья',           shape:'leaf', colors:['#ffb347','#ff8c42','#e2574c','#d96c3f','#c9452f'], size:[5,10], vy:[.6,1.4], sway:[1,2.6], alpha:[.6,.95]},
+stars:      {label:'Ночь · звёздочки',         shape:'star', colors:['#ffffff','#ffd76e','#cfe8ff','#ffe9b0'], size:[1.5,3.5], vy:[.05,.25], sway:[.2,.8], alpha:[.3,.9], twinkle:true},
+fireflies:  {label:'Лето · светлячки',         shape:'glow', colors:['#ffe28a','#c3ff8a','#9affc3','#ffd76e'], size:[2,4.5], vy:[-.15,.35], sway:[.5,1.5], alpha:[.35,.9], twinkle:true, glow:true},
+hearts:     {label:'Сердечки',                 shape:'petal', colors:['#ff1493','#ff69b4','#ffb6c1'], size:[4,9], vy:[.4,1.2], sway:[.6,1.8], alpha:[.5,.9]},
+bubbles:    {label:'Пузыри',                   shape:'glow', colors:['rgba(255,255,255,.5)','rgba(255,255,255,.3)'], size:[2,6], vy:[-.3,.3], sway:[.5,1.5], alpha:[.3,.7], twinkle:true, glow:true},
+confetti:   {label:'Конфетти',                 shape:['petal','star'], colors:['#ff0000','#00ff00','#0000ff','#ffff00','#ff00ff','#00ffff'], size:[3,7], vy:[.5,1.5], sway:[.5,2], alpha:[.6,1]},
+petals:     {label:'Разноцветные лепестки',    shape:'petal', colors:['#ffd76e','#ff7aa2','#b18cff','#6fd6b1'], size:[4.5,10], vy:[.5,1.3], sway:[.6,1.9], alpha:[.55,.95]}
+};
+const TREE_STYLES = {
+sakura:  {label:'Сакура цветущая',   shape:'broad',  trunk:['#3a2531','#6b4a55'], bark:'#2a1a24',
+leaf:['#7e2f52','#c94f7c','#ffd9e6'], blooms:['#ffdce8','#ffcad9','#ffb6cf','#ffa5c6','#fdeef5'], bloomRate:.75},
+maple:   {label:'Клён осенний',      shape:'broad',  trunk:['#4d3226','#7a5240'], bark:'#33201a',
+leaf:['#8c2f1d','#d95a2b','#ffb347']},
+oak:     {label:'Летний дуб',        shape:'broad',  trunk:['#463225','#6e5138'], bark:'#2e2015',
+leaf:['#2c5d31','#4e8f4a','#9ed67f']},
+pine:    {label:'Хвойная ель',       shape:'pine',   trunk:['#4a3428','#6e4e38'], bark:'#312116',
+leaf:['#173a2a','#2b5e40','#4f8f63']},
+willow:  {label:'Плакучая ива',      shape:'willow', trunk:['#4b3a2e','#705a44'], bark:'#32261c',
+leaf:['#4a6b2f','#7fae4e','#c8e39a']},
+birch:   {label:'Берёза',            shape:'birch',  trunk:['#c9cdd4','#f4f6f8'], bark:'#8b93a0', birchMarks:true,
+leaf:['#5f8f3e','#94c162','#e3f0a8']},
+bonsai:  {label:'Бонсай',            shape:'bonsai', trunk:['#5d4433','#8a6850'], bark:'#3e2c20',
+leaf:['#2f5d3a','#4f8f55','#9fd98a']},
+night:   {label:'Ночная сакура',     shape:'broad',  trunk:['#221831','#3d2c49'], bark:'#181022',
+leaf:['#241b2e','#4a2a56','#6e3b6e'], blooms:['#ff7aa2','#ff9dc4','#b18cff','#ffcad9'], bloomRate:.8, glow:'#ff7aa2'},
+magnolia:{label:'Магнолия',          shape:'bare',   trunk:['#4b3341','#6b4d55'], bark:'#2e1f28',
+leaf:null, blooms:['#fff6ea','#fdeedc','#f7e3c8','#ffffff'], bigBloom:true},
+orange:  {label:'Апельсиновое дерево', shape:'broad', trunk:['#4a3527','#6e5138'], bark:'#312116',
+leaf:['#2f5d33','#57a055','#a8d98a'], fruit:['#ff9a3d','#ffb54d'], fruitRate:.5},
+winter:  {label:'Зимнее дерево',     shape:'bare',   trunk:['#3a2d3f','#5d4a5e'], bark:'#281f2e',
+leaf:null, snow:true},
+apple:   {label:'Яблоня в цвету',    shape:'broad',  trunk:['#4b3341','#6b4d55'], bark:'#2e1f28',
+leaf:['#3f6b35','#6fa855','#c3e59a'], blooms:['#fff5f8','#ffd6e3','#ffeef4'], bloomRate:.55},
+firsnow: {label:'Заснеженная ель',   shape:'pine',   trunk:['#3f3242','#5d4a5e'], bark:'#2a2130',
+leaf:['#274156','#3f6d84','#9fc8d8'], snowCap:true}
+};
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const uid = () => Math.random().toString(36).slice(2,9) + Date.now().toString(36);
@@ -1104,7 +1111,6 @@ const fmtDur = min => { const h = Math.floor(min/60), m = Math.round(min%60); if
 const plural = (n,a,b,c) => { const m=n%10,h=n%100; return (h>=11&&h<=14)?c:(m===1?a:(m>=2&&m<=4?b:c)); };
 const findTitle = id => state.titles.find(t => t.id === id);
 const mulberry32 = a => () => { a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; };
-
 function shadeColor(hex, f){
 const n = parseInt(hex.slice(1), 16);
 const r = Math.round(((n>>16)&255)*f), g = Math.round(((n>>8)&255)*f), b = Math.round((n&255)*f);
@@ -1115,7 +1121,6 @@ const n = parseInt(hex.slice(1), 16);
 const mix = v => Math.round(v + (255-v)*f);
 return '#' + ((1<<24)+(mix((n>>16)&255)<<16)+(mix((n>>8)&255)<<8)+mix(n&255)).toString(16).slice(1);
 }
-
 function compressImage(file, maxW, quality){
 return new Promise((resolve, reject) => {
 const img = new Image();
@@ -1135,10 +1140,7 @@ img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('bad image')); 
 img.src = url;
 });
 }
-
-/* ================= хранилище ================= */
-const LS_KEY = 'anime.v3', LS_SET = 'anime.settings', LS_BG = 'anime.bg', LS_SYNC = 'anime.sync';
-const LS_OWNER = 'anime_owner_mode';
+const LS_KEY = 'anime.v3', LS_SET = 'anime.settings', LS_BG = 'anime.bg', LS_SYNC = 'anime.sync', LS_OWNER = 'anime_owner_mode';
 const OLD_KEYS = ['anime.v2','tsundoku.v1'];
 const DEFAULT_SETTINGS = {
 anim:true, tempo:'normal', rowAnim:true, cascade:true, modalPop:true, toastAnim:true, pillGlow:true,
@@ -1153,9 +1155,7 @@ branches:true, branchStyle:'sakura', sway:true, parallax:30, branchAlpha:95,
 ambient:true, moon:true, bgDim:55,
 epMin:24, filmMin:110
 };
-
 function normDate(d){ return (d && +d.y) ? {d:+d.d||null, m:+d.m||null, y:+d.y} : null; }
-
 function unitName(t, u, i){
 if (u.name) return u.name;
 const us = t.units || [];
@@ -1167,7 +1167,6 @@ return KIND[u.kind].label + ' ' + n;
 }
 return us.length > 1 ? KIND[u.kind].label + ' ' + (i + 1) : KIND[u.kind].label;
 }
-
 function normalizeTitle(t){
 const type = ['tv','film','ova','ona'].includes(t.type) ? t.type : 'tv';
 let units;
@@ -1217,7 +1216,6 @@ episodes: (type === 'ova' || type === 'ona') ? units.reduce((s,u) => s + (u.kind
 date, minutes: +t.minutes > 0 ? +t.minutes : null, notes: String(t.notes || '')
 };
 }
-
 function loadTitles(){
 for (const key of [LS_KEY, ...OLD_KEYS]){
 try{
@@ -1231,29 +1229,16 @@ return { titles: d.titles.map(normalizeTitle), updatedAt: +d.updatedAt || 0 };
 }
 return { titles: [], updatedAt: 0 };
 }
-
 function loadSettings(){
 let s = null;
 try{ const raw = localStorage.getItem(LS_SET); if (raw) s = JSON.parse(raw); }catch(e){}
-if (!s){
-try{ const old = JSON.parse(localStorage.getItem(LS_KEY)); if (old && old.settings) s = old.settings; }catch(e){}
-}
 const out = Object.assign({}, DEFAULT_SETTINGS, s || {});
-if (s){
-if (s.tierWobble === false) out.emblemAnim = 'off';
-if (s.tierWobbleSpeed != null && s.embAnimSpeed == null) out.embAnimSpeed = s.tierWobbleSpeed;
-if (s.sssGlow != null) out.tierGlow = s.sssGlow;
-delete out.tierWobble; delete out.tierWobbleSpeed; delete out.sssGlow;
-delete out.grain; delete out.grainOp;
-}
 return out;
 }
-
 let state = loadTitles();
 let settings = loadSettings();
 let sortMode = 'added';
 let quotaWarned = false;
-
 function persist(){
 try{
 localStorage.setItem(LS_KEY, JSON.stringify({v:3, updatedAt: state.updatedAt, titles: state.titles}));
@@ -1268,18 +1253,15 @@ toast('Локальный кэш переполнен — обложки вре�
 }catch(e2){}
 }
 }
-
 function persistSettings(){
 try{ localStorage.setItem(LS_SET, JSON.stringify(settings)); }catch(e){}
 }
-
 function save(push = true){
 state.updatedAt = Date.now();
 persist();
 broadcastLocal();
 if (push && typeof schedulePush === 'function') schedulePush();
 }
-
 let bc = null;
 try{ bc = new BroadcastChannel('anime-catalog'); }catch(e){}
 function broadcastLocal(){ try{ bc && bc.postMessage({updatedAt: state.updatedAt}); }catch(e){} }
@@ -1295,8 +1277,6 @@ renderAll();
 }
 if (bc) bc.onmessage = e => { if (e.data && e.data.updatedAt > (state.updatedAt||0)) applyLocalRemote(); };
 window.addEventListener('storage', e => { if (e.key === LS_KEY && e.newValue) applyLocalRemote(); });
-
-/* ================= расчёты ================= */
 function titleEpisodes(t){
 if (t.units && t.units.length) return t.units.reduce((s,u) => u.kind !== 'film' ? s + (+u.episodes||0) : s, 0);
 if (t.type === 'film') return 0;
@@ -1348,8 +1328,6 @@ else { sMin += titleEpisodes(t) * epMinutes(t); }
 }
 return { n: state.titles.length, eps, films, sMin, fMin, hours: (sMin + fMin) / 60 };
 }
-
-/* ================= даты ================= */
 function parseDate(s){
 if (!s || !s.trim()) return null;
 s = s.trim().replace(/\s+/g,'');
@@ -1368,8 +1346,6 @@ if (d.m != null) return `${pad2(d.m)}.${d.y}`;
 return String(d.y);
 }
 const dateKey = d => d ? d.y*10000 + (d.m||1)*100 + (d.d||1) : -1;
-
-/* ================= обложки ================= */
 function coverSrc(t){
 if (t.cover) return t.cover;
 const letter = (t.name || '?').trim().charAt(0).toUpperCase().replace(/[<>&]/g,'');
@@ -1385,42 +1361,25 @@ const t = findTitle(img.dataset.fb);
 if (t) img.src = coverSrc(t);
 }
 }, true);
-
 /* ================================================================
-ДВИЖОК ЧАСТИЦ (встроен, чтобы избежать "Particles is not defined")
+ДВИЖОК ЧАСТИЦ (встроен — не будет "Particles is not defined")
 ================================================================ */
 const Particles = (() => {
-const cv = document.getElementById('petals');
+const cv = $('#petals');
 if (!cv) return { init:()=>{}, refresh:()=>{}, restyle:()=>{}, burst:()=>{} };
 const ctx = cv.getContext('2d');
 let W=0, H=0, parts=[], bursts=[], running=false, frame=0, last=performance.now();
 const mouse = {x:-9e3, y:-9e3, vx:0, vy:0};
 let gust=0, gustTarget=0, gustUntil=0, nextGust=140;
-
-const PRESETS = {
-sakura:     {label:'Сакура · лепестки',        shape:'petal', colors:['#ffdce8','#ffc6d9','#ffb0cb','#ff9dc4','#fff0f5'], size:[4.5,11], vy:[.5,1.5],  sway:[.6,2.0], alpha:[.55,.95]},
-snow:       {label:'Зима · снег',              shape:'flake', colors:['#ffffff','#f2f7ff','#e8f1ff'], size:[2.5,6.5], vy:[.4,1.1], sway:[.4,1.2], alpha:[.6,1]},
-rain:       {label:'Дождь',                    shape:'drop', colors:['#9fd0ff','#7ab8ff','#c4e2ff'], size:[2,3.5], vy:[3,5], sway:[.05,.2], alpha:[.35,.7]},
-autumn:     {label:'Осень · листья',           shape:'leaf', colors:['#ffb347','#ff8c42','#e2574c','#d96c3f','#c9452f'], size:[5,10], vy:[.6,1.4], sway:[1,2.6], alpha:[.6,.95]},
-stars:      {label:'Ночь · звёздочки',         shape:'star', colors:['#ffffff','#ffd76e','#cfe8ff','#ffe9b0'], size:[1.5,3.5], vy:[.05,.25], sway:[.2,.8], alpha:[.3,.9], twinkle:true},
-fireflies:  {label:'Лето · светлячки',         shape:'glow', colors:['#ffe28a','#c3ff8a','#9affc3','#ffd76e'], size:[2,4.5], vy:[-.15,.35], sway:[.5,1.5], alpha:[.35,.9], twinkle:true, glow:true},
-hearts:     {label:'Сердечки',                 shape:'petal', colors:['#ff1493','#ff69b4','#ffb6c1'], size:[4,9], vy:[.4,1.2], sway:[.6,1.8], alpha:[.5,.9]},
-bubbles:    {label:'Пузыри',                   shape:'glow', colors:['rgba(255,255,255,.5)','rgba(255,255,255,.3)'], size:[2,6], vy:[-.3,.3], sway:[.5,1.5], alpha:[.3,.7], twinkle:true, glow:true},
-confetti:   {label:'Конфетти',                 shape:['petal','star'], colors:['#ff0000','#00ff00','#0000ff','#ffff00','#ff00ff','#00ffff'], size:[3,7], vy:[.5,1.5], sway:[.5,2], alpha:[.6,1]},
-petals:     {label:'Разноцветные лепестки',    shape:'petal', colors:['#ffd76e','#ff7aa2','#b18cff','#6fd6b1'], size:[4.5,10], vy:[.5,1.3], sway:[.6,1.9], alpha:[.55,.95]}
-};
-
 const preset = () => PRESETS[settings.particleStyle] || PRESETS.sakura;
 const pick = a => a[Math.floor(Math.random()*a.length)];
 const rnd = (a,b) => a + Math.random()*(b-a);
-
 function resize(){
 const dpr = Math.min(devicePixelRatio||1, 2);
 W = innerWidth; H = innerHeight;
 cv.width = W*dpr; cv.height = H*dpr;
 ctx.setTransform(dpr,0,0,dpr,0,0);
 }
-
 function spawn(anywhere){
 const p = preset();
 const shape = Array.isArray(p.shape) ? pick(p.shape) : p.shape;
@@ -1436,12 +1395,9 @@ flip: Math.random()*Math.PI*2, flipV: 0.02 + Math.random()*0.05,
 alpha: rnd(p.alpha[0], p.alpha[1]) * am,
 wf: 0.5 + Math.random()*0.9, twk: p.twinkle ? Math.random()*Math.PI*2 : 0, glow: !!p.glow };
 }
-
 function target(){ if (!settings.particles || REDUCED) return 0; return Math.round(W*H/16000 * (0.25 + (settings.petalDensity/100)*1.25)); }
-
 function wind(){ const s = settings.wind/100, t = frame;
 return (Math.sin(t*0.004)*0.6 + Math.sin(t*0.0017+2)*0.4 + Math.sin(t*0.0009+5)*0.3) * s * 1.5 + gust; }
-
 function petalPath(c, s){
 c.beginPath(); c.moveTo(0, s);
 c.bezierCurveTo(s*0.85, s*0.45, s*0.95, -s*0.35, s*0.28, -s*0.82);
@@ -1450,7 +1406,6 @@ c.quadraticCurveTo(-s*0.1, -s*0.97, -s*0.28, -s*0.82);
 c.bezierCurveTo(-s*0.95, -s*0.35, -s*0.85, s*0.45, 0, s);
 c.closePath();
 }
-
 function drawFlake(c, s, color, alpha){
 c.strokeStyle = color; c.fillStyle = color; c.globalAlpha = alpha;
 if (s < 2.2){ c.beginPath(); c.arc(0,0,s,0,6.283); c.fill(); return; }
@@ -1464,7 +1419,6 @@ c.moveTo(mx, my); c.lineTo(mx + Math.cos(a-2.1)*s*.3, my + Math.sin(a-2.1)*s*.3)
 }
 c.stroke();
 }
-
 function drawLeaf(c, s, color, alpha){
 c.fillStyle = color; c.globalAlpha = alpha;
 c.beginPath(); c.moveTo(0, s);
@@ -1474,12 +1428,10 @@ c.closePath(); c.fill();
 c.globalAlpha = alpha*.45; c.strokeStyle = color; c.lineWidth = Math.max(.6, s*.09);
 c.beginPath(); c.moveTo(0, s*.75); c.lineTo(0, -s*.75); c.stroke();
 }
-
 function drawGlow(c, s, color, alpha){
 c.globalAlpha = alpha; c.fillStyle = color; c.shadowColor = color; c.shadowBlur = s*2.6;
 c.beginPath(); c.arc(0, 0, s*.55, 0, 6.283); c.fill(); c.fill(); c.shadowBlur = 0;
 }
-
 function drawStar(c, s, color, alpha){
 c.strokeStyle = color; c.globalAlpha = alpha; c.lineWidth = Math.max(.7, s*.3); c.lineCap = 'round';
 c.beginPath();
@@ -1487,12 +1439,10 @@ c.moveTo(-s,0); c.lineTo(s,0); c.moveTo(0,-s); c.lineTo(0,s);
 c.moveTo(-s*.45,-s*.45); c.lineTo(s*.45,s*.45); c.moveTo(s*.45,-s*.45); c.lineTo(-s*.45,s*.45);
 c.stroke();
 }
-
 function drawDrop(c, s, color, alpha){
 c.strokeStyle = color; c.globalAlpha = alpha; c.lineWidth = s*.5; c.lineCap = 'round';
 c.beginPath(); c.moveTo(0, -s*1.6); c.lineTo(0, s*1.2); c.stroke();
 }
-
 function draw(p, alphaMul){
 ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
 if (p.shape === 'petal' || p.shape === 'leaf') ctx.scale(0.35 + 0.65*Math.abs(Math.cos(p.flip)), 1);
@@ -1505,7 +1455,6 @@ else if (p.shape === 'star') drawStar(ctx, p.s, p.color, a);
 else if (p.shape === 'drop') drawDrop(ctx, p.s, p.color, a);
 ctx.restore();
 }
-
 function step(now){
 const dt = Math.min(48, now - last); last = now; const k = dt/16.7; frame++;
 if (frame > nextGust){ gustTarget = (Math.random()<.5?-1:1)*(0.8+Math.random()*1.6)*(settings.wind/100); gustUntil = frame + 50 + Math.random()*80; nextGust = frame + 260 + Math.random()*420; }
@@ -1542,16 +1491,13 @@ draw(b, Math.max(0, Math.min(1, b.life/b.max*1.3)));
 if (parts.length || bursts.length || target() > 0) requestAnimationFrame(step);
 else { running = false; ctx.clearRect(0,0,W,H); }
 }
-
 function start(){ if (running) return; running = true; last = performance.now(); requestAnimationFrame(step); }
-
 window.addEventListener('resize', resize);
 window.addEventListener('pointermove', e => {
 mouse.vx = Math.max(-40, Math.min(40, e.clientX - mouse.x));
 mouse.vy = Math.max(-40, Math.min(40, e.clientY - mouse.y));
 mouse.x = e.clientX; mouse.y = e.clientY;
 }, {passive:true});
-
 return {
 init(){ resize(); for (let i=0;i<target();i++) parts.push(spawn(true)); start(); },
 refresh(){ if (target() > 0 || bursts.length) start(); },
@@ -1574,7 +1520,6 @@ start();
 }
 };
 })();
-
 /* ================= генеративные деревья (упрощённо) ================= */
 function renderTrees(){
 const tr = $('#branch-tr'), bl = $('#branch-bl');
@@ -1613,10 +1558,8 @@ tr.innerHTML = svg(false);
 bl.innerHTML = svg(true);
 }
 renderTrees();
-
 /* ================= тосты / модалки ================= */
 const PETAL_ICO = '<svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 C 15.5 6.5, 20 8.5, 20 13.5 C 20 18, 15.5 21, 12 22 C 8.5 21, 4 18, 4 13.5 C 4 8.5, 8.5 6.5, 12 2 Z"/></svg>';
-
 function toast(msg, kind='ok'){
 const el = document.createElement('div');
 el.className = 'toast' + (kind === 'warn' ? ' warn' : '');
@@ -1626,12 +1569,10 @@ el.innerHTML = (kind === 'warn'
 $('#toasts').appendChild(el);
 setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity .3s'; setTimeout(() => el.remove(), 320); }, 3600);
 }
-
 const overlays = ['ov-title','ov-form','ov-day','ov-confirm'];
 const openOv = id => $('#'+id).classList.remove('hidden');
 const closeOv = id => $('#'+id).classList.add('hidden');
 const topOv = () => { for (let i = overlays.length-1; i >= 0; i--) if (!$('#'+overlays[i]).classList.contains('hidden')) return overlays[i]; return null; };
-
 document.addEventListener('keydown', e => {
 if (e.key === 'Escape'){
 const sm = $('#sync-menu');
@@ -1643,7 +1584,6 @@ if (e.key === '/' && !e.shiftKey && !e.target.closest('input,textarea,select') &
 if (e.key === '?' && !e.target.closest('input,textarea,select') && !topOv()){ showHelp(); }
 });
 document.addEventListener('click', e => { if (e.target.closest('[data-close]')){ const ov = e.target.closest('.overlay'); if (ov) closeOv(ov.id); } });
-
 function openConfirm({title, text, okLabel='Подтвердить', danger=false, cancel=true, onOk}){
 const m = $('#m-confirm');
 m.innerHTML = `
@@ -1656,7 +1596,6 @@ ${cancel ? '<button class="btn" data-close>Отмена</button>' : ''}
 $('#cf-ok').onclick = () => { closeOv('ov-confirm'); onOk && onOk(); };
 openOv('ov-confirm');
 }
-
 function showHelp(){
 openConfirm({
 title:'Горячие клавиши и приёмы',
@@ -1664,17 +1603,14 @@ text:`· <b>/</b> — фокус на поиск<br>· <b>?</b> — эта по�
 okLabel:'Понятно', cancel:false
 });
 }
-
 function animNum(el, target, dur){
 dur = dur || settings.counterSpeed || 800;
 if (!settings.counters){ el.textContent = fmtInt(target); return; }
 const t0 = performance.now();
 (function s(now){ const p = Math.min(1,(now-t0)/dur), e = 1-Math.pow(1-p,3); el.textContent = fmtInt(target*e); if (p<1) requestAnimationFrame(s); })(t0);
 }
-
 /* ================= рендер ================= */
 function renderAll(){ renderHero(); renderRecent(); renderFilters(); renderTierlist(false); renderTimeline(); renderCalendar(); renderStats(); }
-
 function renderHero(){
 const has = state.titles.length > 0;
 $('#hero').classList.toggle('hidden', !has);
@@ -1687,7 +1623,6 @@ $('#hero-stats').innerHTML = `
 <div class="hst"><b data-num="${Math.round(t.hours)}">0</b><span>часов</span><em>≈ ${(t.hours/24).toLocaleString('ru-RU',{maximumFractionDigits:1})} суток</em></div>`;
 $$('#hero-stats b').forEach(el => animNum(el, +el.dataset.num));
 }
-
 function cardHTML(t, mini=false, ci=0){
 const eps = titleEpisodes(t);
 const films = titleFilms(t);
@@ -1710,7 +1645,6 @@ ${t.tier === 'SSS' ? `<span class="card-crown">${CROWN}</span>` : ''}
 <h3 class="card-title">${esc(t.name)}</h3>
 </article>`;
 }
-
 function chipCardHTML(t){
 const eps = titleEpisodes(t);
 return `
@@ -1723,7 +1657,6 @@ return `
 <span class="cc-tier">${t.tier}</span>
 </button>`;
 }
-
 function listCardHTML(t){
 const eps = titleEpisodes(t);
 const sum = t.type === 'tv' ? tvSummary(t) : (titleFilms(t) > 1 ? titleFilms(t)+' '+plural(titleFilms(t),'фильм','фильма','фильмов') : '');
@@ -1738,7 +1671,6 @@ return `
 <span class="lc-tier">${t.tier}</span>
 </div>`;
 }
-
 function renderRecent(){
 const w = $('#recent-wrap');
 if (!settings.recent || !state.titles.length){ w.innerHTML = ''; return; }
@@ -1749,16 +1681,13 @@ w.innerHTML = `
 <div class="recent-strip">${recent.map((t,i) => cardHTML(t, true, i)).join('')}</div>
 </div>`;
 }
-
 let filterQuery = '', filterGenres = new Set();
 let gpOpen = false, gpMode = 'my', gpQuery = '';
-
 function genreCounts(){
 const counts = new Map();
 state.titles.forEach(t => (t.genres||[]).forEach(g => counts.set(g, (counts.get(g)||0)+1)));
 return counts;
 }
-
 function renderFilters(){
 const w = $('#filters-wrap');
 if (!state.titles.length){ w.innerHTML = ''; return; }
@@ -1819,7 +1748,6 @@ filterGenres.delete(b.dataset.unselect); renderFilters(); renderTierlist(false);
 }));
 if (gpOpen) renderGpGrid();
 }
-
 function renderGpGrid(){
 const grid = $('#gp-grid');
 if (!grid) return;
@@ -1837,20 +1765,17 @@ filterGenres.has(g) ? filterGenres.delete(g) : filterGenres.add(g);
 renderFilters(); renderTierlist(false);
 }));
 }
-
 document.addEventListener('click', e => {
 if (gpOpen && !e.target.closest('#genre-panel') && !e.target.closest('#genre-toggle')){
 gpOpen = false;
 if ($('#filters-wrap').innerHTML) renderFilters();
 }
 });
-
 function matchesFilters(t){
 if (filterQuery && !t.name.toLowerCase().includes(filterQuery.trim().toLowerCase())) return false;
 if (filterGenres.size && ![...(t.genres||[])].some(g => filterGenres.has(g))) return false;
 return true;
 }
-
 function renderTierTotal(counts){
 const bar = $('#tier-total');
 if (!state.titles.length){ bar.innerHTML = ''; return; }
@@ -1861,7 +1786,6 @@ html += `<button class="tt-item" style="--tc:${TIER_COLOR[tier]}" data-goto="${t
 });
 bar.innerHTML = html;
 }
-
 $('#tier-total').addEventListener('click', e => {
 const it = e.target.closest('.tt-item'); if (!it) return;
 if (it.dataset.goto){
@@ -1869,14 +1793,12 @@ const row = document.querySelector(`.tier-row[data-tier="${it.dataset.goto}"]`);
 if (row) row.scrollIntoView({behavior: settings.anim && !REDUCED ? 'smooth' : 'auto', block: 'start'});
 } else window.scrollTo({top:0, behavior:'smooth'});
 });
-
 const SORTS = {
 added:    (a,b) => b.createdAt - a.createdAt,
 name:     (a,b) => a.name.localeCompare(b.name, 'ru'),
 date:     (a,b) => dateKey(b.date) - dateKey(a.date),
 episodes: (a,b) => titleEpisodes(b) - titleEpisodes(a)
 };
-
 function renderTierlist(animate){
 const box = $('#tierlist');
 const hasData = state.titles.length > 0;
@@ -1910,7 +1832,6 @@ if (animate) $$('#tierlist .tc-n').forEach(el => animNum(el, +el.dataset.n, Math
 const info = $('#filter-info');
 if (info) info.textContent = filtering ? `найдено: ${found} · скрыто: ${state.titles.length - found}` : '';
 }
-
 function emblemShape(tier){
 const c = TIER_COLOR[tier];
 const lt = lighten(c, .55);
@@ -1951,7 +1872,6 @@ E: `<rect x="16" y="16" width="68" height="68" rx="14" fill="url(#${id})" stroke
 };
 return `<svg viewBox="0 0 100 100">${defs}${shapes[tier]}</svg>`;
 }
-
 function emblemHTML(tier, i){
 const layers = [
 {z:-12, o:.22, b:.45},
@@ -1970,7 +1890,6 @@ return `
 ${tier === 'SSS' ? `<span class="emb-crown">${CROWN}</span>` : ''}
 </div>`;
 }
-
 function renderTimeline(){
 const box = $('#timeline');
 if (!state.titles.length){ box.innerHTML = '<p class="tier-empty" style="padding:40px 0">Список пуст</p>'; return; }
@@ -1999,14 +1918,9 @@ html += `
 idx++;
 }
 box.innerHTML = html;
-if (window._tlIO) window._tlIO.disconnect();
-window._tlIO = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in'); window._tlIO.unobserve(en.target); } }), {rootMargin:'0px 0px -6% 0px'});
-$$('#timeline .tl-row').forEach(r => window._tlIO.observe(r));
 }
-
 let calY, calM, calMode = 'grid', calListYear = null;
 (function(){ const n = new Date(); calY = n.getFullYear(); calM = n.getMonth(); })();
-
 function yearPool(){
 const s = new Set([new Date().getFullYear()]);
 state.titles.forEach(t => {
@@ -2015,7 +1929,6 @@ if (t.date && t.date.y) s.add(+t.date.y);
 });
 return [...s].sort((a,b) => b - a);
 }
-
 function calEntries(){
 const out = [];
 for (const t of state.titles){
@@ -2037,7 +1950,6 @@ out.push({t, u:null, date:t.date, badge:'', color:'', label:''});
 }
 return out;
 }
-
 function calEvents(){
 const map = {};
 for (const e of calEntries()){
@@ -2048,7 +1960,6 @@ const k = `${e.date.y}-${e.date.m}-${e.date.d}`;
 }
 return map;
 }
-
 function renderCalendar(){
 const grid = calMode === 'grid';
 $('#cal-mode-grid').classList.toggle('on', grid);
@@ -2058,7 +1969,6 @@ $('#cal-grid-wrap').classList.toggle('hidden', !grid);
 $('#cal-list-wrap').classList.toggle('hidden', grid);
 if (grid) renderCalGrid(); else renderCalList();
 }
-
 function renderCalGrid(){
 const ys = yearPool(); if (!ys.includes(calY)){ ys.push(calY); ys.sort((a,b)=>b-a); }
 $('#cal-sel-m').innerHTML = MONTHS.map((m,i) => `<option value="${i}" ${i===calM?'selected':''}>${m}</option>`).join('');
@@ -2089,7 +1999,6 @@ const [y,m,d] = c.dataset.day.split('-').map(Number);
 openDay(y, m-1, d);
 }));
 }
-
 function renderCalList(){
 const years = yearPool();
 $('#cal-years').innerHTML = `<button class="chip ${calListYear===null?'on':''}" data-y="all">Все годы</button>` +
@@ -2128,7 +2037,6 @@ html += `
 }
 box.innerHTML = html;
 }
-
 function openDay(y, m, d){
 const list = calEvents()[`${y}-${m+1}-${d}`] || [];
 $('#m-day').innerHTML = `
@@ -2146,7 +2054,6 @@ ${list.map(e => `
 </div>`).join('')}`;
 openOv('ov-day');
 }
-
 function renderStats(){
 const box = $('#stats');
 if (!state.titles.length){ box.innerHTML = '<p class="tier-empty" style="padding:40px 0">Статистика появится, как только в каталоге появятся тайтлы</p>'; return; }
@@ -2160,7 +2067,7 @@ byType[x.type]++; byTier[x.tier]++; score += TIER_SCORE[x.tier];
 (x.genres||[]).forEach(g => byGenre.set(g, (byGenre.get(g)||0)+1));
 if (x.date && x.date.y) byYear.set(x.date.y, (byYear.get(x.date.y)||0)+1);
 }
-const avg = score / state.titles.length, days = t.hours / 24;
+const avg = score / state.titles.length;
 const verdict =
 avg >= 6.3 ? 'Безупречно — вы почти ничего не смотрите зря.' :
 avg >= 5.4 ? 'Требовательный вкус: планка высокая.' :
@@ -2271,7 +2178,6 @@ $$('#stats .donut-seg').forEach(s => s.setAttribute('stroke-dasharray', s.datase
 $$('#stats .spectrum span').forEach(s => s.style.width = s.dataset.w + '%');
 }));
 }
-
 function openTitle(id){
 const t = findTitle(id);
 if (!t) return;
@@ -2354,11 +2260,9 @@ onOk(){ state.titles = state.titles.filter(x => x.id !== t.id); save(); renderAl
 });
 openOv('ov-title');
 }
-
 let editId = null, formCover = '', formType = 'tv', formTier = 'A';
 let formGenres = new Set(), extraChips = [], fGenreQuery = '';
 let formUnits = [];
-
 function openForm(id = null){
 editId = id;
 const t = id ? findTitle(id) : null;
@@ -2389,13 +2293,11 @@ syncFormType(); updatePreview(); updateEstimate();
 openOv('ov-form');
 setTimeout(() => $('#f-name').focus(), 80);
 }
-
 function buildTierSeg(){
 $('#f-tier').innerHTML = TIERS.map(x =>
 `<button type="button" class="seg-btn ${formTier===x?'on':''}" data-t="${x}" style="--tc:${TIER_COLOR[x]}">${x}</button>`).join('');
 $$('#f-tier .seg-btn').forEach(b => b.onclick = () => { formTier = b.dataset.t; buildTierSeg(); updatePreview(); });
 }
-
 function buildTypeSeg(){
 $('#f-type').innerHTML = TYPES.map(x =>
 `<button type="button" class="seg-btn ${formType===x.id?'on':''}" data-t="${x.id}">${x.label}</button>`).join('');
@@ -2407,7 +2309,6 @@ formUnits = [{kind: DEF_KIND[formType], name:'', count:'', date:'', err:false}];
 syncFormType(); renderUnitRows(); updateEstimate();
 });
 }
-
 function syncFormType(){
 const tv = formType === 'tv', film = formType === 'film';
 $('#units-block').style.display = '';
@@ -2420,7 +2321,6 @@ $('#units-label').textContent = tv
 : 'Записи — название каждой вы задаёте сами, в любом количестве';
 renderUnitsAddButtons();
 }
-
 function buildGenreChips(){
 const sel = $('#f-genres-selected');
 sel.innerHTML = [...formGenres].map(g => `<button type="button" class="chip on" data-frm-unselect="${esc(g)}">${esc(g)} ×</button>`).join('');
@@ -2437,9 +2337,7 @@ buildGenreChips();
 });
 $$('[data-frm-unselect]').forEach(b => b.onclick = () => { formGenres.delete(b.dataset.frmUnselect); buildGenreChips(); });
 }
-
 $('#f-genre-search').addEventListener('input', e => { fGenreQuery = e.target.value; buildGenreChips(); });
-
 function addCustomGenre(){
 const v = $('#f-genre-new').value.trim();
 if (!v) return;
@@ -2450,7 +2348,6 @@ buildGenreChips();
 }
 $('#f-genre-add').onclick = addCustomGenre;
 $('#f-genre-new').addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); addCustomGenre(); } });
-
 function renderUnitsAddButtons(){
 const box = $('#units-add');
 const tv = formType === 'tv';
@@ -2464,7 +2361,6 @@ renderUnitRows(formUnits.length - 1);
 const list = $('#units-list'); list.scrollTop = list.scrollHeight;
 });
 }
-
 function renderUnitRows(popIdx = -1){
 const list = $('#units-list');
 const tv = formType === 'tv';
@@ -2490,7 +2386,6 @@ ${typeSel}
 list.classList.toggle('scrolled', formUnits.length > 7);
 updateUnitsSummary();
 }
-
 function updateUnitsSummary(){
 const n = formUnits.length;
 if (formType !== 'tv'){
@@ -2520,7 +2415,6 @@ if (on) parts.push(`${on} ONA`);
 parts.push(`${eps} ${plural(eps,'серия','серии','серий')}`);
 $('#units-sum').textContent = parts.join(' · ');
 }
-
 $('#units-list').addEventListener('input', e => {
 const row = e.target.closest('.urow'); if (!row) return;
 const r = formUnits[+row.dataset.i];
@@ -2543,7 +2437,6 @@ if (!del) return;
 formUnits.splice(+del.dataset.del, 1);
 renderUnitRows(); updateEstimate();
 });
-
 function collectUnits(){
 let bad = -1;
 const units = formUnits.map((r, i) => {
@@ -2556,9 +2449,7 @@ return {kind:r.kind, name, episodes: isNaN(count) || count < 0 ? 0 : count, minu
 });
 return {units, bad};
 }
-
 function updatePreview(){ $('#f-preview').src = coverSrc({name: $('#f-name').value || '?', tier: formTier, cover: formCover}); }
-
 function updateEstimate(){
 let total = 0;
 const m = parseInt($('#f-minutes').value, 10);
@@ -2576,11 +2467,9 @@ total = eps * epM + fmin;
 }
 $('#f-estimate').textContent = total > 0 ? `≈ ${fmtDur(total)} просмотра попадёт в статистику` : '';
 }
-
 $('#f-name').addEventListener('input', updatePreview);
 $('#f-cover-url').addEventListener('input', e => { formCover = e.target.value.trim(); updatePreview(); });
 ['#f-episodes','#f-minutes'].forEach(s => $(s).addEventListener('input', updateEstimate));
-
 $('#f-cover-file').addEventListener('change', async e => {
 const file = e.target.files[0];
 if (!file) return;
@@ -2593,7 +2482,6 @@ toast('Обложка сжата и готова');
 e.target.value = '';
 });
 $('#f-cover-clear').onclick = () => { formCover = ''; $('#f-cover-url').value = ''; updatePreview(); };
-
 $('#title-form').addEventListener('submit', e => {
 e.preventDefault();
 const name = $('#f-name').value.trim();
@@ -2633,10 +2521,8 @@ save();
 closeOv('ov-form');
 renderAll();
 });
-
 /* ================= настройки ================= */
 const TEMPO = {calm:1.5, normal:1, lively:.6, instant:.15};
-
 function applySettings(){
 const s = settings, b = document.body, root = document.documentElement;
 b.classList.toggle('light', !!s.light);
@@ -2668,14 +2554,12 @@ root.style.setProperty('--branch-alpha', (s.branchAlpha/100).toFixed(2));
 applyUserBg();
 Particles.refresh();
 }
-
 function applyUserBg(){
 let bg = null;
 try{ bg = localStorage.getItem(LS_BG); }catch(e){}
 document.body.classList.toggle('has-bg', !!bg);
 if (bg) document.documentElement.style.setProperty('--user-img', `url("${bg}")`);
 }
-
 $('#bg-file').addEventListener('change', async e => {
 const file = e.target.files[0];
 if (!file) return;
@@ -2688,7 +2572,6 @@ applyUserBg(); toast('Фоновая картина обновлена');
 e.target.value = '';
 });
 $('#bg-remove').onclick = () => { try{ localStorage.removeItem(LS_BG); }catch(e){} applyUserBg(); toast('Фоновая картина убрана'); };
-
 window.addEventListener('pointermove', e => {
 const k = (settings.parallax || 0)/100 * 16;
 if (!k || !settings.branches) return;
@@ -2697,7 +2580,6 @@ const tr = $('#branch-tr'), bl = $('#branch-bl');
 if (tr) tr.style.transform = `translate(${(-mx*k).toFixed(1)}px,${(-my*k*.6).toFixed(1)}px)`;
 if (bl) bl.style.transform = `translate(${(mx*k*.7).toFixed(1)}px,${(my*k*.5).toFixed(1)}px)`;
 }, {passive:true});
-
 function bindSettings(){
 $('#sel-pstyle').innerHTML = Object.entries(PRESETS).map(([k,p]) => `<option value="${k}">${esc(p.label)}</option>`).join('');
 const treeStyles = {sakura:'Сакура',maple:'Клён',oak:'Дуб',pine:'Ель',willow:'Ива',birch:'Берёза',bonsai:'Бонсай',night:'Ночная сакура',magnolia:'Магнолия',orange:'Апельсиновое дерево',winter:'Зимнее дерево',apple:'Яблоня в цвету',firsnow:'Заснеженная ель'};
@@ -2719,11 +2601,15 @@ counters:'s-counters', recent:'s-recent', light:'s-light',
 particles:'s-particles', particleSpin:'s-pspin', twinkle:'s-twinkle', petsFront:'s-petsfront',
 branches:'s-branches', sway:'s-sway', ambient:'s-ambient', moon:'s-moon'};
 for (const [key, id] of Object.entries(map)){
-$('#'+id).checked = !!settings[key];
-$('#'+id).addEventListener('change', e => { settings[key] = e.target.checked; persistSettings(); applySettings(); renderAll(); });
+const el = $('#'+id);
+if (el){
+el.checked = !!settings[key];
+el.addEventListener('change', e => { settings[key] = e.target.checked; persistSettings(); applySettings(); renderAll(); });
+}
 }
 const range = (rid, vid, key, fmt, after) => {
 const r = $('#'+rid);
+if (!r) return;
 r.value = settings[key];
 $('#'+vid).textContent = fmt(settings[key]);
 r.addEventListener('input', () => {
@@ -2756,23 +2642,24 @@ persistSettings(); applySettings();
 });
 $('#s-epmin').value = settings.epMin;
 $('#s-filmmin').value = settings.filmMin;
-const numHandler = (id, key) => $('#'+id).addEventListener('change', e => {
+const numHandler = (id, key) => {
+const el = $('#'+id);
+if (el) el.addEventListener('change', e => {
 let v = parseInt(e.target.value, 10);
 if (isNaN(v) || v < 1) v = DEFAULT_SETTINGS[key];
 if (v > 600) v = 600;
 e.target.value = v; settings[key] = v;
 persistSettings(); renderAll();
 });
+};
 numHandler('s-epmin','epMin'); numHandler('s-filmmin','filmMin');
 }
-
 $('#btn-reset-set').onclick = () => openConfirm({
 title:'Вернуть стандартные настройки?',
 text:'Оформление, эффекты и атмосфера сбросятся к исходным — только в вашем браузере. Каталог и вход не затрагиваются.',
 okLabel:'Сбросить',
 onOk(){ settings = {...DEFAULT_SETTINGS}; persistSettings(); applySettings(); renderTrees(); Particles.restyle(); renderAll(); toast('Настройки возвращены к стандартным'); }
 });
-
 $('#btn-export').onclick = () => {
 const blob = new Blob([JSON.stringify({v:3, updatedAt: state.updatedAt, titles: state.titles, settings}, null, 2)], {type:'application/json'});
 const a = document.createElement('a');
@@ -2812,17 +2699,14 @@ foot.appendChild(add);
 r.readAsText(f);
 e.target.value = '';
 });
-
 /* ================================================================
 СИНХРОНИЗАЦИЯ С GITHUB
 ================================================================ */
 let sync = null;
 try{ sync = JSON.parse(localStorage.getItem(LS_SYNC)) || null; }catch(e){}
-
 let syncStatus = 'off', lastSyncAt = 0, pushTimer = null, pollTimer = null;
 let lastSeenSha = null, lastApiCheck = 0, apiFailStreak = 0;
 const POLL_MS = 5000, API_MS = 70000;
-
 const b64encode = str => { const b = new TextEncoder().encode(str); let s=''; b.forEach(x => s += String.fromCharCode(x)); return btoa(s); };
 
 /* ПРОВЕРКА ВЛАДЕЛЬЦА: только флаг anime_owner_mode из localStorage */
@@ -2831,9 +2715,8 @@ return localStorage.getItem(LS_OWNER) === 'true';
 }
 
 function saveSync(){ if (sync) localStorage.setItem(LS_SYNC, JSON.stringify(sync)); else localStorage.removeItem(LS_SYNC); }
-function rawURL(){ return `https://raw.githubusercontent.com/${sync.owner}/${sync.repo}/${sync.branch}/${DATA_PATH}`; }
+function rawURL(){ return sync ? `https://raw.githubusercontent.com/${sync.owner}/${sync.repo}/${sync.branch}/${DATA_PATH}` : ''; }
 function shaURL(sha){ return `https://raw.githubusercontent.com/${sync.owner}/${sync.repo}/${sha}/${DATA_PATH}`; }
-
 async function gh(path, token, opts = {}){
 const h = {'Accept':'application/vnd.github+json', ...opts.headers};
 if (token) h.Authorization = 'Bearer ' + token;
@@ -2845,14 +2728,12 @@ throw {status: r.status, message: msg};
 }
 return r.status === 204 ? null : r.json();
 }
-
 function setSyncStatus(st){
 syncStatus = st;
 const dot = $('#su-dot');
 if (dot) dot.className = 'sync-dot ' + (st === 'ok' ? 'ok' : st === 'sync' ? 'sync' : st === 'err' ? 'err' : '');
 renderSyncMenu();
 }
-
 function renderSyncMenu(){
 const m = $('#sync-menu');
 if (!sync){ m.classList.add('hidden'); return; }
@@ -2876,7 +2757,6 @@ toast('Вы вышли из режима владельца');
 setTimeout(() => location.reload(), 1000);
 };
 }
-
 function updateSyncUI(){
 const connected = !!sync;
 const syncUser = $('#sync-user');
@@ -2892,7 +2772,6 @@ if (btnAdd) btnAdd.classList.toggle('hidden', !editable);
 $$('[data-act="add"]').forEach(b => b.classList.toggle('hidden', !editable));
 setSyncStatus(sync ? syncStatus : 'off');
 }
-
 $('#sync-user').addEventListener('click', e => {
 e.stopPropagation();
 $('#sync-menu').classList.toggle('hidden');
@@ -2900,7 +2779,6 @@ $('#sync-menu').classList.toggle('hidden');
 document.addEventListener('click', e => {
 if (!e.target.closest('.sync-wrap')) $('#sync-menu').classList.add('hidden');
 });
-
 async function pull(silent = true){
 if (!sync) return;
 setSyncStatus('sync');
@@ -2942,7 +2820,6 @@ setSyncStatus('err');
 if (!silent) toast('Не удалось получить данные: ' + (err.message || err), 'warn');
 }
 }
-
 async function push(){
 if (!sync || sync.mode !== 'rw') return;
 setSyncStatus('sync');
@@ -2954,7 +2831,7 @@ if (cur && cur.sha) sha = cur.sha;
 }catch(e){ if (e.status !== 404) throw e; }
 const payload = {v: 3, updatedAt: state.updatedAt || Date.now(), titles: state.titles};
 const content = b64encode(JSON.stringify(payload));
-if (content.length > 20 * 1024 * 1024) throw {message:'файл данных слишком большой — уменьшите обложки-файлы'};
+if (content.length > 20 * 1024 * 1024) throw {message:'файл данных слишком большой'};
 const res = await gh(`/repos/${sync.owner}/${sync.repo}/contents/${DATA_PATH}`, sync.token, {
 method: 'PUT',
 headers: {'Content-Type': 'application/json'},
@@ -2968,13 +2845,11 @@ setSyncStatus('err');
 toast('Не удалось отправить данные: ' + (err.message || 'ошибка сети'), 'warn');
 }
 }
-
 function schedulePush(){
 if (!sync || sync.mode !== 'rw') return;
 clearTimeout(pushTimer);
 pushTimer = setTimeout(push, 1200);
 }
-
 async function connectAndSync(){
 updateSyncUI();
 lastSyncAt = 0;
@@ -2986,19 +2861,16 @@ pollTimer = setInterval(() => {
 if (sync && document.visibilityState === 'visible') pull(true);
 }, POLL_MS);
 }
-
 document.addEventListener('visibilitychange', () => {
 if (document.visibilityState === 'visible' && sync){
 if (Date.now() - lastSyncAt > 60000) lastApiCheck = 0;
 pull(true);
 }
 });
-
 /* ================================================================
 НАВИГАЦИЯ, ПАНЕЛЬ, МЕЛОЧИ
 ================================================================ */
 let currentView = 'tier';
-
 function movePill(){
 const act = $('.nav-btn.active'), pill = $('#nav-pill');
 if (!act) return;
@@ -3007,7 +2879,6 @@ pill.style.top = act.offsetTop + 'px';
 pill.style.width = act.offsetWidth + 'px';
 pill.style.height = act.offsetHeight + 'px';
 }
-
 function switchView(name){
 if (name === 'settings'){ toggleDrawer(); return; }
 closeDrawer();
@@ -3019,21 +2890,18 @@ if (name === 'tier') renderTierlist(true);
 movePill();
 window.scrollTo({top:0, behavior: settings.anim && !REDUCED ? 'smooth' : 'auto'});
 }
-
 function toggleDrawer(){
 const open = !document.body.classList.contains('drawer-open');
 document.body.classList.toggle('drawer-open', open);
 $$('.nav-btn').forEach(x => x.classList.toggle('active', x.dataset.view === (open ? 'settings' : currentView)));
 movePill();
 }
-
 function closeDrawer(){
 if (!document.body.classList.contains('drawer-open')) return;
 document.body.classList.remove('drawer-open');
 $$('.nav-btn').forEach(x => x.classList.toggle('active', x.dataset.view === currentView));
 movePill();
 }
-
 $('#drawer-x').addEventListener('click', closeDrawer);
 $('#nav').addEventListener('click', e => { const b = e.target.closest('[data-view]'); if (b) switchView(b.dataset.view); });
 $$('[data-act="add"]').forEach(b => b.addEventListener('click', () => { if (canEdit()) openForm(); }));
@@ -3041,14 +2909,12 @@ $('#btn-random').onclick = () => {
 if (!state.titles.length){ toast('Каталог пуст', 'warn'); return; }
 openTitle(state.titles[Math.floor(Math.random()*state.titles.length)].id);
 };
-
 document.addEventListener('click', e => {
 const c = e.target.closest('.js-open');
 if (!c) return;
 if (e.target.closest('#ov-day')){ closeOv('ov-day'); setTimeout(() => openTitle(c.dataset.id), 60); }
 else openTitle(c.dataset.id);
 });
-
 $('#cal-prev').onclick = () => { calM--; if (calM < 0){ calM = 11; calY--; } renderCalGrid(); };
 $('#cal-next').onclick = () => { calM++; if (calM > 11){ calM = 0; calY++; } renderCalGrid(); };
 $('#cal-today').onclick = () => { const n = new Date(); calY = n.getFullYear(); calM = n.getMonth(); renderCalGrid(); };
@@ -3056,12 +2922,10 @@ $('#cal-sel-m').addEventListener('change', e => { calM = +e.target.value; render
 $('#cal-sel-y').addEventListener('change', e => { calY = +e.target.value; renderCalGrid(); });
 $('#cal-mode-grid').onclick = () => { calMode = 'grid'; renderCalendar(); };
 $('#cal-mode-list').onclick = () => { calMode = 'list'; renderCalendar(); };
-
 window.addEventListener('scroll', () => {
 $('#to-top').classList.toggle('show', scrollY > 500);
 }, {passive:true});
 $('#to-top').onclick = () => window.scrollTo({top:0, behavior:'smooth'});
-
 let tiltEl = null;
 document.addEventListener('pointermove', e => {
 if (!settings.tilt || REDUCED || e.pointerType !== 'mouse' || matchMedia('(hover:none)').matches) return;
@@ -3082,9 +2946,19 @@ if (tiltEl && e.target.closest && e.target.closest('.card') === tiltEl){ tiltEl.
 window.addEventListener('blur', () => { if (tiltEl){ tiltEl.style.transform = ''; tiltEl = null; } });
 window.addEventListener('resize', movePill);
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(movePill);
-
 /* ================= старт ================= */
 document.addEventListener('DOMContentLoaded', () => {
+// Загрузка демо-данных из anime-data.json если каталог пуст
+if (!state.titles.length) {
+fetch(DATA_PATH).then(r => r.ok ? r.json() : null).then(d => {
+if (d && d.titles && d.titles.length) {
+state = { titles: d.titles.map(normalizeTitle), updatedAt: d.updatedAt || Date.now() };
+persist();
+renderAll();
+toast('Загружено ' + d.titles.length + ' демо-тайтлов');
+}
+}).catch(() => {});
+}
 Particles.init();
 applySettings();
 bindSettings();
