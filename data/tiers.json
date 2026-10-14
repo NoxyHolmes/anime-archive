@@ -4,7 +4,7 @@
     "owner": "geraltschwarzenegger-svg",
     "repo": "myTierAnime",
     "branch": "main",
-    "updatedAt": "2026-10-14T21:51:12.046Z",
+    "updatedAt": "2026-10-14T21:51:17.758Z",
     "activeMode": "emblems-realism"
   },
   "tiers": [
@@ -130,6 +130,33 @@
               "note": "Второй сезон"
             }
           ]
+        },
+        {
+          "uid": "anime-yourname-2016",
+          "kind": "Фильм",
+          "title": "Твоё имя",
+          "origTitle": "Kimi no Na wa.",
+          "year": 2016,
+          "studio": "CoMix Wave Films",
+          "score": 9.4,
+          "reaction": "☄️ Комета",
+          "genres": [
+            "Романтика",
+            "Драма",
+            "Сверхъестественное"
+          ],
+          "poster": "https://shikimori.one/system/animes/original/32281.jpg",
+          "comment": "Визуальный шедевр Макото Синкая с музыкой RADWIMPS.",
+          "seasons": [
+            {
+              "title": "Полнометражный фильм",
+              "type": "Фильм",
+              "episodes": 1,
+              "epMinutes": 106,
+              "date": "19.01.2026",
+              "note": "Просмотр в 4K"
+            }
+          ]
         }
       ]
     },
@@ -164,33 +191,6 @@
               "epMinutes": 24,
               "date": "14.03.2026",
               "note": "1 сезон"
-            }
-          ]
-        },
-        {
-          "uid": "anime-yourname-2016",
-          "kind": "Фильм",
-          "title": "Твоё имя",
-          "origTitle": "Kimi no Na wa.",
-          "year": 2016,
-          "studio": "CoMix Wave Films",
-          "score": 9.4,
-          "reaction": "☄️ Комета",
-          "genres": [
-            "Романтика",
-            "Драма",
-            "Сверхъестественное"
-          ],
-          "poster": "https://shikimori.one/system/animes/original/32281.jpg",
-          "comment": "Визуальный шедевр Макото Синкая с музыкой RADWIMPS.",
-          "seasons": [
-            {
-              "title": "Полнометражный фильм",
-              "type": "Фильм",
-              "episodes": 1,
-              "epMinutes": 106,
-              "date": "19.01.2026",
-              "note": "Просмотр в 4K"
             }
           ]
         }
