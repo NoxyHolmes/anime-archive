@@ -3,25 +3,85 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Вход владельца</title>
+<title>ANIME — Панель владельца</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #100c15; color: #f3eef6; font-family: 'Onest', system-ui, sans-serif; }
-  .loader { text-align: center; }
-  .spinner { width: 44px; height: 44px; border: 3px solid #2b2138; border-top-color: #ff7aa2; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  p { font-family: 'JetBrains Mono'; font-size: 12px; letter-spacing: 2px; color: #a094b2; text-transform: uppercase; }
+:root{--bg:#100c15;--panel:#181224;--line:#2b2138;--text:#f3eef6;--muted:#a094b2;--accent:#ff7aa2;--warn:#ff6b6b}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Onest',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center}
+.gate-box{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:40px;max-width:420px;width:90%;text-align:center;box-shadow:0 20px 46px -18px rgba(0,0,0,.65)}
+.gate-box h2{font-family:'Unbounded';font-size:20px;margin-bottom:12px;color:var(--accent)}
+.gate-box p{color:var(--muted);font-size:14px;margin-bottom:24px;line-height:1.5}
+.gate-input{width:100%;padding:12px 16px;background:#161020;border:1px solid var(--line);border-radius:10px;color:var(--text);font-family:'JetBrains Mono';font-size:14px;margin-bottom:16px;outline:none;text-align:center}
+.gate-input:focus{border-color:var(--accent)}
+.gate-error{color:var(--warn);font-size:13px;margin-bottom:12px;min-height:20px}
+.gate-btn{width:100%;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-weight:600;cursor:pointer;font-size:15px;transition:.2s}
+.gate-btn:hover{background:#ff5a8a}
+.gate-btn:disabled{opacity:0.5;cursor:not-allowed}
+.gate-link{display:block;margin-top:20px;color:var(--muted);font-size:13px;text-decoration:none}
+.gate-link:hover{color:var(--text)}
+.hidden{display:none!important}
 </style>
 </head>
 <body>
-  <div class="loader">
-    <div class="spinner"></div>
-    <p>вход владельца...</p>
-  </div>
-  <script>
-    // Устанавливаем флаг владельца и сразу редиректим на главную
-    localStorage.setItem('anime_owner_mode', 'true');
-    // Через 800мс переходим — чтобы пользователь увидел анимацию
-    setTimeout(() => { window.location.href = 'index.html'; }, 800);
-  </script>
+<div class="gate-box" id="gate">
+    <h2>🔐 Доступ владельца</h2>
+    <p>Введите ваш Personal Access Token от GitHub, чтобы получить права на добавление, редактирование и удаление тайтлов.</p>
+    <input type="password" id="gate-token" class="gate-input" placeholder="ghp_... или github_pat_...">
+    <div class="gate-error" id="gate-error"></div>
+    <button class="gate-btn" id="gate-submit">Войти в систему</button>
+    <a href="index.html" class="gate-link">← Вернуться к публичной версии</a>
+</div>
+
+<script>
+const LS_TOKEN = 'anime_owner_token';
+const LS_REPO = 'anime_owner_repo';
+
+function checkAuth() {
+    const token = localStorage.getItem(LS_TOKEN);
+    if (token) {
+        // Если токен уже есть, сразу перенаправляем на главную, где он подхватится
+        window.location.href = 'index.html?admin=true';
+    }
+}
+
+document.getElementById('gate-submit').addEventListener('click', async () => {
+    const token = document.getElementById('gate-token').value.trim();
+    const err = document.getElementById('gate-error');
+    const btn = document.getElementById('gate-submit');
+    
+    if (!token) { err.textContent = 'Введите токен'; return; }
+    if (!token.startsWith('ghp_') && !token.startsWith('github_pat_')) {
+        err.textContent = 'Неверный формат токена (должен начинаться с ghp_ или github_pat_)';
+        return;
+    }
+
+    btn.disabled = true; btn.textContent = 'Проверка...'; err.textContent = '';
+
+    try {
+        const res = await fetch('https://api.github.com/user', {
+            headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
+        });
+        if (!res.ok) throw new Error('Токен недействителен или отозван');
+        
+        const user = await res.json();
+        localStorage.setItem(LS_TOKEN, token);
+        
+        let repo = localStorage.getItem(LS_REPO);
+        if (!repo) {
+            repo = prompt(`Токен принят, ${user.login}!\nВведите имя вашего репозитория (например: noxyholmes/anime-archive):`, `${user.login}/anime-archive`);
+            if (repo) localStorage.setItem(LS_REPO, repo);
+        }
+        
+        window.location.href = 'index.html?admin=true';
+    } catch (e) {
+        err.textContent = 'Ошибка: ' + e.message;
+        btn.disabled = false; btn.textContent = 'Войти в систему';
+    }
+});
+
+checkAuth();
+</script>
 </body>
 </html>
