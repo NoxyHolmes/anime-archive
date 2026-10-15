@@ -1,18 +1,21 @@
 {
   "meta": {
-    "title": "myTierAnime · Канон 2026",
+    "title": "myTierAnime",
     "owner": "geraltschwarzenegger-svg",
     "repo": "myTierAnime",
     "branch": "main",
-    "updatedAt": "2026-10-14T21:51:17.758Z",
-    "activeMode": "emblems-realism"
+    "updatedAt": "2026-10-15T04:28:42.511Z",
+    "activeMode": "emblems-realism",
+    "bgImage": "backgrounds/1792038514471_girl_city_hoodie_1010273_3840x2160.jpg",
+    "bgDim": 65,
+    "bgBlur": 4
   },
   "tiers": [
     {
       "id": "S",
       "rank": 1,
-      "name": "Абсолютный Канон",
-      "subtitle": "Астролябия Короны · Шедевры на все времена",
+      "name": "Золотой фонд",
+      "subtitle": "Шедевры и эталонные произведения на все времена",
       "hue": 45,
       "items": [
         {
@@ -23,7 +26,7 @@
           "year": 2022,
           "studio": "Liden Films",
           "score": 10,
-          "reaction": "👑 Корона ночи",
+          "reaction": "👑 Шедевр",
           "genres": [
             "Сверхъестественное",
             "Романтика",
@@ -31,7 +34,7 @@
             "Ночной вайб"
           ],
           "poster": "https://shikimori.one/system/animes/original/48926.jpg",
-          "comment": "Неоновая эстетика ночного города, потрясающий саундтрек Creepy Nuts и харизма Надзуны Нанакусы. Идеальная атмосфера свободы и ночных прогулок.",
+          "comment": "Неоновая эстетика ночного города, потрясающий саундтрек Creepy Nuts и харизма Надзуны Нанакусы.",
           "seasons": [
             {
               "title": "Сезон 1",
@@ -59,7 +62,7 @@
           "year": 2023,
           "studio": "Madhouse",
           "score": 9.9,
-          "reaction": "💎 Вечность",
+          "reaction": "💎 Эталон",
           "genres": [
             "Фэнтези",
             "Приключения",
@@ -67,7 +70,7 @@
             "Философия"
           ],
           "poster": "https://shikimori.one/system/animes/original/52991.jpg",
-          "comment": "Глубокая, меланхоличная и невероятно красивая история о течении времени, памяти о товарищах и ценности каждого мгновения.",
+          "comment": "Глубокая, меланхоличная и невероятно красивая история о течении времени и памяти о товарищах.",
           "seasons": [
             {
               "title": "Сезон 1",
@@ -95,7 +98,7 @@
           "year": 2023,
           "studio": "Doga Kobo",
           "score": 9.8,
-          "reaction": "✨ Идол",
+          "reaction": "✨ Фаворит",
           "genres": [
             "Драма",
             "Музыка",
@@ -130,41 +133,14 @@
               "note": "Второй сезон"
             }
           ]
-        },
-        {
-          "uid": "anime-yourname-2016",
-          "kind": "Фильм",
-          "title": "Твоё имя",
-          "origTitle": "Kimi no Na wa.",
-          "year": 2016,
-          "studio": "CoMix Wave Films",
-          "score": 9.4,
-          "reaction": "☄️ Комета",
-          "genres": [
-            "Романтика",
-            "Драма",
-            "Сверхъестественное"
-          ],
-          "poster": "https://shikimori.one/system/animes/original/32281.jpg",
-          "comment": "Визуальный шедевр Макото Синкая с музыкой RADWIMPS.",
-          "seasons": [
-            {
-              "title": "Полнометражный фильм",
-              "type": "Фильм",
-              "episodes": 1,
-              "epMinutes": 106,
-              "date": "19.01.2026",
-              "note": "Просмотр в 4K"
-            }
-          ]
         }
       ]
     },
     {
       "id": "A",
       "rank": 2,
-      "name": "Кристалл Спектра",
-      "subtitle": "Тессеракт Дисперсии · Выдающиеся тайтлы",
+      "name": "Высшая лига",
+      "subtitle": "Отличные и запоминающиеся тайтлы",
       "hue": 185,
       "items": [
         {
@@ -193,14 +169,41 @@
               "note": "1 сезон"
             }
           ]
+        },
+        {
+          "uid": "anime-yourname-2016",
+          "kind": "Фильм",
+          "title": "Твоё имя",
+          "origTitle": "Kimi no Na wa.",
+          "year": 2016,
+          "studio": "CoMix Wave Films",
+          "score": 9.4,
+          "reaction": "☄️ Классика",
+          "genres": [
+            "Романтика",
+            "Драма",
+            "Сверхъестественное"
+          ],
+          "poster": "https://shikimori.one/system/animes/original/32281.jpg",
+          "comment": "Визуальный шедевр Макото Синкая с музыкой RADWIMPS.",
+          "seasons": [
+            {
+              "title": "Полнометражный фильм",
+              "type": "Фильм",
+              "episodes": 1,
+              "epMinutes": 106,
+              "date": "19.01.2026",
+              "note": "Просмотр в 4K"
+            }
+          ]
         }
       ]
     },
     {
       "id": "B",
       "rank": 3,
-      "name": "Аметистовый Резонанс",
-      "subtitle": "Магнитный Тор · Достойные и атмосферные работы",
+      "name": "Достойный уровень",
+      "subtitle": "Крепкие и атмосферные работы",
       "hue": 275,
       "items": [
         {
@@ -235,8 +238,8 @@
     {
       "id": "C",
       "rank": 4,
-      "name": "Изумрудная Роса",
-      "subtitle": "Био-Сфера Росы · Расслабляющие и нишевые тайтлы",
+      "name": "На один вечер",
+      "subtitle": "Неплохие и расслабляющие тайтлы под настроение",
       "hue": 148,
       "items": [
         {
@@ -270,16 +273,16 @@
     {
       "id": "D",
       "rank": 5,
-      "name": "Янтарный Маятник",
-      "subtitle": "Хронометр · Спорные или проходные работы",
+      "name": "Проходной уровень",
+      "subtitle": "Спорные или слабые проекты",
       "hue": 28,
       "items": []
     },
     {
       "id": "E",
       "rank": 6,
-      "name": "Монолит Забвения",
-      "subtitle": "Обелиск Пепла · Разочарования и брошенные тайтлы",
+      "name": "Вне рейтинга",
+      "subtitle": "Разочарования и брошенные тайтлы",
       "hue": 215,
       "items": []
     }
